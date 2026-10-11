@@ -1,6 +1,6 @@
 # CalmSense
 
-### A Machine Learning and Deep Learning Framework for Wearable Biosignal Analysis, Integrating 1D CNNs, Explainable AI, Probability Calibration, and Cross-Dataset Evaluation.
+### Wearable stress classification with feature models and a 1D CNN.
 
 [Live demo](https://urmeo.github.io/calm-sense/) · [Colab](https://colab.research.google.com/github/urmeo/CalmSense/blob/main/notebooks/CalmSense.ipynb) · [Code](#architecture) · [Model](#protocol--provenance)
 
