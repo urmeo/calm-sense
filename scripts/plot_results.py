@@ -267,6 +267,7 @@ def plot_roc_auc(data):
     ):
         raise ValueError("ROC/AUC charts require available models with valid AUROC")
     points = [_roc_points(model) for model in models]
+    n_curves = sum(point is not None for point in points)
     fig, (roc, scores) = plt.subplots(1, 2, figsize=(12, 6.8))
     subjects = f"{data['n_subjects']} subjects | " if "n_subjects" in data else ""
     _header(
@@ -276,7 +277,7 @@ def plot_roc_auc(data):
         " | Stress is the positive class",
     )
     colors = (BLUE, TEAL, AMBER, "#7c3aed")
-    if any(point is not None for point in points):
+    if n_curves:
         roc.plot([0, 1], [0, 1], color=MUTED, linestyle=":", label="Chance reference")
         for index, (model, point) in enumerate(zip(models, points)):
             if point is not None:
@@ -344,7 +345,6 @@ def plot_roc_auc(data):
     scores.set_ylabel("Area under the ROC curve", labelpad=12)
     scores.set_title("Recorded AUROC", loc="left", fontsize=13)
     scores.grid(axis="y")
-    missing = [model["model"] for model, point in zip(models, points) if point is None]
     replay = data.get("methodology", {}).get("replay")
     fig.text(
         0.05,
@@ -353,7 +353,7 @@ def plot_roc_auc(data):
             "Replay of the recorded benchmark: original source and verified cached inputs."
             " Feature models only; no CNN curve."
             if replay
-            else f"ROC points are available for {len(models) - len(missing)} of {len(models)} models."
+            else f"ROC points are available for {n_curves} of {len(models)} models."
             " Curves require saved false-positive and true-positive rates."
         ),
         fontsize=10,

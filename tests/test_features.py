@@ -3,7 +3,6 @@ from contextlib import ExitStack
 from unittest.mock import patch
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from functools import partialmethod
 from itertools import product
 import pickle
 import numpy as np
@@ -205,8 +204,12 @@ class FeaturesTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "PSD method"):
             extractor.compute_psd(rr, method="typo")
 
-    def _case_sample_entropy_is_zero_when_every_matching_pattern_extends(self, rr):
-        self.assertEqual(HRVNonlinearExtractor().compute_sample_entropy(rr), 0.0)
+    def test_sample_entropy_is_zero_when_every_matching_pattern_extends(self):
+        for rr in (np.full(20, 800.0), np.tile([800.0, 820.0], 10)):
+            with self.subTest(rr=rr.tolist()):
+                self.assertEqual(
+                    HRVNonlinearExtractor().compute_sample_entropy(rr), 0.0
+                )
 
     def test_sample_entropy_reports_zero_continuation_probability(self):
         rr = np.array([800, 800, 900, 800, 800, 1000])
@@ -272,9 +275,11 @@ class FeaturesTests(unittest.TestCase):
             ).all()
         )
 
-    def _case_rr_extraction_rejects_invalid_peak_order_or_values(self, peaks):
-        with self.assertRaisesRegex(ValueError, "strictly increasing"):
-            ECGProcessor().extract_rr_intervals(np.asarray(peaks))
+    def test_rr_extraction_rejects_invalid_peak_order_or_values(self):
+        for peaks in ([700, 350], [350, 350], [0, np.nan], [-1, 350]):
+            with self.subTest(peaks=peaks):
+                with self.assertRaisesRegex(ValueError, "strictly increasing"):
+                    ECGProcessor().extract_rr_intervals(np.asarray(peaks))
 
     def test_ecg_empty_or_constant_input_has_no_peaks(self):
         processor = ECGProcessor()
@@ -283,14 +288,33 @@ class FeaturesTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Nyquist"):
             processor.bandpass_filter(np.ones(100), low=10, high=5)
 
-    def _case_feature_extractors_reject_invalid_sampling_rates(self, name, rate):
-        with self.assertRaisesRegex(ValueError, "finite and positive"):
-            getattr(features, name)(sampling_rate=rate)
+    def test_feature_extractors_reject_invalid_sampling_rates(self):
+        extractors = (
+            "EDAFeatureExtractor",
+            "TemperatureFeatureExtractor",
+            "RespirationFeatureExtractor",
+            "AccelerometerFeatureExtractor",
+        )
+        for name, rate in product(extractors, (0, -1, np.inf, np.nan, True)):
+            with self.subTest(extractor=name, sampling_rate=rate):
+                with self.assertRaisesRegex(ValueError, "finite and positive"):
+                    getattr(features, name)(sampling_rate=rate)
 
-    def _case_window_configuration_is_rejected_before_loading_data(self, parameters):
-        for builder in (WindowedDataset, WristDataset):
-            with self.assertRaises(ValueError):
-                builder(**parameters)
+    def test_window_configuration_is_rejected_before_loading_data(self):
+        configurations = (
+            {"window_sec": 0},
+            {"overlap": 1},
+            {"overlap": -0.1},
+            {"purity": 0},
+            {"purity": np.nan},
+            {"window_sec": 0.0001},
+        )
+        for parameters, builder in product(
+            configurations, (WindowedDataset, WristDataset)
+        ):
+            with self.subTest(builder=builder.__name__, parameters=parameters):
+                with self.assertRaises(ValueError):
+                    builder(**parameters)
 
     def test_feature_schema_does_not_compute_dummy_signals(self):
         pipeline = FeatureExtractionPipeline()
@@ -309,6 +333,23 @@ class FeaturesTests(unittest.TestCase):
             list(pipeline.extract_all_features([])),
             ["subject_id", "window_id", "label", *pipeline.get_feature_names()],
         )
+
+    def test_feature_groups_preserve_schema_order_and_disabled_groups(self):
+        for enabled in (
+            {},
+            {"hrv_time": False, "eda": False},
+            dict.fromkeys(FeatureExtractionPipeline.DEFAULT_CONFIG, False),
+        ):
+            with self.subTest(configuration=enabled):
+                pipeline = FeatureExtractionPipeline(enabled)
+                grouped = pipeline.get_feature_groups()
+                self.assertEqual(
+                    [name for names in grouped.values() for name in names],
+                    pipeline.get_feature_names(),
+                )
+                for group, (_, label) in pipeline._GROUPS.items():
+                    if not pipeline.feature_config[group]:
+                        self.assertEqual(grouped[label], [])
 
     def test_synthetic_subjects_skip_unavailable_wesad_ids(self):
         tmp_path = self.tmp_path
@@ -383,61 +424,3 @@ class FeaturesTests(unittest.TestCase):
         frame.attrs["dataset_parameters"]["purity"] = 0.7
         frame.to_parquet(tmp_path / "features.parquet", index=False)
         self.assertIs(dataset.load_cached(), None)
-
-
-for index, rr in enumerate([np.full(20, 800.0), np.tile([800.0, 820.0], 10)]):
-    setattr(
-        FeaturesTests,
-        f"test_sample_entropy_is_zero_when_every_matching_pattern_extends_{index}",
-        partialmethod(
-            FeaturesTests._case_sample_entropy_is_zero_when_every_matching_pattern_extends,
-            rr=rr,
-        ),
-    )
-for index, peaks in enumerate([[700, 350], [350, 350], [0, np.nan], [-1, 350]]):
-    setattr(
-        FeaturesTests,
-        f"test_rr_extraction_rejects_invalid_peak_order_or_values_{index}",
-        partialmethod(
-            FeaturesTests._case_rr_extraction_rejects_invalid_peak_order_or_values,
-            peaks=peaks,
-        ),
-    )
-for index, (name, rate) in enumerate(
-    product(
-        [
-            "EDAFeatureExtractor",
-            "TemperatureFeatureExtractor",
-            "RespirationFeatureExtractor",
-            "AccelerometerFeatureExtractor",
-        ],
-        [0, -1, np.inf, np.nan, True],
-    )
-):
-    setattr(
-        FeaturesTests,
-        f"test_feature_extractors_reject_invalid_sampling_rates_{index}",
-        partialmethod(
-            FeaturesTests._case_feature_extractors_reject_invalid_sampling_rates,
-            name=name,
-            rate=rate,
-        ),
-    )
-for index, parameters in enumerate(
-    [
-        {"window_sec": 0},
-        {"overlap": 1},
-        {"overlap": -0.1},
-        {"purity": 0},
-        {"purity": np.nan},
-        {"window_sec": 0.0001},
-    ]
-):
-    setattr(
-        FeaturesTests,
-        f"test_window_configuration_is_rejected_before_loading_data_{index}",
-        partialmethod(
-            FeaturesTests._case_window_configuration_is_rejected_before_loading_data,
-            parameters=parameters,
-        ),
-    )

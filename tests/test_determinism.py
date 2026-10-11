@@ -21,7 +21,6 @@ class DeterminismTests(unittest.TestCase):
         self.assertEqual(first, second)
 
     def test_feature_extraction_is_deterministic(self):
-        import numpy as np
         from src.synthetic import features
 
         feature_df_a, _, _ = features(n_subjects=2, block_sec=80, seed=5)

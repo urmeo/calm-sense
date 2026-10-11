@@ -46,9 +46,11 @@ class PersonalizeTests(unittest.TestCase):
         pick = _sample_k(np.array([0, 0, 1, 1]), 1, np.random.RandomState(0))
         self.assertEqual(len(pick), 1)
 
-    def _case_sampling_rejects_invalid_budget(self, budget):
-        with self.assertRaisesRegex(ValueError, "positive integers"):
-            _sample_k(np.array([0, 1]), budget, np.random.RandomState(0))
+    def test_sampling_rejects_invalid_budget(self):
+        for budget in [0, -1, 1.5, True]:
+            with self.subTest(budget=budget):
+                with self.assertRaisesRegex(ValueError, "positive integers"):
+                    _sample_k(np.array([0, 1]), budget, np.random.RandomState(0))
 
     def test_tiny_personalization_pool_falls_back_without_crashing(self):
         from sklearn.dummy import DummyClassifier
@@ -183,14 +185,6 @@ class PersonalizeTests(unittest.TestCase):
         self.assertEqual(path.read_bytes(), b"previous usable snapshot")
 
 
-for index, budget in enumerate([0, -1, 1.5, True]):
-    setattr(
-        PersonalizeTests,
-        f"test_sampling_rejects_invalid_budget_{index}",
-        partialmethod(
-            PersonalizeTests._case_sampling_rejects_invalid_budget, budget=budget
-        ),
-    )
 for index, synthetic in enumerate([False, True]):
     setattr(
         PersonalizeTests,

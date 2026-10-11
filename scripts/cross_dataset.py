@@ -214,7 +214,6 @@ def _xy(df, feature_cols):
             "Select distinct portable feature columns, excluding subject and label"
         )
     X = df[feature_cols].to_numpy(dtype=float)
-    X[~np.isfinite(X)] = np.nan
     return X, df["label"].to_numpy(dtype=int), df["subject"].to_numpy()
 
 

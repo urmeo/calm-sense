@@ -1,6 +1,7 @@
 """WESAD requires its source research agreement."""
 
 import argparse
+import re
 import sys
 import zipfile
 from pathlib import Path
@@ -145,8 +146,6 @@ def download_noneeg() -> None:
 
 
 def verify_noneeg(target=None) -> None:
-    import re
-
     target = (
         Path(target)
         if target is not None
@@ -191,9 +190,11 @@ def download_wesad() -> None:
 
 
 def _check(url) -> None:
-    if not url.startswith("https://"):
+    if urlsplit(url).scheme != "https":
         raise ValueError(f"refusing non-HTTPS request: {url}")
     with urlopen(url, timeout=DOWNLOAD_TIMEOUT) as r:
+        if urlsplit(r.geturl()).scheme != "https":
+            raise ValueError("refusing a redirect to a non-HTTPS request")
         size = r.headers.get("Content-Length")
         print(f"{r.status}  {url}  ({int(size) // (1024 * 1024) if size else '?'} MB)")
 

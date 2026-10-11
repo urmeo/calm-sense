@@ -49,36 +49,36 @@ def build(subjects: Optional[list] = None) -> pd.DataFrame:
         raise ValueError(
             "subjects must contain distinct Non-EEG IDs from Subject1 to Subject20"
         )
-    win = int(WINDOW_SEC * ACC_FS)
-    step = int(win * (1 - OVERLAP))
+    window_samples = int(WINDOW_SEC * ACC_FS)
+    step_samples = int(window_samples * (1 - OVERLAP))
     rows = []
 
-    for sid in subjects:
-        acc_rec = str(DATA_DIR / f"{sid}_AccTempEDA")
-        hr_rec = str(DATA_DIR / f"{sid}_SpO2HR")
-        if not Path(acc_rec + ".hea").exists():
+    for subject_id in subjects:
+        sensor_path = str(DATA_DIR / f"{subject_id}_AccTempEDA")
+        hr_path = str(DATA_DIR / f"{subject_id}_SpO2HR")
+        if not Path(sensor_path + ".hea").exists():
             continue
-        sensor_record = read_record(acc_rec)
-        hr_record = read_record(hr_rec)
+        sensor_record = read_record(sensor_path)
+        hr_record = read_record(hr_path)
         if sensor_record.fs != ACC_FS or hr_record.fs != HR_FS:
-            raise ValueError(f"Unexpected Non-EEG sampling rates for {sid}")
+            raise ValueError(f"Unexpected Non-EEG sampling rates for {subject_id}")
         if (
             sensor_record.p_signal.ndim != 2
             or sensor_record.p_signal.shape[1] != 5
             or hr_record.p_signal.ndim != 2
             or hr_record.p_signal.shape[1] < 2
         ):
-            raise ValueError(f"Unexpected Non-EEG channel shapes for {sid}")
-        sig = sensor_record.p_signal
-        hr = hr_record.p_signal[:, 1]
-        acc_mag = np.sqrt(np.sum(sig[:, 0:3] ** 2, axis=1))
-        temp, eda = sig[:, 3], sig[:, 4]
+            raise ValueError(f"Unexpected Non-EEG channel shapes for {subject_id}")
+        signals = sensor_record.p_signal
+        heart_rate = hr_record.p_signal[:, 1]
+        acc_mag = np.sqrt(np.sum(signals[:, 0:3] ** 2, axis=1))
+        temperature, eda = signals[:, 3], signals[:, 4]
 
-        for s0, s1, note in _segments(acc_rec):
-            s1 = s1 if s1 is not None else len(eda)
-            if not 0 <= s0 < s1 <= len(eda):
+        for segment_start, segment_end, note in _segments(sensor_path):
+            segment_end = segment_end if segment_end is not None else len(eda)
+            if not 0 <= segment_start < segment_end <= len(eda):
                 raise ValueError(
-                    f"Non-EEG annotation interval outside the sensor record for {sid}"
+                    f"Non-EEG annotation interval outside the sensor record for {subject_id}"
                 )
             if note in STRESS:
                 label = 1
@@ -86,24 +86,26 @@ def build(subjects: Optional[list] = None) -> pd.DataFrame:
                 label = 0
             else:
                 continue
-            for w0 in range(s0, s1 - win + 1, step):
-                w1 = w0 + win
-                h0 = (w0 * HR_FS + ACC_FS - 1) // ACC_FS
-                h1 = (w1 * HR_FS + ACC_FS - 1) // ACC_FS
-                hr_win = hr[h0:h1]
-                if len(hr_win) != h1 - h0:
+            for window_start in range(
+                segment_start, segment_end - window_samples + 1, step_samples
+            ):
+                window_end = window_start + window_samples
+                hr_start = (window_start * HR_FS + ACC_FS - 1) // ACC_FS
+                hr_end = (window_end * HR_FS + ACC_FS - 1) // ACC_FS
+                hr_window = heart_rate[hr_start:hr_end]
+                if len(hr_window) != hr_end - hr_start:
                     raise ValueError(
-                        f"Non-EEG HR record is shorter than the sensor window for {sid}"
+                        f"Non-EEG HR record is shorter than the sensor window for {subject_id}"
                     )
                 row: dict[str, Any] = portable_features(
-                    eda[w0:w1],
-                    temp[w0:w1],
-                    acc_mag[w0:w1],
-                    hr_win,
+                    eda[window_start:window_end],
+                    temperature[window_start:window_end],
+                    acc_mag[window_start:window_end],
+                    hr_window,
                     eda_fs=EDA_FS,
                     temp_fs=TEMP_FS,
                 )
-                row["subject"] = sid
+                row["subject"] = subject_id
                 row["label"] = label
                 rows.append(row)
 

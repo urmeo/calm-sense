@@ -454,8 +454,6 @@ class DashboardDataTests(unittest.TestCase):
 
     def _case_shap_link_requires_the_recorded_benchmark_artifact(self, fault):
         tmp_path = self.tmp_path
-        from src.utils import sha256_file
-
         loader = build_dashboard_data._load_json
 
         def current_primary(name):

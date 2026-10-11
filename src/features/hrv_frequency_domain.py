@@ -79,7 +79,7 @@ class HRVFrequencyDomainExtractor(BaseHRVExtractor):
         return self._compute_psd_welch(rr)
 
     def _compute_psd_welch(self, rr: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-        t_uniform, rr_interp = self._interpolate_rr(rr)
+        _, rr_interp = self._interpolate_rr(rr)
         if rr_interp is None:
             return np.array([]), np.array([])
 
@@ -221,7 +221,15 @@ class HRVFrequencyDomainExtractor(BaseHRVExtractor):
             features["VLF_power"] = self.compute_vlf_power(freqs, psd)
             features["LF_power"] = self.compute_lf_power(freqs, psd)
             features["HF_power"] = self.compute_hf_power(freqs, psd)
-            features["Total_power"] = self.compute_total_power(freqs, psd)
+            band_powers = [
+                features["VLF_power"],
+                features["LF_power"],
+                features["HF_power"],
+            ]
+            finite_powers = [power for power in band_powers if np.isfinite(power)]
+            features["Total_power"] = (
+                float(sum(finite_powers)) if finite_powers else np.nan
+            )
 
             features["LF_HF_ratio"] = self.compute_lf_hf_ratio(
                 features["LF_power"], features["HF_power"]

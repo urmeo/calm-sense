@@ -21,10 +21,6 @@ class ErrorBoundary extends Component<Props, State> {
     console.error('ErrorBoundary caught:', error, info.componentStack);
   }
 
-  handleReload = (): void => {
-    window.location.reload();
-  };
-
   render(): ReactNode {
     if (!this.state.hasError) {
       return this.props.children;
@@ -42,7 +38,7 @@ class ErrorBoundary extends Component<Props, State> {
               ? this.state.error.message : 'An unexpected error occurred'}
           </p>
           <button
-            onClick={this.handleReload}
+            onClick={() => window.location.reload()}
             className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
           >
             <RefreshCw className="w-4 h-4 mr-2" />

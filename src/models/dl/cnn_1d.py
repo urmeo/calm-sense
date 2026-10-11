@@ -142,31 +142,37 @@ class CNN1DClassifier(LoggerMixin):
         subjects, group_index = np.unique(groups, return_inverse=True)
         n_train = len(subjects) - int(np.ceil(self.val_fraction * len(subjects)))
         class_index = np.searchsorted(classes, y)
-        masks = [
-            sum(1 << int(c) for c in np.unique(class_index[group_index == g]))
-            for g in range(len(subjects))
+        class_masks = [
+            sum(
+                1 << int(label)
+                for label in np.unique(class_index[group_index == subject])
+            )
+            for subject in range(len(subjects))
         ]
         order = np.random.RandomState(self.random_state).permutation(len(subjects))
-        covers: dict[int, tuple[int, ...]] = {0: ()}
-        target = (1 << len(classes)) - 1
-        for g in order:
-            for covered, selected in list(covers.items()):
+        # Keep the smallest subject set for each combination of represented classes.
+        class_coverage: dict[int, tuple[int, ...]] = {0: ()}
+        all_classes_mask = (1 << len(classes)) - 1
+        for subject in order:
+            for covered_classes, selected in list(class_coverage.items()):
                 if len(selected) >= n_train:
                     continue
-                next_mask = covered | masks[g]
-                candidate = (*selected, int(g))
-                if next_mask not in covers or len(candidate) < len(covers[next_mask]):
-                    covers[next_mask] = candidate
-            if target in covers:
+                next_mask = covered_classes | class_masks[subject]
+                candidate = (*selected, int(subject))
+                if next_mask not in class_coverage or len(candidate) < len(
+                    class_coverage[next_mask]
+                ):
+                    class_coverage[next_mask] = candidate
+            if all_classes_mask in class_coverage:
                 break
-        if target not in covers:
+        if all_classes_mask not in class_coverage:
             raise ValueError(
                 "No subject validation split can retain every training class at this fraction"
             )
-        training_groups = list(covers[target])
-        training_groups += [int(g) for g in order if g not in training_groups][
-            : n_train - len(training_groups)
-        ]
+        training_groups = list(class_coverage[all_classes_mask])
+        training_groups += [
+            int(subject) for subject in order if subject not in training_groups
+        ][: n_train - len(training_groups)]
         training = np.isin(group_index, training_groups)
         return indices[training], indices[~training]
 

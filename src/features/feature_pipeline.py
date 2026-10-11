@@ -181,14 +181,16 @@ class FeatureExtractionPipeline(LoggerMixin):
         return len(self.get_feature_names())
 
     def get_feature_descriptions(self) -> Dict[str, str]:
-        return {
-            key if key.startswith(prefix) else prefix + key: description
-            for group, (prefix, _) in self._GROUPS.items()
-            if self.feature_config.get(group, True)
-            for key, description in self.extractors[group]
-            .get_feature_descriptions()
-            .items()
-        }
+        descriptions = {}
+        for group, (prefix, _) in self._GROUPS.items():
+            if not self.feature_config.get(group, True):
+                continue
+            for name, description in (
+                self.extractors[group].get_feature_descriptions().items()
+            ):
+                full_name = name if name.startswith(prefix) else prefix + name
+                descriptions[full_name] = description
+        return descriptions
 
     def save_features(
         self,
@@ -231,11 +233,11 @@ class FeatureExtractionPipeline(LoggerMixin):
 
     def get_feature_groups(self) -> Dict[str, List[str]]:
         enabled = set(self.get_feature_names())
-        return {
-            label: [
-                name
-                for key in self.extractors[group].get_feature_descriptions()
-                if (name := key if key.startswith(prefix) else prefix + key) in enabled
+        groups = {}
+        for group, (prefix, label) in self._GROUPS.items():
+            names = [
+                name if name.startswith(prefix) else prefix + name
+                for name in self.extractors[group].get_feature_descriptions()
             ]
-            for group, (prefix, label) in self._GROUPS.items()
-        }
+            groups[label] = [name for name in names if name in enabled]
+        return groups

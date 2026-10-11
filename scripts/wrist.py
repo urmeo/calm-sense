@@ -13,12 +13,11 @@ import numpy as np
 from scripts.run_experiment import (
     CLASSIFIERS,
     CLF_NAMES,
-    FIGURES_DIR,
-    RESULTS_DIR,
     _prepare_features,
     build_pipeline,
     loso_evaluate,
 )
+from src.config import FIGURES_DIR, RESULTS_DIR
 from src.dataset_wrist import WristDataset, load_wrist
 from src.features.feature_pipeline import FEATURE_SCHEMA_VERSION
 from src.utils import (

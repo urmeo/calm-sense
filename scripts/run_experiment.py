@@ -179,7 +179,7 @@ def plot_model_comparison(rows, path):
     plt.xlabel("LOSO accuracy")
     plt.title("Subject-independent model comparison")
     plt.xlim(0, 1)
-    for i, (acc, _) in enumerate(zip(df["accuracy_mean"], df["accuracy_std"])):
+    for i, acc in enumerate(df["accuracy_mean"]):
         plt.text(acc + 0.01, i, f"{acc:.3f}", va="center")
     plt.tight_layout()
     plt.savefig(path, dpi=150)
@@ -288,7 +288,7 @@ def _prepare_features(features_df, keep, meta):
         raise ValueError(
             "Task windows require features and nonmissing subject identifiers"
         )
-    X = sub[feature_cols].to_numpy(dtype=float)
+    X = sub[feature_cols].to_numpy(dtype=float, copy=True)
     X[~np.isfinite(X)] = np.nan
     keep_cols = ~np.isnan(X).all(axis=0)
     X = X[:, keep_cols]
@@ -471,10 +471,7 @@ def run():
         }
 
         if task == "binary":
-            top_clf = max(
-                [(k, results[k]) for k in CLASSIFIERS],
-                key=lambda kv: kv[1]["accuracy_mean"],
-            )[0]
+            top_clf = max(CLASSIFIERS, key=lambda key: results[key]["accuracy_mean"])
             importance = shap_analysis(X, y, feature_cols, figures_dir)
             shap_path = results_dir / "shap_top_features.csv"
             atomic_write_text(shap_path, importance.to_csv(index=False))

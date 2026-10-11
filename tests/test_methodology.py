@@ -26,6 +26,30 @@ class MethodologyTests(unittest.TestCase):
         pipe = build_pipeline("rf")
         self.assertEqual([name for name, _ in pipe.steps], ["impute", "scale", "clf"])
 
+    def test_task_preparation_sanitizes_a_copy_under_pandas_copy_on_write(self):
+        import pandas as pd
+        from scripts.run_experiment import prepare_task
+
+        frame = pd.DataFrame(
+            {
+                "subject_id": ["S0", "S1"],
+                "window_id": [0, 0],
+                "label": [1, 2],
+                "label_name": ["baseline", "stress"],
+                "HRV_test": [1.0, np.inf],
+            }
+        )
+        original = frame.copy(deep=True)
+        raw = np.zeros((2, 1, 4))
+        with pd.option_context("mode.copy_on_write", True):
+            X, y, subjects, columns, selected_raw = prepare_task(frame, raw, [1, 2])
+        np.testing.assert_array_equal(X, [[1.0], [np.nan]])
+        np.testing.assert_array_equal(y, [0, 1])
+        np.testing.assert_array_equal(subjects, ["S0", "S1"])
+        np.testing.assert_array_equal(selected_raw, raw)
+        self.assertEqual(columns, ["HRV_test"])
+        pd.testing.assert_frame_equal(frame, original)
+
     def test_loso_evaluate_holds_out_each_subject(self):
         rng = np.random.RandomState(0)
         n_subjects, per = (4, 40)
@@ -406,11 +430,13 @@ class MethodologyTests(unittest.TestCase):
             {"a": 0.03, "c": 0.06, "b": 0.06},
         )
 
-    def _case_subject_bootstrap_rejects_insufficient_or_nonfinite_data(self, scores):
+    def test_subject_bootstrap_rejects_insufficient_or_nonfinite_data(self):
         from scripts.stats import bootstrap_ci
 
-        with self.assertRaisesRegex(ValueError, "three finite"):
-            bootstrap_ci(scores)
+        for scores in [[], [0.1, 0.2], [0.1, 0.2, np.nan]]:
+            with self.subTest(scores=scores):
+                with self.assertRaisesRegex(ValueError, "three finite"):
+                    bootstrap_ci(scores)
 
     def _case_experiment_exports_zero_gap_and_feature_schema(self, cnn_wins):
         tmp_path = self.tmp_path
@@ -644,15 +670,6 @@ for index, (schema, subjects) in enumerate(
             MethodologyTests._case_wrist_rejects_incompatible_chest_results_before_fitting,
             schema=schema,
             subjects=subjects,
-        ),
-    )
-for index, scores in enumerate([[], [0.1, 0.2], [0.1, 0.2, np.nan]]):
-    setattr(
-        MethodologyTests,
-        f"test_subject_bootstrap_rejects_insufficient_or_nonfinite_data_{index}",
-        partialmethod(
-            MethodologyTests._case_subject_bootstrap_rejects_insufficient_or_nonfinite_data,
-            scores=scores,
         ),
     )
 for index, cnn_wins in enumerate([False, True]):

@@ -7,7 +7,6 @@ import structlog
 
 from .config import LOG_FILE, LOG_LEVEL
 
-_logging_configured = False
 _configured_settings: Optional[tuple[str, Optional[Path], bool]] = None
 
 _shared_processors: list[Any] = [
@@ -23,7 +22,7 @@ _shared_processors: list[Any] = [
 def setup_logging(
     level: str = LOG_LEVEL, log_file: Optional[Path] = LOG_FILE, console: bool = True
 ) -> None:
-    global _logging_configured, _configured_settings
+    global _configured_settings
 
     level = level.upper()
     log_level = logging.getLevelNamesMapping().get(level)
@@ -31,7 +30,7 @@ def setup_logging(
         raise ValueError(f"Unknown logging level: {level}")
     log_file = Path(log_file).resolve() if log_file is not None else None
     settings = (level, log_file, console)
-    if _logging_configured and settings == _configured_settings:
+    if settings == _configured_settings:
         return
 
     formatter = structlog.stdlib.ProcessorFormatter(
@@ -62,12 +61,11 @@ def setup_logging(
     for handler in handlers:
         project_logger.addHandler(handler)
 
-    _logging_configured = True
     _configured_settings = settings
 
 
 def get_logger(name: str):
-    if not _logging_configured:
+    if _configured_settings is None:
         setup_logging()
 
     if name.startswith("src."):

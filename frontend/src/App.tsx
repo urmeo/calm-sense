@@ -26,11 +26,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     saveDarkMode(darkMode);
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    document.documentElement.classList.toggle('dark', darkMode);
   }, [darkMode]);
 
   const toggleDarkMode = () => setDarkMode((current) => !current);

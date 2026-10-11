@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 from unittest.mock import Mock
 import pandas as pd
+import numpy as np
 from scripts import cross_dataset
 from src.portable import (
     PORTABLE_FEATURE_COLUMNS,
@@ -129,10 +130,22 @@ class CrossDatasetTests(unittest.TestCase):
         self.assertIn(y.dtype.kind, "iu")
         self.assertEqual(y.tolist(), [0, 1])
 
-    def _case_cross_dataset_rejects_metadata_as_features(self, columns):
-        features = self.features
-        with self.assertRaisesRegex(ValueError, "feature columns"):
-            cross_dataset._xy(features, columns)
+    def test_feature_preparation_accepts_read_only_arrays_without_changing_frame(self):
+        frame = self.features
+        frame.loc[0, PORTABLE_FEATURE_COLUMNS[0]] = np.nan
+        original = frame.copy(deep=True)
+        with pd.option_context("mode.copy_on_write", True):
+            X, y, subjects = cross_dataset._xy(frame, list(PORTABLE_FEATURE_COLUMNS))
+        self.assertTrue(np.isnan(X[0, 0]))
+        np.testing.assert_array_equal(y, [0, 1])
+        np.testing.assert_array_equal(subjects, ["S2", "S3"])
+        pd.testing.assert_frame_equal(frame, original)
+
+    def test_cross_dataset_rejects_metadata_as_features(self):
+        for columns in [[], ["label"], ["subject"], ["eda_mean", "eda_mean"]]:
+            with self.subTest(columns=columns):
+                with self.assertRaisesRegex(ValueError, "feature columns"):
+                    cross_dataset._xy(self.features, columns)
 
     def test_failed_rebuild_preserves_verified_cache(self):
         tmp_path = self.tmp_path
@@ -207,15 +220,6 @@ for index, field in enumerate(["extractor_sha256", "extraction_packages"]):
         partialmethod(
             CrossDatasetTests._case_cache_rejects_changed_extractor_or_environment_and_can_rebuild,
             field=field,
-        ),
-    )
-for index, columns in enumerate([[], ["label"], ["subject"], ["eda_mean", "eda_mean"]]):
-    setattr(
-        CrossDatasetTests,
-        f"test_cross_dataset_rejects_metadata_as_features_{index}",
-        partialmethod(
-            CrossDatasetTests._case_cross_dataset_rejects_metadata_as_features,
-            columns=columns,
         ),
     )
 for index, existing in enumerate([False, True]):

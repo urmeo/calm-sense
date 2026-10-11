@@ -84,7 +84,7 @@ def compute(X, y, groups, model="rf", k_values=K_VALUES):
     factory = lambda: build_pipeline(model)
     logo = LeaveOneGroupOut()
     rng = np.random.RandomState(SEED)
-    acc = {"uncalibrated": [], "global": [], **{k: [] for k in k_values}}
+    scores = {"uncalibrated": [], "global": [], **{k: [] for k in k_values}}
 
     for train_idx, test_idx in logo.split(X, y, groups):
         Xtr, ytr, gtr = X[train_idx], y[train_idx], groups[train_idx]
@@ -98,22 +98,25 @@ def compute(X, y, groups, model="rf", k_values=K_VALUES):
 
         ev, pool = _stratified_split(y_s, 0.5, rng)
         raw_ev, y_ev = raw[ev], y_s[ev]
-        glob = _global_calibrator(factory, Xtr, ytr, gtr, METHOD)
-
-        acc["uncalibrated"].append(_metrics(y_ev, raw_ev))
-        acc["global"].append(
-            _metrics(y_ev, _apply_calibrator(glob, raw_ev, METHOD) if glob else raw_ev)
+        global_calibrator = _global_calibrator(factory, Xtr, ytr, gtr, METHOD)
+        global_probabilities = (
+            raw_ev
+            if global_calibrator is None
+            else _apply_calibrator(global_calibrator, raw_ev, METHOD)
         )
+
+        scores["uncalibrated"].append(_metrics(y_ev, raw_ev))
+        scores["global"].append(_metrics(y_ev, global_probabilities))
 
         for k in k_values:
             pick = _sample_k(y_s[pool], k, rng)
             if len(np.unique(y_s[pool][pick])) < 2:
-                acc[k].append(_metrics(y_ev, raw_ev))
+                scores[k].append(_metrics(y_ev, raw_ev))
                 continue
             calib = _fit_calibrator(raw[pool][pick], y_s[pool][pick], METHOD)
-            acc[k].append(_metrics(y_ev, _apply_calibrator(calib, raw_ev, METHOD)))
+            scores[k].append(_metrics(y_ev, _apply_calibrator(calib, raw_ev, METHOD)))
 
-    if not acc["uncalibrated"]:
+    if not scores["uncalibrated"]:
         raise ValueError(
             "Personalization requires a target subject with both baseline and stress windows"
         )
@@ -127,10 +130,10 @@ def compute(X, y, groups, model="rf", k_values=K_VALUES):
         "brier_definition": cal.BINARY_BRIER_DEFINITION,
         "eval_frac": 0.5,
         "k_values": k_values,
-        "n_subjects": len(acc["uncalibrated"]),
-        "uncalibrated": mean(acc["uncalibrated"]),
-        "global": mean(acc["global"]),
-        "fewshot": {str(k): mean(acc[k]) for k in k_values},
+        "n_subjects": len(scores["uncalibrated"]),
+        "uncalibrated": mean(scores["uncalibrated"]),
+        "global": mean(scores["global"]),
+        "fewshot": {str(k): mean(scores[k]) for k in k_values},
     }
 
 

@@ -116,15 +116,17 @@ class TuningTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "C"):
             tuning.tune_model("lr", X, y, groups, inner_splits=2)
 
-    def _case_nested_tuning_requires_valid_subject_counts(self, inner_splits, groups):
-        with self.assertRaisesRegex(ValueError, "requires"):
-            tuning.tune_model(
-                "lr",
-                np.zeros((len(groups), 1)),
-                np.zeros(len(groups)),
-                np.array(groups),
-                inner_splits,
-            )
+    def test_nested_tuning_requires_valid_subject_counts(self):
+        for inner_splits, groups in [(1, ["S0", "S1", "S2"]), (2, ["S0", "S1"])]:
+            with self.subTest(inner_splits=inner_splits, groups=groups):
+                with self.assertRaisesRegex(ValueError, "requires"):
+                    tuning.tune_model(
+                        "lr",
+                        np.zeros((len(groups), 1)),
+                        np.zeros(len(groups)),
+                        np.array(groups),
+                        inner_splits,
+                    )
 
     def test_tuning_plot_does_not_show_missing_default_as_zero(self):
         tmp_path = self.tmp_path
@@ -219,18 +221,6 @@ for index, demo_accuracy in enumerate([None, 0.42]):
         partialmethod(
             TuningTests._case_synthetic_tuning_isolates_outputs_and_reads_only_demo_defaults,
             demo_accuracy=demo_accuracy,
-        ),
-    )
-for index, (inner_splits, groups) in enumerate(
-    [(1, ["S0", "S1", "S2"]), (2, ["S0", "S1"])]
-):
-    setattr(
-        TuningTests,
-        f"test_nested_tuning_requires_valid_subject_counts_{index}",
-        partialmethod(
-            TuningTests._case_nested_tuning_requires_valid_subject_counts,
-            inner_splits=inner_splits,
-            groups=groups,
         ),
     )
 for index, mismatch in enumerate([None, "schema", "protocol", "cohort", "duplicates"]):

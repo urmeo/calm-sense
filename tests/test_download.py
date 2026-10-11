@@ -105,6 +105,14 @@ class DownloadTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "non-HTTPS"):
             _download("http://example.com/x.zip", tmp_path / "x.zip")
 
+    def test_link_check_refuses_non_https_urls_and_redirects(self):
+        with self.assertRaisesRegex(ValueError, "non-HTTPS"):
+            download_data._check("http://example.com/data.zip")
+        response = DownloadResponse(b"", url="http://example.com/data.zip")
+        with patch.object(download_data, "urlopen", return_value=response):
+            with self.assertRaisesRegex(ValueError, "non-HTTPS"):
+                download_data._check("https://example.com/data.zip")
+
     def _case_existing_wesad_must_be_complete_and_verified(self, missing_subject):
         tmp_path = self.tmp_path
         self.stack.enter_context(patch.object(download_data, "RAW_DATA_DIR", tmp_path))

@@ -1,5 +1,5 @@
 import unittest
-from functools import partialmethod
+from unittest.mock import patch
 import numpy as np
 from src.calibration import (
     brier_score,
@@ -12,6 +12,27 @@ from src.calibration import (
 
 
 class CalibrationTests(unittest.TestCase):
+
+    def test_decision_curve_rejects_divergent_label_order(self):
+        from scripts import calibration
+
+        y = np.tile([0, 0, 1, 1], 3)
+        groups = np.repeat(["S0", "S1", "S2"], 4)
+        X = np.zeros((len(y), 1))
+
+        def probabilities(factory, values, labels, subjects):
+            return labels, np.tile([0.4, 0.6], (len(labels), 1)), subjects
+
+        def recalibrated(factory, values, labels, subjects, method):
+            return labels[::-1], np.tile([0.4, 0.6], (len(labels), 1))
+
+        with (
+            patch.object(calibration, "loso_proba", probabilities),
+            patch.object(calibration, "within_subject_proba", probabilities),
+            patch.object(calibration, "loso_recalibrated_proba", recalibrated),
+        ):
+            with self.assertRaisesRegex(ValueError, "label order diverged"):
+                calibration.compute(X, y, groups)
 
     def test_binary_brier_is_independent_of_probability_representation(self):
         y = np.array([0, 1, 1, 0])
@@ -116,14 +137,32 @@ class CalibrationTests(unittest.TestCase):
         self.assertGreater(sig["ci95"][0], 0)
         self.assertLess(sig["wilcoxon_p"], 0.05)
 
-    def _case_calibration_rejects_invalid_probability_contract(self, y, proba):
-        for metric in (brier_score, expected_calibration_error, reliability_curve):
-            with self.assertRaises(ValueError):
-                metric(y, proba)
+    def test_calibration_rejects_invalid_probability_contract(self):
+        for y, proba in [
+            ([], []),
+            ([0, 1], [0.2]),
+            ([0], [np.nan]),
+            ([1], [1.1]),
+            ([2], [0.3]),
+            ([0.5], [0.5]),
+            ([0], [[0.2, 0.2]]),
+            ([0], [[1.0]]),
+            ([[0]], [0.1]),
+        ]:
+            with self.subTest(y=y, proba=proba):
+                for metric in (
+                    brier_score,
+                    expected_calibration_error,
+                    reliability_curve,
+                ):
+                    with self.assertRaises(ValueError):
+                        metric(y, proba)
 
-    def _case_calibration_requires_positive_integer_bin_count(self, bins):
-        with self.assertRaisesRegex(ValueError, "n_bins"):
-            expected_calibration_error([0, 1], [0.2, 0.8], bins)
+    def test_calibration_requires_positive_integer_bin_count(self):
+        for bins in [0, -1, 2.5, True]:
+            with self.subTest(bins=bins):
+                with self.assertRaisesRegex(ValueError, "n_bins"):
+                    expected_calibration_error([0, 1], [0.2, 0.8], bins)
 
     def test_binary_reliability_ties_match_two_column_predictions(self):
         y = [0, 0, 1]
@@ -132,9 +171,11 @@ class CalibrationTests(unittest.TestCase):
             reliability_curve(y, p), reliability_curve(y, np.column_stack([1 - p, p]))
         )
 
-    def _case_net_benefit_rejects_invalid_thresholds(self, thresholds):
-        with self.assertRaisesRegex(ValueError, "Thresholds"):
-            net_benefit([0, 1], [0.1, 0.9], np.array(thresholds))
+    def test_net_benefit_rejects_invalid_thresholds(self):
+        for thresholds in [[-0.1], [1.1], [np.nan], [[0.5]]]:
+            with self.subTest(thresholds=thresholds):
+                with self.assertRaisesRegex(ValueError, "Thresholds"):
+                    net_benefit([0, 1], [0.1, 0.9], np.array(thresholds))
 
     def test_single_class_loso_probabilities_keep_baseline_stress_columns(self):
         from sklearn.dummy import DummyClassifier
@@ -150,13 +191,18 @@ class CalibrationTests(unittest.TestCase):
         np.testing.assert_array_equal(subjects, groups)
         np.testing.assert_array_equal(proba, [[0, 1], [0, 1], [1, 0], [1, 0]])
 
-    def _case_sigmoid_single_class_calibrator_returns_class_constant(self, label):
+    def test_sigmoid_single_class_calibrator_returns_class_constant(self):
         from scripts.calibration import _apply_calibrator, _fit_calibrator
 
-        model = _fit_calibrator(np.array([0.2, 0.4, 0.8]), np.full(3, label), "sigmoid")
-        np.testing.assert_array_equal(
-            _apply_calibrator(model, np.array([0.1, 0.9]), "sigmoid"), [label, label]
-        )
+        for label in [0, 1]:
+            with self.subTest(label=label):
+                model = _fit_calibrator(
+                    np.array([0.2, 0.4, 0.8]), np.full(3, label), "sigmoid"
+                )
+                np.testing.assert_array_equal(
+                    _apply_calibrator(model, np.array([0.1, 0.9]), "sigmoid"),
+                    [label, label],
+                )
 
     def test_gap_significance_rejects_missing_or_unpaired_subject_scores(self):
         from scripts.calibration import gap_significance
@@ -168,19 +214,27 @@ class CalibrationTests(unittest.TestCase):
                 {"S0": 0.1, "S1": 0.2, "S2": 0.3}, {"S0": 0.1, "S1": 0.2, "S3": 0.3}
             )
 
-    def _case_estimator_probability_contract_rejects_invalid_folds(
-        self, classes, probabilities
-    ):
+    def test_estimator_probability_contract_rejects_invalid_folds(self):
         from scripts.calibration import _pos_proba
 
-        class Estimator:
-            classes_ = classes
+        for classes, probabilities in [
+            ([0], [[np.nan]]),
+            ([0], [[0.5]]),
+            ([0, 1], [[0.2, 0.9]]),
+            ([0, 1], [[-0.1, 1.1]]),
+            ([0, 1], [[0.2]]),
+            ([0, 0], [[0.5, 0.5]]),
+        ]:
+            with self.subTest(classes=classes, probabilities=probabilities):
 
-            def predict_proba(self, X):
-                return probabilities
+                class Estimator:
+                    classes_ = classes
 
-        with self.assertRaisesRegex(ValueError, "(probabilities|classes)"):
-            _pos_proba(Estimator(), np.zeros((1, 1)))
+                    def predict_proba(self, X):
+                        return probabilities
+
+                with self.assertRaisesRegex(ValueError, "(probabilities|classes)"):
+                    _pos_proba(Estimator(), np.zeros((1, 1)))
 
     def test_estimator_positive_probabilities_follow_reversed_class_order(self):
         from scripts.calibration import _pos_proba
@@ -194,73 +248,3 @@ class CalibrationTests(unittest.TestCase):
         np.testing.assert_array_equal(
             _pos_proba(Estimator(), np.zeros((2, 1))), [0.8, 0.3]
         )
-
-
-for index, (y, proba) in enumerate(
-    [
-        ([], []),
-        ([0, 1], [0.2]),
-        ([0], [np.nan]),
-        ([1], [1.1]),
-        ([2], [0.3]),
-        ([0.5], [0.5]),
-        ([0], [[0.2, 0.2]]),
-        ([0], [[1.0]]),
-        ([[0]], [0.1]),
-    ]
-):
-    setattr(
-        CalibrationTests,
-        f"test_calibration_rejects_invalid_probability_contract_{index}",
-        partialmethod(
-            CalibrationTests._case_calibration_rejects_invalid_probability_contract,
-            y=y,
-            proba=proba,
-        ),
-    )
-for index, bins in enumerate([0, -1, 2.5, True]):
-    setattr(
-        CalibrationTests,
-        f"test_calibration_requires_positive_integer_bin_count_{index}",
-        partialmethod(
-            CalibrationTests._case_calibration_requires_positive_integer_bin_count,
-            bins=bins,
-        ),
-    )
-for index, thresholds in enumerate([[-0.1], [1.1], [np.nan], [[0.5]]]):
-    setattr(
-        CalibrationTests,
-        f"test_net_benefit_rejects_invalid_thresholds_{index}",
-        partialmethod(
-            CalibrationTests._case_net_benefit_rejects_invalid_thresholds,
-            thresholds=thresholds,
-        ),
-    )
-for index, label in enumerate([0, 1]):
-    setattr(
-        CalibrationTests,
-        f"test_sigmoid_single_class_calibrator_returns_class_constant_{index}",
-        partialmethod(
-            CalibrationTests._case_sigmoid_single_class_calibrator_returns_class_constant,
-            label=label,
-        ),
-    )
-for index, (classes, probabilities) in enumerate(
-    [
-        ([0], [[np.nan]]),
-        ([0], [[0.5]]),
-        ([0, 1], [[0.2, 0.9]]),
-        ([0, 1], [[-0.1, 1.1]]),
-        ([0, 1], [[0.2]]),
-        ([0, 0], [[0.5, 0.5]]),
-    ]
-):
-    setattr(
-        CalibrationTests,
-        f"test_estimator_probability_contract_rejects_invalid_folds_{index}",
-        partialmethod(
-            CalibrationTests._case_estimator_probability_contract_rejects_invalid_folds,
-            classes=classes,
-            probabilities=probabilities,
-        ),
-    )

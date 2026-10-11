@@ -89,14 +89,14 @@ def wesad_portable(
     step = WINDOW_SEC * (1 - OVERLAP)
     rows = []
 
-    for sid in subjects:
-        data = loader.load_subject(sid)
-        wrist = data["wrist"]
-        labels = np.asarray(data["label"]).flatten()
+    for subject_id in subjects:
+        recording = loader.load_subject(subject_id)
+        wrist = recording["wrist"]
+        labels = np.asarray(recording["label"]).flatten()
         bvp = np.asarray(wrist["BVP"]).flatten()
         eda = np.asarray(wrist["EDA"]).flatten()
         temp = np.asarray(wrist["TEMP"]).flatten()
-        acc_mag = np.sqrt(np.sum(np.asarray(wrist["ACC"]) ** 2, axis=1))
+        acc_magnitude = np.sqrt(np.sum(np.asarray(wrist["ACC"]) ** 2, axis=1))
 
         peaks = np.asarray(
             nk.ppg_findpeaks(
@@ -105,31 +105,38 @@ def wesad_portable(
             )["PPG_Peaks"]
         )
         beat_hr = 60.0 / (np.diff(peaks) / FS.WRIST_BVP)
-        beat_t = peaks[1:] / FS.WRIST_BVP
+        beat_times = peaks[1:] / FS.WRIST_BVP
 
         duration = len(labels) / FS.CHEST
-        t = 0.0
-        while t + WINDOW_SEC <= duration:
+        window_start = 0.0
+        while window_start + WINDOW_SEC <= duration:
+            window_end = window_start + WINDOW_SEC
             lab = _window_label(
-                labels[int(t * FS.CHEST) : int((t + WINDOW_SEC) * FS.CHEST)], {1, 2}
+                labels[int(window_start * FS.CHEST) : int(window_end * FS.CHEST)],
+                {1, 2},
             )
             if lab is not None:
-                e0, e1 = int(t * FS.WRIST_EDA), int((t + WINDOW_SEC) * FS.WRIST_EDA)
-                t0, t1 = int(t * FS.WRIST_TEMP), int((t + WINDOW_SEC) * FS.WRIST_TEMP)
-                a0, a1 = int(t * FS.WRIST_ACC), int((t + WINDOW_SEC) * FS.WRIST_ACC)
-                hr_win = beat_hr[(beat_t >= t) & (beat_t < t + WINDOW_SEC)]
+                eda_start = int(window_start * FS.WRIST_EDA)
+                eda_end = int(window_end * FS.WRIST_EDA)
+                temp_start = int(window_start * FS.WRIST_TEMP)
+                temp_end = int(window_end * FS.WRIST_TEMP)
+                acc_start = int(window_start * FS.WRIST_ACC)
+                acc_end = int(window_end * FS.WRIST_ACC)
+                hr_win = beat_hr[
+                    (beat_times >= window_start) & (beat_times < window_end)
+                ]
                 row: Dict[str, Any] = portable_features(
-                    eda[e0:e1],
-                    temp[t0:t1],
-                    acc_mag[a0:a1],
+                    eda[eda_start:eda_end],
+                    temp[temp_start:temp_end],
+                    acc_magnitude[acc_start:acc_end],
                     hr_win,
                     eda_fs=FS.WRIST_EDA,
                     temp_fs=FS.WRIST_TEMP,
                 )
-                row["subject"] = sid
+                row["subject"] = subject_id
                 row["label"] = 0 if lab == 1 else 1
                 rows.append(row)
-            t += step
+            window_start += step
 
     return pd.DataFrame(
         rows, columns=cast(Any, [*PORTABLE_FEATURE_COLUMNS, "subject", "label"])

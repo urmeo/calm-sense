@@ -1,7 +1,6 @@
 import unittest
 from contextlib import ExitStack
 from unittest.mock import patch
-from functools import partialmethod
 from importlib import import_module
 import numpy as np
 
@@ -102,28 +101,33 @@ class CnnTests(unittest.TestCase):
         proba = model.predict_proba(X)
         self.assertTrue(proba.shape == (8, 2) and np.isfinite(proba).all())
 
-    def _case_cnn_rejects_nonfinite_normalization_or_inference(self, failure):
+    def test_cnn_rejects_nonfinite_normalization_or_inference(self):
         torch = self._torch()
         from src.models.dl.cnn_1d import CNN1DClassifier
 
-        class FixedNetwork(torch.nn.Module):
+        for failure in ("overflow", "invalid_scale", "invalid_network"):
+            with self.subTest(failure=failure):
 
-            def forward(self, X):
-                fill = float("nan") if failure == "invalid_network" else 0.0
-                return torch.full((len(X), 2), fill)
+                class FixedNetwork(torch.nn.Module):
 
-        model = CNN1DClassifier(in_channels=1, device="cpu")
-        model.classes_ = np.array([0, 1])
-        model.model = FixedNetwork()
-        model._mean = np.zeros((1, 1, 1), dtype="float32")
-        model._std = np.full((1, 1, 1), 1e-08, dtype="float32")
-        X = np.zeros((2, 1, 61), dtype="float32")
-        if failure == "overflow":
-            X.fill(1e38)
-        elif failure == "invalid_scale":
-            model._std.fill(np.inf)
-        with self.assertRaisesRegex(ValueError, "CNN (normalization|inference)"):
-            model.predict_proba(X)
+                    def forward(self, X):
+                        fill = float("nan") if failure == "invalid_network" else 0.0
+                        return torch.full((len(X), 2), fill)
+
+                model = CNN1DClassifier(in_channels=1, device="cpu")
+                model.classes_ = np.array([0, 1])
+                model.model = FixedNetwork()
+                model._mean = np.zeros((1, 1, 1), dtype="float32")
+                model._std = np.full((1, 1, 1), 1e-08, dtype="float32")
+                X = np.zeros((2, 1, 61), dtype="float32")
+                if failure == "overflow":
+                    X.fill(1e38)
+                elif failure == "invalid_scale":
+                    model._std.fill(np.inf)
+                with self.assertRaisesRegex(
+                    ValueError, "CNN (normalization|inference)"
+                ):
+                    model.predict_proba(X)
 
     def test_cnn_group_split_fallback_finds_rare_class_cover_deterministically(self):
         self._torch()
@@ -146,14 +150,3 @@ class CnnTests(unittest.TestCase):
             CNN1DClassifier(val_fraction=0.5)._validation_split(
                 np.array([0, 1, 2]), np.arange(3)
             )
-
-
-for index, failure in enumerate(["overflow", "invalid_scale", "invalid_network"]):
-    setattr(
-        CnnTests,
-        f"test_cnn_rejects_nonfinite_normalization_or_inference_{index}",
-        partialmethod(
-            CnnTests._case_cnn_rejects_nonfinite_normalization_or_inference,
-            failure=failure,
-        ),
-    )

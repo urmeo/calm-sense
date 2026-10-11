@@ -37,7 +37,7 @@ class UtilsTests(unittest.TestCase):
         self.assertTrue(isinstance(p["working_tree_dirty"], bool))
         self.assertEqual(p["feature_schema_version"], 2)
 
-    def test_paired_effect_size_matches_hand_calc(self):
+    def test_paired_effect_size_direction_and_small_sample_correction(self):
         a = [0.9, 0.8, 0.95, 0.7]
         b = [0.85, 0.78, 0.9, 0.72]
         es = paired_effect_size(a, b)
@@ -79,8 +79,6 @@ class UtilsTests(unittest.TestCase):
 
     def test_file_sha256_streams_without_read_bytes(self):
         tmp_path = self.tmp_path
-        from pathlib import Path
-
         path = tmp_path / "recording.bin"
         contents = b"recording" * 100000
         path.write_bytes(contents)

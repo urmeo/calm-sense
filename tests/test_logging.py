@@ -26,9 +26,6 @@ class LoggingTests(unittest.TestCase):
         host.addHandler(host_handler)
         structlog_before = structlog.get_config().copy()
         self.stack.enter_context(
-            patch.object(logging_config, "_logging_configured", False)
-        )
-        self.stack.enter_context(
             patch.object(logging_config, "_configured_settings", None)
         )
         first, second = (tmp_path / "first.log", tmp_path / "second.log")
@@ -59,9 +56,6 @@ class LoggingTests(unittest.TestCase):
         project = logging.getLogger("calmsense")
         saved = (project.handlers[:], project.level, project.propagate)
         project.handlers = []
-        self.stack.enter_context(
-            patch.object(logging_config, "_logging_configured", False)
-        )
         self.stack.enter_context(
             patch.object(logging_config, "_configured_settings", None)
         )

@@ -1,6 +1,7 @@
 """Fixed defaults; tuning runs are separate."""
 
-from typing import Any, Callable, Dict
+from importlib import import_module
+from typing import Any, Dict
 
 from ...config import SEED
 
@@ -48,52 +49,27 @@ HYPERPARAMS: Dict[str, Dict[str, Any]] = {
 }
 
 
-def _logistic_regression(random_state: int = SEED, **kwargs: Any) -> Any:
-    from sklearn.linear_model import LogisticRegression
-
-    return LogisticRegression(
-        **{**HYPERPARAMS["lr"], "random_state": random_state, "n_jobs": -1, **kwargs}
-    )
-
-
-def _random_forest(random_state: int = SEED, **kwargs: Any) -> Any:
-    from sklearn.ensemble import RandomForestClassifier
-
-    return RandomForestClassifier(
-        **{**HYPERPARAMS["rf"], "random_state": random_state, "n_jobs": -1, **kwargs}
-    )
-
-
-def _xgboost(random_state: int = SEED, **kwargs: Any) -> Any:
-    import xgboost as xgb
-
-    return xgb.XGBClassifier(
-        **{**HYPERPARAMS["xgb"], "random_state": random_state, "n_jobs": -1, **kwargs}
-    )
-
-
-def _lightgbm(random_state: int = SEED, **kwargs: Any) -> Any:
-    import lightgbm as lgb
-
-    return lgb.LGBMClassifier(
-        **{**HYPERPARAMS["lgbm"], "random_state": random_state, "n_jobs": -1, **kwargs}
-    )
-
-
-_REGISTRY: Dict[str, Callable[..., Any]] = {
-    "lr": _logistic_regression,
-    "logistic": _logistic_regression,
-    "rf": _random_forest,
-    "random_forest": _random_forest,
-    "xgb": _xgboost,
-    "xgboost": _xgboost,
-    "lgbm": _lightgbm,
-    "lightgbm": _lightgbm,
+_CLASSIFIERS = {
+    "lr": ("sklearn.linear_model", "LogisticRegression"),
+    "rf": ("sklearn.ensemble", "RandomForestClassifier"),
+    "xgb": ("xgboost", "XGBClassifier"),
+    "lgbm": ("lightgbm", "LGBMClassifier"),
+}
+_ALIASES = {
+    "logistic": "lr",
+    "random_forest": "rf",
+    "xgboost": "xgb",
+    "lightgbm": "lgbm",
 }
 
 
 def get_classifier(name: str, **kwargs: Any) -> Any:
     key = name.lower()
-    if key not in _REGISTRY:
-        raise ValueError(f"Unknown classifier: {name}. Available: {sorted(_REGISTRY)}")
-    return _REGISTRY[key](**kwargs)
+    key = _ALIASES.get(key, key)
+    if key not in _CLASSIFIERS:
+        available = sorted([*_CLASSIFIERS, *_ALIASES])
+        raise ValueError(f"Unknown classifier: {name}. Available: {available}")
+    module_name, class_name = _CLASSIFIERS[key]
+    classifier = getattr(import_module(module_name), class_name)
+    parameters = {**HYPERPARAMS[key], "random_state": SEED, "n_jobs": -1, **kwargs}
+    return classifier(**parameters)

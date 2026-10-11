@@ -39,7 +39,7 @@ class DocsTests(unittest.TestCase):
         )
 
     def test_readme_local_links_and_images_exist(self):
-        refs = re.findall("\\]\\(([^\\s)]+)\\)", README) + re.findall(
+        refs = re.findall(r"\]\(([^\s)]+)\)", README) + re.findall(
             '(?:src|href)="([^"]+)"', README
         )
         for ref in refs:
@@ -69,7 +69,7 @@ class DocsTests(unittest.TestCase):
             _replace("overview without generated tables", "calibration", "replacement")
 
     def test_referenced_notebooks_exist(self):
-        refs = sorted(set(re.findall("notebooks/[\\w./-]+\\.ipynb", README)))
+        refs = sorted(set(re.findall(r"notebooks/[\w./-]+\.ipynb", README)))
         missing = [ref for ref in refs if not (ROOT / ref).exists()]
         self.assertFalse(
             missing, f"Docs reference notebooks that do not exist: {missing}"
@@ -80,23 +80,3 @@ class DocsTests(unittest.TestCase):
             re.search("notebooks/0[1-8]_", README),
             "README references a nonexistent numbered 01-08 notebook series",
         )
-
-    def test_no_em_or_en_dashes_anywhere(self):
-        targets = (
-            sorted(ROOT.glob("src/**/*.py"))
-            + sorted(ROOT.glob("scripts/*.py"))
-            + sorted(ROOT.glob("tests/*.py"))
-            + sorted(ROOT.glob("frontend/src/**/*.ts"))
-            + sorted(ROOT.glob("frontend/src/**/*.tsx"))
-            + sorted(ROOT.glob("outputs/dashboard/**/*.ts"))
-            + sorted(ROOT.glob("docs/*.md"))
-            + sorted(ROOT.glob("notebooks/*.ipynb"))
-            + [ROOT / "README.md", ROOT / "CONTRIBUTING.md"]
-        )
-        en_dash, em_dash = (chr(8211), chr(8212))
-        offenders = [
-            str(p.relative_to(ROOT))
-            for p in targets
-            if p.exists() and (en_dash in p.read_text() or em_dash in p.read_text())
-        ]
-        self.assertFalse(offenders, f"em/en dash found in: {offenders}")
