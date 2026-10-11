@@ -7,7 +7,7 @@ import manifest from './config/manifest.mjs';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const output = resolve(root, '../outputs/generated/site');
-const base = '/CalmSense/';
+const base = '/calm-sense/';
 const mode = process.argv[2] ?? 'build';
 const args = process.argv.slice(3);
 const clients = new Set();

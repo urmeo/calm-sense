@@ -2,10 +2,10 @@
 
 ### A Machine Learning and Deep Learning Framework for Wearable Biosignal Analysis, Integrating 1D CNNs, Explainable AI, Probability Calibration, and Cross-Dataset Evaluation.
 
-[Live demo](https://urmeo.github.io/CalmSense/) · [Colab](https://colab.research.google.com/github/urmeo/CalmSense/blob/main/notebooks/CalmSense.ipynb) · [Code](#architecture) · [Model](#protocol--provenance)
+[Live demo](https://urmeo.github.io/calm-sense/) · [Colab](https://colab.research.google.com/github/urmeo/CalmSense/blob/main/notebooks/CalmSense.ipynb) · [Code](#architecture) · [Model](#protocol--provenance)
 
 <p align="center">
-<a href="https://urmeo.github.io/CalmSense/"><img src="outputs/figures/demo.gif" width="800" alt="CalmSense dashboard"></a>
+<a href="https://urmeo.github.io/calm-sense/"><img src="outputs/figures/demo.gif" width="800" alt="CalmSense dashboard"></a>
 </p>
 
 ## Overview
