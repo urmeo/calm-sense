@@ -1,27 +1,32 @@
 # CalmSense
 
-CalmSense classifies stress from wearable physiological recordings. It compares four feature-based classifiers and a 1D convolutional neural network on WESAD, then examines calibration, personalization, chest and wrist signals, and transfer to a second dataset.
+CalmSense classifies stress from wearable ECG, skin conductance, temperature, respiration, and motion. It compares four feature-based classifiers and a 1D CNN, then examines calibration, personalization, chest and wrist signals, and transfer to a second dataset.
 
-The dashboard displays saved research results and recorded signal excerpts. It does not run live inference.
+[Results dashboard](https://urmeo.github.io/calm-sense/) · [Colab demo](https://colab.research.google.com/github/urmeo/calm-sense/blob/main/notebooks/CalmSense.ipynb) · [Methodology](docs/methodology.md) · [Reproduction](docs/reproduction.md) · [Repository map](docs/structure.md)
 
-[Results dashboard](https://urmeo.github.io/calm-sense/) · [Colab demo](https://colab.research.google.com/github/urmeo/calm-sense/blob/main/notebooks/CalmSense.ipynb) · [Repository map](docs/structure.md) · [Methodology](docs/methodology.md) · [Reproduction](docs/reproduction.md)
+<p align="center">
+<a href="https://urmeo.github.io/calm-sense/"><img src="outputs/figures/demo.gif" width="800" alt="Recorded dashboard preview showing the saved research results"></a>
+</p>
 
-## Data flow
+The preview above shows an earlier dashboard interface. The current dashboard displays saved research results and recorded signal excerpts; it does not run live inference.
+
+## Pipeline
 
 ![Five steps: recordings, prepare windows, model inputs, LOSO evaluation, saved results](docs/assets/pipeline.svg)
 
-The recorded chest benchmark uses 58 features for Random Forest, XGBoost, Logistic Regression, and LightGBM. The CNN uses five processed signal channels. The feature registry has 60 entries; two respiration features are entirely missing in this benchmark.
+| WESAD subjects | Saved chest features | Binary windows | Three-class windows |
+| :--: | :--: | :--: | :--: |
+| 15 | 58 | 869 | 1,032 |
 
-Python, NumPy, pandas, SciPy, and NeuroKit2 handle signals and features. Models use scikit-learn, XGBoost, LightGBM, and PyTorch; SHAP describes a separate full-data XGBoost fit. The dashboard uses React and TypeScript.
+The chest benchmark uses 60-second windows with 50% overlap and at least 90% label purity. Each leave-one-subject-out (LOSO) fold trains on 14 subjects and tests on the remaining one. Median imputation and standardization are fitted on training subjects within each fold.
+
+The feature models use 58 features. The registry contains 60 entries; two respiration features are entirely missing in this benchmark. The CNN uses five processed signal channels.
+
+Python, NumPy, pandas, SciPy, and NeuroKit2 handle signals and features. Models use scikit-learn, XGBoost, LightGBM, and PyTorch. SHAP describes a separate full-data XGBoost fit. The dashboard uses React and TypeScript.
 
 ## Recorded results
 
-The [4 October 2026 benchmark](outputs/results/provenance.json) tests 15 WESAD subjects with leave-one-subject-out (LOSO) evaluation. Each fold trains on 14 subjects and tests on the remaining one. The binary task separates baseline from stress; the three-class task adds amusement.
-
-![Binary and three-class accuracy for five models; bars show subject means and whiskers show subject standard deviations](docs/assets/research-overview.svg)
-
-<details>
-<summary>Exact model scores and statistical comparison</summary>
+The [4 October 2026 benchmark](outputs/results/provenance.json) covers 15 WESAD subjects. The binary task separates baseline from stress; the three-class task adds amusement.
 
 | Model | Binary accuracy | Binary macro-F1 | Binary AUROC | Binary AUPRC | Three-class accuracy | Three-class macro-F1 |
 | :-- | --: | --: | --: | --: | --: | --: |
@@ -33,13 +38,98 @@ The [4 October 2026 benchmark](outputs/results/provenance.json) tests 15 WESAD s
 
 Accuracy and macro-F1 are means across subjects. AUROC and AUPRC use pooled held-out binary predictions. Random Forest has a pooled balanced accuracy of 89.9% and a subject-bootstrap 95% confidence interval of 85.8% to 95.6% for mean accuracy. The four feature models show no significant accuracy differences in the Friedman test (`p = 0.599`) or Holm-adjusted pairwise tests. [Metrics](outputs/results/metrics.json) and [statistics](outputs/results/stats.json) contain the recorded values.
 
-</details>
+## Graphs and charts
+
+These are the original plots from the saved benchmark. Click a plot to open it at full size.
+
+<table width="100%">
+<tr>
+<td align="center" width="50%"><strong>Binary accuracy · LOSO</strong></td>
+<td align="center" width="50%"><strong>Three-class accuracy · LOSO</strong></td>
+</tr>
+<tr>
+<td align="center" valign="middle" height="300" width="50%"><a href="outputs/figures/binary_model_comparison.png"><img src="outputs/figures/binary_model_comparison.png" width="390" alt="Binary LOSO accuracy for five models with subject standard deviation error bars"></a></td>
+<td align="center" valign="middle" height="300" width="50%"><a href="outputs/figures/multiclass_model_comparison.png"><img src="outputs/figures/multiclass_model_comparison.png" width="390" alt="Three-class LOSO accuracy for five models with subject standard deviation error bars"></a></td>
+</tr>
+<tr>
+<td align="center"><sub>RF <b>0.910</b> · five models</sub></td>
+<td align="center"><sub>LightGBM <b>0.672</b> · five models</sub></td>
+</tr>
+<tr>
+<td align="center" width="50%"><strong>Subject-mixed vs held-out testing</strong></td>
+<td align="center" width="50%"><strong>Across the 15 subjects</strong></td>
+</tr>
+<tr>
+<td align="center" valign="middle" height="300" width="50%"><a href="outputs/figures/binary_optimism_gap.png"><img src="outputs/figures/binary_optimism_gap.png" width="329" alt="Binary accuracy on matched non-overlapping windows under LOSO and subject-mixed testing"></a></td>
+<td align="center" valign="middle" height="300" width="50%"><a href="outputs/figures/binary_per_subject.png"><img src="outputs/figures/binary_per_subject.png" width="390" alt="Binary Random Forest LOSO accuracy for each held-out subject"></a></td>
+</tr>
+<tr>
+<td align="center"><sub>Matched pooled accuracy: <b>0.913 → 0.964</b> · +5.0 pp</sub></td>
+<td align="center"><sub><b>0.712 to 1.000</b> · RF accuracy</sub></td>
+</tr>
+<tr>
+<td align="center" width="50%"><strong>Feature ablation</strong></td>
+<td align="center" width="50%"><strong>Chest vs wrist</strong></td>
+</tr>
+<tr>
+<td align="center" valign="middle" height="300" width="50%"><a href="outputs/figures/ablation.png"><img src="outputs/figures/ablation.png" width="390" alt="Random Forest binary LOSO accuracy for feature subsets"></a></td>
+<td align="center" valign="middle" height="300" width="50%"><a href="outputs/figures/chest_vs_wrist.png"><img src="outputs/figures/chest_vs_wrist.png" width="329" alt="Same-model Random Forest binary LOSO accuracy for chest and wrist"></a></td>
+</tr>
+<tr>
+<td align="center"><sub>RF: all <b>0.910</b> · no motion <b>0.901</b></sub></td>
+<td align="center"><sub>RF: chest <b>0.910</b> · wrist <b>0.890</b></sub></td>
+</tr>
+<tr>
+<td align="center" width="50%"><strong>Cross-dataset transfer</strong></td>
+<td align="center" width="50%"><strong>SHAP explainability</strong></td>
+</tr>
+<tr>
+<td align="center" valign="middle" height="300" width="50%"><a href="outputs/figures/cross_dataset.png"><img src="outputs/figures/cross_dataset.png" width="390" alt="Within-dataset and cross-dataset balanced accuracy on 18 shared features"></a></td>
+<td align="center" valign="middle" height="300" width="50%"><a href="outputs/figures/shap_beeswarm.png"><img src="outputs/figures/shap_beeswarm.png" width="312" alt="Global signed SHAP contributions and feature values for the full-data binary XGBoost fit"></a></td>
+</tr>
+<tr>
+<td align="center"><sub>Balanced accuracy: WESAD → Non-EEG <b>0.558</b> · reverse <b>0.497</b></sub></td>
+<td align="center"><sub>XGBoost full-data fit · motion, HRV, EDA</sub></td>
+</tr>
+<tr>
+<td align="center" width="50%"><strong>Probability calibration</strong></td>
+<td align="center" width="50%"><strong>Few-shot personalization</strong></td>
+</tr>
+<tr>
+<td align="center" valign="middle" height="300" width="50%"><a href="outputs/figures/calibration_reliability.png"><img src="outputs/figures/calibration_reliability.png" width="293" alt="Confidence versus accuracy before and after training-subject isotonic recalibration"></a></td>
+<td align="center" valign="middle" height="300" width="50%"><a href="outputs/figures/personalization.png"><img src="outputs/figures/personalization.png" width="390" alt="Mean per-subject calibration error against requested enrollment budget"></a></td>
+</tr>
+<tr>
+<td align="center"><sub>RF pooled full-window LOSO ECE: <b>0.077 → 0.026</b></sub></td>
+<td align="center"><sub>RF mean subject ECE: <b>0.162 → 0.078</b> · requested 20</sub></td>
+</tr>
+<tr>
+<td align="center" width="50%"><strong>Binary confusion · RF</strong></td>
+<td align="center" width="50%"><strong>Three-class confusion · LightGBM</strong></td>
+</tr>
+<tr>
+<td align="center" valign="middle" height="300" width="50%"><a href="outputs/figures/binary_confusion.png"><img src="outputs/figures/binary_confusion.png" width="366" alt="Pooled row-normalized binary Random Forest confusion matrix at default classifier decisions"></a></td>
+<td align="center" valign="middle" height="300" width="50%"><a href="outputs/figures/multiclass_confusion.png"><img src="outputs/figures/multiclass_confusion.png" width="366" alt="Pooled row-normalized three-class LightGBM confusion matrix at default classifier decisions"></a></td>
+</tr>
+<tr>
+<td align="center"><sub>Pooled default decisions</sub></td>
+<td align="center"><sub>Pooled default decisions</sub></td>
+</tr>
+</table>
+
+## ROC/AUC curves
 
 ![ROC and AUROC results for the binary feature models](docs/assets/roc-auc.svg)
 
 ROC curves compare the true-positive rate with the false-positive rate as the stress-probability threshold changes. AUROC summarizes that curve. These binary scores pool held-out predictions; they are separate from the subject means above. The [curve replay](outputs/results/roc_curves.json) uses the original benchmark code and verified cached inputs; all four AUROC and AUPRC values match the saved scores exactly. The CNN has no recorded AUROC or AUPRC result.
 
-![Random Forest reliability curves and decision curves from saved held-out results](docs/assets/calibration-curves.svg)
+## Calibration and personalization
+
+<p align="center">
+<a href="outputs/figures/calibration_decision_curve.png"><img src="outputs/figures/calibration_decision_curve.png" width="650" alt="Exploratory Random Forest decision curves before and after recalibration, with alert-everyone and alert-no-one references"></a>
+</p>
+
+The decision curve shows net benefit across probability thresholds. It is an exploratory analysis and does not establish a clinical alert threshold.
 
 <details>
 <summary>Calibration and personalization results</summary>
@@ -71,7 +161,7 @@ A budget of 5 selects 4 class-balanced enrollment windows. Limited class availab
 
 </details>
 
-[Transfer chart](docs/assets/transfer.svg) · [All saved charts and tables](outputs/README.md)
+[All saved charts and tables](outputs/README.md) · [Detailed evaluation conditions](docs/methodology.md)
 
 ## Run locally
 
