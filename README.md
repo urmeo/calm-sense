@@ -14,24 +14,21 @@ The dashboard displays saved research results and recorded signal excerpts. It d
 
 These recordings show the current interface. Select an animated preview to play the full MP4 video, or download the file to watch locally. Both videos are silent.
 
-<table width="100%">
-<tr>
-<td align="center" width="50%"><strong>Dashboard tour · 32 s</strong></td>
-<td align="center" width="50%"><strong>Signal exploration · 24 s</strong></td>
-</tr>
-<tr>
-<td align="center"><a href="https://urmeo.github.io/calm-sense/media/dashboard-tour.mp4"><img src="frontend/public/media/dashboard-tour.gif" width="420" alt="Animated preview of the current dashboard tour; select to play the full video"></a></td>
-<td align="center"><a href="https://urmeo.github.io/calm-sense/media/signal-explorer.mp4"><img src="frontend/public/media/signal-explorer.gif" width="420" alt="Animated preview of recorded WESAD signal exploration; select to play the full video"></a></td>
-</tr>
-<tr>
-<td>Saved LOSO results, binary and three-class model comparison, calibration, and the research pipeline.</td>
-<td>Select a WESAD subject, toggle signal channels, zoom, and reset the view.</td>
-</tr>
-<tr>
-<td align="center"><a href="https://urmeo.github.io/calm-sense/media/dashboard-tour.mp4">Watch video</a> · <a href="frontend/public/media/dashboard-tour.mp4">Repository copy</a></td>
-<td align="center"><a href="https://urmeo.github.io/calm-sense/media/signal-explorer.mp4">Watch video</a> · <a href="frontend/public/media/signal-explorer.mp4">Repository copy</a></td>
-</tr>
-</table>
+**Dashboard tour · 32 s**
+
+<p align="center">
+<a href="https://urmeo.github.io/calm-sense/media/dashboard-tour.mp4"><img src="frontend/public/media/dashboard-tour.gif" width="800" alt="Animated preview of the current dashboard tour; select to play the full video"></a>
+</p>
+
+Saved LOSO results, binary and three-class model comparison, calibration, and the research pipeline. [Watch video](https://urmeo.github.io/calm-sense/media/dashboard-tour.mp4) · [Repository copy](frontend/public/media/dashboard-tour.mp4)
+
+**Signal exploration · 24 s**
+
+<p align="center">
+<a href="https://urmeo.github.io/calm-sense/media/signal-explorer.mp4"><img src="frontend/public/media/signal-explorer.gif" width="800" alt="Animated preview of recorded WESAD signal exploration; select to play the full video"></a>
+</p>
+
+Select a WESAD subject, toggle signal channels, zoom, and reset the view. [Watch video](https://urmeo.github.io/calm-sense/media/signal-explorer.mp4) · [Repository copy](frontend/public/media/signal-explorer.mp4)
 
 <table width="100%">
 <tr>
