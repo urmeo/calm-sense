@@ -12,17 +12,19 @@ The preview above shows an earlier dashboard interface. The current dashboard di
 
 ## Pipeline
 
-![Five steps: recordings, prepare windows, model inputs, LOSO evaluation, saved results](docs/assets/pipeline.svg)
+[![Research pipeline: five main steps, two model paths within each held-out fold, separate analyses, and saved outputs](docs/assets/pipeline.svg)](docs/assets/pipeline.svg)
 
 | WESAD subjects | Saved chest features | Binary windows | Three-class windows |
 | :--: | :--: | :--: | :--: |
 | 15 | 58 | 869 | 1,032 |
 
-The chest benchmark uses 60-second windows with 50% overlap and at least 90% label purity. Each leave-one-subject-out (LOSO) fold trains on 14 subjects and tests on the remaining one. Median imputation and standardization are fitted on training subjects within each fold.
+Each leave-one-subject-out (LOSO) fold holds out one complete person. The other 14 subjects form the training pool. Median imputation and scaling use only this pool. The CNN splits it into training and validation subjects. Its normalization uses inner training windows only.
 
 The feature models use 58 features. The registry contains 60 entries; two respiration features are entirely missing in this benchmark. The CNN uses five processed signal channels.
 
-Python, NumPy, pandas, SciPy, and NeuroKit2 handle signals and features. Models use scikit-learn, XGBoost, LightGBM, and PyTorch. SHAP describes a separate full-data XGBoost fit. The dashboard uses React and TypeScript.
+Calibration, personalization, ablation, wrist comparison, transfer, statistics, and nested tuning are [separate research runs](docs/reproduction.md#additional-analyses), each with its own evaluation protocol. Transfer uses 18 shared features from WESAD wrist and Non-EEG. The exported Random Forest and descriptive XGBoost SHAP values come from separate full-data fits. See the [methodology](docs/methodology.md) for the full protocols.
+
+Python, NumPy, pandas, SciPy, and NeuroKit2 handle signals and features. Models use scikit-learn, XGBoost, LightGBM, and PyTorch. The dashboard uses React and TypeScript.
 
 ## Recorded results
 

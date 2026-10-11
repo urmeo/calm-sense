@@ -1,34 +1,103 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="350" viewBox="0 0 1200 350" role="img" aria-labelledby="title description">
-  <title id="title">CalmSense: recordings to held-out results</title>
-  <desc id="description">Five steps: WESAD recordings from 15 subjects; filtered 60-second windows with 50 percent overlap and at least 90 percent label purity; 58 features or five signal channels for the CNN; leave-one-subject-out evaluation with preprocessing fitted on training subjects; saved metrics, curves, and dashboard exports.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1080" viewBox="0 0 1200 1080" role="img" aria-labelledby="title description">
+  <title id="title">CalmSense research pipeline: recordings, subject-held-out evaluation, and separate analyses</title>
+  <desc id="description">The WESAD chest benchmark uses 15 subjects and filtered 60-second windows, with 50 percent overlap and at least 90 percent label purity. Each of 15 leave-one-subject-out folds holds out one complete subject. The other 14 subjects supply either 58 features for four classifiers or five channels of 1,024 samples for a CNN. Feature imputation and scaling fit only the outer training fold. The CNN splits training and validation subjects within that fold and normalizes on inner training windows. Held-out predictions produce subject means and pooled metrics; binary ROC curves and AUROC/AUPRC scores cover only the four feature models. Calibration, personalization, robustness, statistical analysis, and nested tuning run separately. Full-data Random Forest export and descriptive XGBoost SHAP fits are distinct from held-out scores. The dashboard displays saved results and recorded signal clips.</desc>
   <defs>
-    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="none" stroke="#94a3b8" stroke-width="1.6"/></marker>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#64748b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <style>
+      text { font-family: DejaVu Sans, Arial, sans-serif; fill: #17243b; }
+      .heading { font-size: 22px; font-weight: 700; }
+      .label { font-size: 17px; font-weight: 700; }
+      .body, .body text { font-size: 15px; fill: #475569; }
+      .small { font-size: 14px; fill: #475569; }
+      .number, .number text { font-size: 13px; font-weight: 700; fill: #fff; text-anchor: middle; }
+      .arrow { fill: none; stroke: #64748b; stroke-width: 1.5; marker-end: url(#arrow); }
+    </style>
   </defs>
-  <rect width="1200" height="350" rx="16" fill="#f8fafc"/>
-  <g font-family="DejaVu Sans, Arial, sans-serif">
-    <text x="30" y="42" font-size="23" font-weight="700" fill="#17243b">From recordings to held-out results</text>
-    <text x="30" y="69" font-size="14" fill="#52627a">WESAD chest benchmark · Baseline / stress, with amusement in the three-class task</text>
-    <g fill="#fff" stroke="#dbe3ef">
-      <rect x="30" y="103" width="208" height="171" rx="12"/>
-      <rect x="263" y="103" width="208" height="171" rx="12"/>
-      <rect x="496" y="103" width="208" height="171" rx="12"/>
-      <rect x="729" y="103" width="208" height="171" rx="12"/>
-      <rect x="962" y="103" width="208" height="171" rx="12"/>
-    </g>
-    <g stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)">
-      <path d="M241 188h16"/><path d="M474 188h16"/><path d="M707 188h16"/><path d="M940 188h16"/>
-    </g>
-    <g fill="#2563eb"><circle cx="54" cy="127" r="12"/><circle cx="287" cy="127" r="12"/><circle cx="520" cy="127" r="12"/><circle cx="753" cy="127" r="12"/></g>
-    <circle cx="986" cy="127" r="12" fill="#0f766e"/>
-    <g fill="#fff" font-size="12" font-weight="700" text-anchor="middle"><text x="54" y="131">1</text><text x="287" y="131">2</text><text x="520" y="131">3</text><text x="753" y="131">4</text><text x="986" y="131">5</text></g>
-    <g fill="#17243b" font-size="16" font-weight="700"><text x="46" y="164">Recordings</text><text x="279" y="164">Prepare windows</text><text x="512" y="164">Model inputs</text><text x="745" y="164">LOSO evaluation</text><text x="978" y="164">Saved results</text></g>
-    <g fill="#52627a" font-size="13">
-      <text x="46" y="194">15 laboratory subjects</text><text x="46" y="217">ECG, EDA, temperature,</text><text x="46" y="240">respiration, and motion</text>
-      <text x="279" y="194">Filter signals</text><text x="279" y="217">60 s · 50% overlap</text><text x="279" y="240">At least 90% label purity</text>
-      <text x="512" y="194">58 features: four models</text><text x="512" y="217">or CNN: five channels</text><text x="512" y="240">× 1,024 samples</text>
-      <text x="745" y="194">Train on 14 subjects</text><text x="745" y="217">Test on the held-out one</text><text x="745" y="240">Repeat for all 15 subjects</text>
-      <text x="978" y="194">Metrics and curves</text><text x="978" y="217">Recorded signal excerpts</text><text x="978" y="240">Static results dashboard</text>
-    </g>
-    <text x="30" y="315" font-size="13" fill="#52627a">Imputation and scaling use training subjects only. The saved full-data model is fitted separately from held-out evaluation.</text>
+  <rect width="1200" height="1080" rx="18" fill="#f8fafc"/>
+  <text x="32" y="43" font-size="26" font-weight="700">From wearable recordings to held-out evidence</text>
+  <text x="32" y="72" class="body">WESAD chest · 15 subjects · Baseline / stress; amusement added for the three-class task</text>
+
+  <!-- The five-step overview stays separate from the detailed fold below. -->
+  <g fill="#fff" stroke="#cbd5e1">
+    <rect x="32" y="100" width="208" height="120" rx="12"/>
+    <rect x="264" y="100" width="208" height="120" rx="12"/>
+    <rect x="496" y="100" width="208" height="120" rx="12"/>
+    <rect x="728" y="100" width="208" height="120" rx="12"/>
+    <rect x="960" y="100" width="208" height="120" rx="12"/>
   </g>
+  <g class="arrow"><path d="M243 160h16"/><path d="M475 160h16"/><path d="M707 160h16"/><path d="M939 160h16"/></g>
+  <g fill="#2563eb"><circle cx="55" cy="125" r="12"/><circle cx="287" cy="125" r="12"/><circle cx="519" cy="125" r="12"/><circle cx="751" cy="125" r="12"/><circle cx="983" cy="125" r="12"/></g>
+  <g class="number"><text x="55" y="130">1</text><text x="287" y="130">2</text><text x="519" y="130">3</text><text x="751" y="130">4</text><text x="983" y="130">5</text></g>
+  <g class="label"><text x="48" y="159">Recordings</text><text x="280" y="159">Filter + window</text><text x="512" y="159">Two model paths</text><text x="744" y="159">Hold out a subject</text><text x="976" y="159">Measure results</text></g>
+  <g class="small">
+    <text x="48" y="185">ECG, EDA, temperature,</text><text x="48" y="205">respiration, motion</text>
+    <text x="280" y="185">60 s · 50% overlap</text><text x="280" y="205">At least 90% label purity</text>
+    <text x="512" y="185">Feature classifiers</text><text x="512" y="205">or a signal-based CNN</text>
+    <text x="744" y="185">One person per test fold</text><text x="744" y="205">Repeat for all 15 subjects</text>
+    <text x="976" y="185">Subject scores</text><text x="976" y="205">and pooled predictions</text>
+  </g>
+
+  <text x="32" y="265" class="heading">Inside one held-out fold</text>
+  <text x="1168" y="265" text-anchor="end" class="small">LOSO = leave one subject out</text>
+  <rect x="32" y="286" width="746" height="272" rx="12" fill="#eff6ff" stroke="#93c5fd"/>
+  <text x="52" y="318" class="label">14 subjects available for training and validation</text>
+  <text x="52" y="343" class="small">Learn the transforms and model here. Keep the test subject outside both paths.</text>
+
+  <g fill="#fff" stroke="#bfdbfe">
+    <rect x="52" y="366" width="146" height="78" rx="8"/>
+    <rect x="228" y="366" width="258" height="78" rx="8"/>
+    <rect x="516" y="366" width="242" height="78" rx="8"/>
+    <rect x="52" y="462" width="146" height="78" rx="8"/>
+    <rect x="228" y="462" width="258" height="78" rx="8"/>
+    <rect x="516" y="462" width="242" height="78" rx="8"/>
+  </g>
+  <g class="arrow"><path d="M202 405h20"/><path d="M490 405h20"/><path d="M202 501h20"/><path d="M490 501h20"/><path d="M762 405h60"/><path d="M762 501h60"/></g>
+  <text x="66" y="396" class="label">58 features</text>
+  <text x="66" y="422" class="small">5 signal groups</text>
+  <text x="242" y="391" class="label">Impute → standardize</text>
+  <text x="242" y="414" class="small">Medians and scaling fit only</text><text x="242" y="433" class="small">on this outer training fold</text>
+  <text x="530" y="396" class="label">Four classifiers</text><text x="530" y="422" class="small">LR · RF · XGBoost · LightGBM</text>
+  <text x="66" y="492" class="label">5 × 1,024</text><text x="66" y="518" class="small">Signal samples</text>
+  <text x="242" y="487" class="label">Split training / validation</text>
+  <text x="242" y="510" class="small">Separate subjects; normalize</text><text x="242" y="529" class="small">using inner training windows</text>
+  <text x="530" y="492" class="label">1D-CNN</text><text x="530" y="518" class="small">Early stop on validation data</text>
+
+  <rect x="828" y="286" width="340" height="272" rx="12" fill="#f0fdfa" stroke="#5eead4"/>
+  <text x="848" y="318" class="label">1 held-out subject</text>
+  <text x="848" y="343" class="small">Used only for the outer test</text>
+  <text x="848" y="396" class="label">Apply fitted transforms</text><text x="848" y="422" class="body">Predict labels and probabilities</text>
+  <path d="M848 447h300" stroke="#99f6e4"/>
+  <text x="848" y="484" class="body">No fitting on this subject</text><text x="848" y="510" class="body">No validation or early stopping</text><text x="848" y="536" class="body">Save predictions; move to next fold</text>
+
+  <path d="M998 562v18" class="arrow"/>
+  <rect x="32" y="586" width="1136" height="94" rx="12" fill="#fff" stroke="#cbd5e1"/>
+  <text x="52" y="615" class="label">Combine the 15 test folds</text>
+  <g class="body">
+    <text x="52" y="644">Subject means</text><text x="52" y="666">Accuracy · macro-F1</text>
+    <text x="408" y="644">Pooled held-out predictions</text><text x="408" y="666">Confusion matrices · balanced accuracy</text>
+    <text x="846" y="644">Binary ROC · AUROC / AUPRC</text><text x="846" y="666">Four feature models only</text>
+  </g>
+
+  <text x="32" y="723" class="heading">Separate analyses</text>
+  <text x="32" y="748" class="body">These use their own evaluation protocols. They are separate runs, not extra steps in every fold.</text>
+  <g fill="#fff" stroke="#cbd5e1">
+    <rect x="32" y="766" width="364" height="150" rx="12"/>
+    <rect x="418" y="766" width="364" height="150" rx="12"/>
+    <rect x="804" y="766" width="364" height="150" rx="12"/>
+  </g>
+  <g stroke-width="4" stroke-linecap="round"><path d="M52 785h44" stroke="#7c3aed"/><path d="M438 785h44" stroke="#d97706"/><path d="M824 785h44" stroke="#2563eb"/></g>
+  <text x="52" y="814" class="label">Calibration / personalization</text>
+  <text x="52" y="843" class="small">Global: training-subject OOF probabilities</text><text x="52" y="867" class="small">Personal: disjoint, non-overlapping windows</text><text x="52" y="891" class="small">Fixed RF; probability calibration only</text>
+  <text x="438" y="814" class="label">Robustness</text>
+  <text x="438" y="843" class="small">Ablation · subject-mixed comparison</text><text x="438" y="867" class="small">Chest vs wrist signal pipelines</text><text x="438" y="891" class="small">Wrist ↔ Non-EEG transfer: 18 features</text>
+  <text x="824" y="814" class="label">Statistics / tuning</text>
+  <text x="824" y="843" class="small">Subject bootstrap confidence intervals</text><text x="824" y="867" class="small">Four feature models: paired tests + Holm</text><text x="824" y="891" class="small">Nested tuning: grouped inner folds</text>
+
+  <text x="32" y="958" class="heading">Saved outputs</text>
+  <rect x="32" y="976" width="556" height="80" rx="12" fill="#f0fdfa" stroke="#99f6e4"/>
+  <rect x="612" y="976" width="556" height="80" rx="12" fill="#f1f5f9" stroke="#cbd5e1"/>
+  <text x="52" y="1004" class="label">Results → figures + static dashboard</text>
+  <text x="52" y="1028" class="small">Saved metrics, analyses, and recorded signal clips</text><text x="52" y="1047" class="small">The browser displays these files; it does not run inference.</text>
+  <text x="632" y="1004" class="label">Separate full-data fits → model + SHAP</text>
+  <text x="632" y="1028" class="small">RF export; descriptive XGBoost SHAP on all binary windows</text><text x="632" y="1047" class="small">These full-data fits do not produce the held-out scores.</text>
 </svg>
