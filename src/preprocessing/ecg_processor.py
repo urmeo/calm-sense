@@ -10,7 +10,7 @@ from .filters import _positive_integer, _positive_number
 
 
 class ECGProcessor(LoggerMixin):
-    """NeuroKit2 peaks; Pan-Tompkins fallback."""
+    """Detect R-peaks with NeuroKit2, or a simplified Pan-Tompkins fallback."""
 
     def __init__(self, sampling_rate: float = FS.CHEST):
         self.sampling_rate = _positive_number(sampling_rate, "sampling_rate")

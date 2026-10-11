@@ -1,4 +1,7 @@
-"""Youden-J selection and scoring share labels; rates are exploratory."""
+"""Save pooled LOSO ROC curves.
+
+Youden-J selection and scoring share labels; operating points are exploratory.
+"""
 
 import sys
 from pathlib import Path
@@ -86,6 +89,15 @@ def run():
                 raise ValueError(
                     "AUROC and AUPRC require finite scores and both binary classes"
                 )
+            fpr, tpr, thresholds = roc_curve(y_true, p1)
+            row["roc_curve"] = {
+                "fpr": fpr.tolist(),
+                "tpr": tpr.tolist(),
+                "thresholds": [
+                    float(threshold) if np.isfinite(threshold) else None
+                    for threshold in thresholds
+                ],
+            }
             if key == POINT_MODEL:
                 row["operating_point"] = operating_point(y_true, p1)
         except Exception as e:
@@ -98,7 +110,11 @@ def run():
         print(f"  {name:20s} AUROC={row['auroc']:.3f}  AUPRC={row['auprc']:.3f}")
 
     out["provenance"] = analysis_provenance(RESULTS_DIR, benchmark_sha)
-    out["methodology"] = {"xgboost_balancing": "training_fold_sample_weights"}
+    out["methodology"] = {
+        "xgboost_balancing": "training_fold_sample_weights",
+        "roc_curve": "pooled held-out LOSO probabilities; stress is positive",
+        "roc_thresholds": "null denotes an infinite threshold (predict no stress)",
+    }
     path = RESULTS_DIR / "threshold_metrics.json"
     path.parent.mkdir(parents=True, exist_ok=True)
     write_json(path, out)

@@ -6,6 +6,7 @@ from tempfile import TemporaryDirectory
 from functools import partialmethod
 import hashlib
 import io
+import json
 import zipfile
 from scripts import download_data
 from scripts.download_data import _download, _safe_extract
@@ -55,6 +56,49 @@ class DownloadTests(unittest.TestCase):
             z.writestr("data.bin", b"x" * 4096)
         with self.assertRaisesRegex(RuntimeError, "size cap"):
             _safe_extract(archive, tmp_path / "out", max_bytes=1024)
+
+    def test_wesad_download_accepts_recorded_uncompressed_size(self):
+        provenance = (
+            Path(__file__).resolve().parents[1] / "outputs/results/provenance.json"
+        )
+        expanded_bytes = json.loads(provenance.read_text())["input_verification"][
+            "wesad"
+        ]["bytes"]
+        payload = b"verified recording"
+        self.stack.enter_context(
+            patch.object(download_data, "RAW_DATA_DIR", self.tmp_path)
+        )
+        self.stack.enter_context(
+            patch.object(
+                download_data,
+                "WESAD_SHA256",
+                {"S2": hashlib.sha256(payload).hexdigest()},
+            )
+        )
+
+        def download_archive(url, destination):
+            destination.write_bytes(b"archive placeholder")
+
+        self.stack.enter_context(
+            patch.object(download_data, "_download", download_archive)
+        )
+        archive = self.stack.enter_context(
+            patch.object(download_data.zipfile, "ZipFile")
+        )
+        contents = archive.return_value.__enter__.return_value
+        entry = zipfile.ZipInfo("WESAD/S2/S2.pkl")
+        entry.file_size = expanded_bytes
+        contents.infolist.return_value = [entry]
+
+        def extract_recording(destination):
+            subject = destination / "WESAD" / "S2"
+            subject.mkdir(parents=True)
+            (subject / "S2.pkl").write_bytes(payload)
+
+        contents.extractall.side_effect = extract_recording
+        download_data.download_wesad()
+        self.assertEqual((self.tmp_path / "WESAD/S2/S2.pkl").read_bytes(), payload)
+        self.assertFalse((self.tmp_path / "WESAD.zip").exists())
 
     def test_download_refuses_non_https(self):
         tmp_path = self.tmp_path

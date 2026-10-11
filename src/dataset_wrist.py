@@ -15,6 +15,8 @@ from .preprocessing.filters import _window_parameters
 
 
 class WristDataset(LoggerMixin):
+    """Build features from WESAD wrist windows using the chest label timeline."""
+
     def __init__(
         self, window_sec: float = 60.0, overlap: float = 0.5, purity: float = 0.9
     ):
@@ -55,54 +57,59 @@ class WristDataset(LoggerMixin):
         eda_filt = self.eda.lowpass_filter(eda)
         tonic, phasic = self.eda.decompose_eda(eda_filt)
         _, scr_features = self.eda.detect_scr_peaks(phasic)
-        scr_idx = np.array([s["peak_idx"] for s in scr_features])
+        scr_peak_indices = np.array([scr["peak_idx"] for scr in scr_features])
 
         step = self.window_sec * (1 - self.overlap)
         duration = len(labels) / self.label_fs
-        windows, ys = [], []
-        t = 0.0
-        while t + self.window_sec <= duration:
-            lab = self._window_label(
+        windows, window_labels = [], []
+        window_start = 0.0
+        while window_start + self.window_sec <= duration:
+            window_end = window_start + self.window_sec
+            label = self._window_label(
                 labels[
-                    int(t * self.label_fs) : int((t + self.window_sec) * self.label_fs)
+                    int(window_start * self.label_fs) : int(window_end * self.label_fs)
                 ]
             )
-            if lab is not None:
-                b0, b1 = int(t * FS.WRIST_BVP), int(
-                    (t + self.window_sec) * FS.WRIST_BVP
+            if label is not None:
+                bvp_start, bvp_end = int(window_start * FS.WRIST_BVP), int(
+                    window_end * FS.WRIST_BVP
                 )
-                in_win = (peaks >= b0) & (peaks < b1)
-                rr = self.rr.extract_rr_intervals(peaks[in_win], unit="ms")
+                in_window = (peaks >= bvp_start) & (peaks < bvp_end)
+                rr = self.rr.extract_rr_intervals(peaks[in_window], unit="ms")
                 _, valid = self.rr.remove_ectopic_beats(rr)
                 rr_clean = self.rr.interpolate_artifacts(rr, valid)
 
-                e0, e1 = int(t * FS.WRIST_EDA), int(
-                    (t + self.window_sec) * FS.WRIST_EDA
+                eda_start, eda_end = int(window_start * FS.WRIST_EDA), int(
+                    window_end * FS.WRIST_EDA
                 )
-                a0, a1 = int(t * FS.WRIST_ACC), int(
-                    (t + self.window_sec) * FS.WRIST_ACC
+                acc_start, acc_end = int(window_start * FS.WRIST_ACC), int(
+                    window_end * FS.WRIST_ACC
                 )
-                scr_in = [s for s, idx in zip(scr_features, scr_idx) if e0 <= idx < e1]
+                window_scr = [
+                    scr
+                    for scr, peak_index in zip(scr_features, scr_peak_indices)
+                    if eda_start <= peak_index < eda_end
+                ]
 
                 windows.append(
                     {
                         "rr_intervals": rr_clean,
-                        "eda_tonic": tonic[e0:e1],
-                        "eda_phasic": phasic[e0:e1],
-                        "eda_raw": eda_filt[e0:e1],
-                        "scr_peaks": scr_in,
-                        "temperature": temp[e0:e1],
-                        "accelerometer": {"magnitude": acc_mag[a0:a1]},
+                        "eda_tonic": tonic[eda_start:eda_end],
+                        "eda_phasic": phasic[eda_start:eda_end],
+                        "eda_raw": eda_filt[eda_start:eda_end],
+                        "scr_peaks": window_scr,
+                        "temperature": temp[eda_start:eda_end],
+                        "accelerometer": {"magnitude": acc_mag[acc_start:acc_end]},
                         "subject_id": subject_id,
-                        "window_id": int(t * self.label_fs),
-                        "label": lab,
+                        "window_id": int(window_start * self.label_fs),
+                        "label": label,
                     }
                 )
-                ys.append(lab)
-            t += step
+                window_labels.append(label)
+            window_start += step
 
-        self.logger.info(f"{subject_id} (wrist): {len(ys)} windows")
-        return windows, ys
+        self.logger.info(f"{subject_id} (wrist): {len(window_labels)} windows")
+        return windows, window_labels
 
     def build(
         self, subjects: Optional[List[str]] = None, cache: bool = True
@@ -111,21 +118,23 @@ class WristDataset(LoggerMixin):
         if not subjects or len(set(subjects)) != len(subjects):
             raise ValueError("subjects must be a nonempty list without duplicates")
         frames = []
-        for s in subjects:
-            windows, _ = self._process_subject(s)
+        for subject_id in subjects:
+            windows, _ = self._process_subject(subject_id)
             if windows:
                 frames.append(
                     self.features.extract_all_features(windows, show_progress=False)
                 )
             del windows
-        df = (
+        features_df = (
             pd.concat(frames, ignore_index=True)
             if frames
             else self.features.extract_all_features([], show_progress=False)
         )
-        df["label_name"] = df["label"].map(cast(Any, CONDITION_LABELS))
-        df.attrs["feature_schema_version"] = FEATURE_SCHEMA_VERSION
-        df.attrs["dataset_parameters"] = {
+        features_df["label_name"] = features_df["label"].map(
+            cast(Any, CONDITION_LABELS)
+        )
+        features_df.attrs["feature_schema_version"] = FEATURE_SCHEMA_VERSION
+        features_df.attrs["dataset_parameters"] = {
             "window_sec": self.window_sec,
             "overlap": self.overlap,
             "purity": self.purity,
@@ -133,9 +142,11 @@ class WristDataset(LoggerMixin):
         }
         if cache:
             PROCESSED_DATA_DIR.mkdir(parents=True, exist_ok=True)
-            df.to_parquet(PROCESSED_DATA_DIR / "features_wrist.parquet", index=False)
-            self.logger.info(f"Cached wrist features ({len(df)} windows)")
-        return df
+            features_df.to_parquet(
+                PROCESSED_DATA_DIR / "features_wrist.parquet", index=False
+            )
+            self.logger.info(f"Cached wrist features ({len(features_df)} windows)")
+        return features_df
 
 
 def load_wrist() -> Optional[pd.DataFrame]:

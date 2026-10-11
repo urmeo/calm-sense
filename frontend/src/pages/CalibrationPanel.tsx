@@ -34,8 +34,7 @@ const CalibrationPanel: React.FC = () => {
   const names: Record<string, string> = { lr: 'Logistic Regression', rf: 'Random Forest', xgb: 'XGBoost', lgbm: 'LightGBM' };
   const model = cal.model ? names[cal.model] ?? cal.model : 'Unrecorded model';
 
-  const { loso, loso_matched, within_subject, recalibrated_isotonic, recalibrated_sigmoid, decision_curve } = cal;
-  const dc = decision_curve;
+  const { loso, loso_matched, within_subject, recalibrated_isotonic, recalibrated_sigmoid, decision_curve: decisionCurve } = cal;
 
   const evaluations = [
     { name: 'LOSO', summary: loso, color: COLORS.loso },
@@ -43,11 +42,11 @@ const CalibrationPanel: React.FC = () => {
     { name: 'LOSO + sigmoid', summary: recalibrated_sigmoid, color: COLORS.sigmoid },
   ];
   const rows = [
-    { key: 'Subject-mixed · matched non-overlapping', s: within_subject },
-    { key: 'LOSO · matched non-overlapping', s: loso_matched },
-    { key: 'LOSO · all windows', s: loso },
-    { key: 'LOSO + isotonic · all windows', s: recalibrated_isotonic },
-    { key: 'LOSO + sigmoid · all windows', s: recalibrated_sigmoid },
+    { key: 'Subject-mixed · matched non-overlapping', summary: within_subject },
+    { key: 'LOSO · matched non-overlapping', summary: loso_matched },
+    { key: 'LOSO · all windows', summary: loso },
+    { key: 'LOSO + isotonic · all windows', summary: recalibrated_isotonic },
+    { key: 'LOSO + sigmoid · all windows', summary: recalibrated_sigmoid },
   ];
 
   return (
@@ -57,9 +56,10 @@ const CalibrationPanel: React.FC = () => {
           <Gauge className="w-6 h-6" /> Calibration
         </h1>
         <p className="text-gray-500 dark:text-gray-400">
-          Binary {model} confidence on unseen subjects: full-window LOSO and
-          training-subject recalibration ({cal.n_windows} windows, {cal.n_bins} bins).
-          The optimism comparison uses a separate matched non-overlapping subset.
+          Saved binary {model} probabilities for held-out subjects
+          ({cal.n_windows} windows, {cal.n_bins} confidence bins).
+          Recalibration uses only training subjects. The optimism comparison
+          uses a separate subset of non-overlapping windows.
         </p>
       </div>
 
@@ -80,7 +80,7 @@ const CalibrationPanel: React.FC = () => {
       <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-xl p-4 text-sm text-orange-800 dark:text-orange-200">
         On matched non-overlapping windows, subject-mixed ECE is{' '}
         <strong>{fmt(within_subject.ece)}</strong> and LOSO ECE is{' '}
-        <strong>{fmt(loso_matched.ece)}</strong>: a gap of{' '}
+        <strong>{fmt(loso_matched.ece)}</strong>. LOSO minus subject-mixed ECE is{' '}
         <strong>{signed(cal.calibration_optimism_gap_ece)}</strong>.
         Separately, full-window LOSO ECE changes from <strong>{fmt(loso.ece)}</strong> to{' '}
         <strong>{fmt(recalibrated_isotonic.ece)}</strong> with training-subject isotonic recalibration.
@@ -88,6 +88,10 @@ const CalibrationPanel: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Panel title="Reliability · all windows">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+            Confidence is the model's probability for its predicted class.
+            Each point compares mean confidence with accuracy in one bin.
+          </p>
           <Chart height={380} label="Reliability curves for LOSO, isotonic and sigmoid calibration, against perfect calibration."
             option={{
               ...calibrationAxes,
@@ -124,11 +128,11 @@ const CalibrationPanel: React.FC = () => {
             yAxis: { type: 'value', name: 'Net benefit', nameLocation: 'middle', nameGap: 45, scale: true },
             legend: { type: 'scroll', bottom: 5, textStyle: { fontSize: 11 } },
             series: [
-              lineSeries(dc.thresholds, dc.net_benefit_uncalibrated, 'Uncalibrated', COLORS.loso),
-              lineSeries(dc.thresholds, dc.net_benefit_recalibrated, 'Recalibrated', COLORS.recal),
-              { ...lineSeries(dc.thresholds, dc.treat_all, 'Alert everyone', COLORS.diagonal),
+              lineSeries(decisionCurve.thresholds, decisionCurve.net_benefit_uncalibrated, 'Uncalibrated', COLORS.loso),
+              lineSeries(decisionCurve.thresholds, decisionCurve.net_benefit_recalibrated, 'Isotonic recalibration', COLORS.recal),
+              { ...lineSeries(decisionCurve.thresholds, decisionCurve.treat_all, 'Alert everyone', COLORS.diagonal),
                 showSymbol: false, lineStyle: { color: COLORS.diagonal, type: 'dashed' } },
-              { ...lineSeries(dc.thresholds, dc.thresholds.map(() => 0), 'Alert no one', '#6B7280'),
+              { ...lineSeries(decisionCurve.thresholds, decisionCurve.thresholds.map(() => 0), 'Alert no one', '#6B7280'),
                 showSymbol: false, lineStyle: { color: '#6B7280', type: 'dotted' } },
             ],
           }}
@@ -137,7 +141,9 @@ const CalibrationPanel: React.FC = () => {
 
       <Panel title="Calibration metrics by evaluation">
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-          Brier is the mean squared error of the stress probability, averaged over windows.
+          ECE is the average absolute gap between confidence and accuracy across bins,
+          weighted by window count. MCE is the largest bin gap.
+          Brier is the mean squared error of the stress probability.
           Matched and full-window rows use different evaluation sets.
         </p>
         <div className="overflow-x-auto">
@@ -154,9 +160,9 @@ const CalibrationPanel: React.FC = () => {
               {rows.map((row) => (
                 <tr key={row.key} className="border-b border-gray-100 dark:border-gray-700">
                   <td className="px-4 py-2 font-medium text-gray-900 dark:text-white">{row.key}</td>
-                  <td className="px-4 py-2">{fmt(row.s.ece)}</td>
-                  <td className="px-4 py-2">{fmt(row.s.mce)}</td>
-                  <td className="px-4 py-2">{fmt(row.s.brier)}</td>
+                  <td className="px-4 py-2">{fmt(row.summary.ece)}</td>
+                  <td className="px-4 py-2">{fmt(row.summary.mce)}</td>
+                  <td className="px-4 py-2">{fmt(row.summary.brier)}</td>
                 </tr>
               ))}
             </tbody>

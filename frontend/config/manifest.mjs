@@ -1,7 +1,7 @@
 export default {
   "short_name": "CalmSense",
-  "name": "CalmSense - Stress Detection Dashboard",
-  "description": "Subject-independent stress detection from wearable signals.",
+  "name": "CalmSense - Research Dashboard",
+  "description": "Saved WESAD stress classification results and wearable signal clips.",
   "icons": [
     {
       "src": "favicon.ico",

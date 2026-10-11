@@ -1,4 +1,4 @@
-"""Exclude physical stress."""
+"""Build Relax versus cognitive or emotional stress windows from Non-EEG records."""
 
 from pathlib import Path
 from typing import Any, cast, Optional

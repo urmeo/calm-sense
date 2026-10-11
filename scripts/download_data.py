@@ -20,6 +20,8 @@ NONEEG_URL = (
 NONEEG_DIR = EXTERNAL_DATA_DIR / "noneeg"
 WESAD_URL = "https://uni-siegen.sciebo.de/s/HGdUkoNlW1Ub0Gx/download"
 MAX_UNCOMPRESSED = 10 * 1024**3
+# The 15 verified WESAD recordings total about 12.9 GiB before other files.
+WESAD_MAX_UNCOMPRESSED = 20 * 1024**3
 DOWNLOAD_TIMEOUT = 30
 NONEEG_FILES = tuple(
     f"Subject{subject}_{record}.{extension}"
@@ -70,10 +72,9 @@ def verify_wesad(target=None) -> None:
     print(f"WESAD integrity OK: {len(WESAD_SHA256)} subjects verified.")
 
 
-def _progress(block, block_size, total):
-    done = block * block_size
-    pct = min(100, 100 * done / total) if total > 0 else 0
-    print(f"\r  {done // (1024 * 1024)} MB ({pct:.0f}%)", end="", flush=True)
+def _progress(downloaded, total):
+    percent = min(100, 100 * downloaded / total) if total > 0 else 0
+    print(f"\r  {downloaded // (1024 * 1024)} MB ({percent:.0f}%)", end="", flush=True)
 
 
 def _download(url, dest):
@@ -94,7 +95,7 @@ def _download(url, dest):
             while block := response.read(1024 * 1024):
                 stream.write(block)
                 downloaded += len(block)
-                _progress(downloaded, 1, total)
+                _progress(downloaded, total)
             if total > 0 and downloaded != total:
                 raise RuntimeError("incomplete dataset download; retry the command")
         part.replace(dest)
@@ -119,11 +120,11 @@ def _safe_extract(zip_path, dest, max_bytes=MAX_UNCOMPRESSED):
         z.extractall(dest)
 
 
-def _install_archive(zip_path, target, verify):
+def _install_archive(zip_path, target, verify, *, max_bytes=MAX_UNCOMPRESSED):
     target = Path(target)
     with TemporaryDirectory(dir=target.parent) as directory:
         staging = Path(directory)
-        _safe_extract(zip_path, staging)
+        _safe_extract(zip_path, staging, max_bytes=max_bytes)
         candidate = staging / target.name
         verify(candidate)
         candidate.replace(target)
@@ -184,7 +185,7 @@ def download_wesad() -> None:
     zip_path = RAW_DATA_DIR / "WESAD.zip"
     print("WESAD is ~2 GB and covered by a research-only agreement.")
     _download(WESAD_URL, zip_path)
-    _install_archive(zip_path, target, verify_wesad)
+    _install_archive(zip_path, target, verify_wesad, max_bytes=WESAD_MAX_UNCOMPRESSED)
     zip_path.unlink()
     print(f"WESAD ready at {target}")
 

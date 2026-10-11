@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Trophy, AlertTriangle, Activity } from 'lucide-react';
-import results from '../data';
+import results, { shapContext } from '../data';
 import Panel from '../components/Panel';
 import Chart from '../components/Chart';
 import { barChartOption } from '../lib/charts';
@@ -20,7 +20,7 @@ const ModelComparison: React.FC = () => {
   const gap = matchedGap(losoMatched, data.within_subject_accuracy);
   const wrist = results.wrist?.same_model_rf;
   const transfer = results.cross_dataset;
-  const shap = results.shap || [];
+  const shap = results.shap ?? [];
 
   const barData = models.map((m) => ({
     name: m.model,
@@ -33,8 +33,9 @@ const ModelComparison: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Model Comparison</h1>
           <p className="text-gray-500 dark:text-gray-400">
-            WESAD: {data.n_subjects ?? 15} held-out subjects. Table accuracy and macro-F1 are subject means;
-            balanced accuracy pools held-out predictions.
+            WESAD chest signals. {data.n_subjects === undefined ? 'The subject count is not recorded.' : `${data.n_subjects} subjects, each held out once.`}{' '}
+            Accuracy and macro-F1 give each subject equal weight.
+            Balanced accuracy pools all held-out predictions.
           </p>
         </div>
         <select
@@ -52,10 +53,10 @@ const ModelComparison: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <SummaryCard icon={<Trophy className="w-6 h-6 text-green-600" />} label="Highest observed accuracy" value={best?.model ?? 'Unavailable'} />
+        <SummaryCard icon={<Trophy className="w-6 h-6 text-green-600" />} label="Highest mean accuracy" value={best?.model ?? 'Unavailable'} />
         <SummaryCard
           icon={<Activity className="w-6 h-6 text-blue-600" />}
-          label="LOSO accuracy"
+          label="LOSO accuracy · subject mean"
           value={pct(best?.accuracy_mean)}
         />
         <SummaryCard
@@ -77,9 +78,9 @@ const ModelComparison: React.FC = () => {
           {wrist && <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 text-sm">
             <p className="font-semibold text-gray-900 dark:text-white mb-1">Binary RF: wrist vs. chest</p>
             <p className="text-gray-600 dark:text-gray-400">
-              With the same model, Empatica E4 wrist signals reach{' '}
-              <strong>{pct(wrist.wrist)}</strong> vs{' '}
-              {pct(wrist.chest)} for the chest. Chest-to-wrist drop:{' '}
+              Mean LOSO accuracy with Random Forest is{' '}
+              <strong>{pct(wrist.wrist)}</strong> for Empatica E4 wrist signals and{' '}
+              {pct(wrist.chest)} for chest signals. Chest-to-wrist difference:{' '}
               {typeof wrist.drop_pts === 'number' && Number.isFinite(wrist.drop_pts) ? `${wrist.drop_pts.toFixed(1)} pts.` : 'unavailable.'}{' '}
               This laboratory comparison does not establish sensor equivalence or field performance.
             </p>
@@ -104,9 +105,9 @@ const ModelComparison: React.FC = () => {
             <thead>
               <tr className="border-b border-gray-200 dark:border-gray-700 text-left text-gray-600 dark:text-gray-300">
                 <th className="px-4 py-2">Model</th>
-                <th className="px-4 py-2">Accuracy</th>
-                <th className="px-4 py-2">Macro-F1</th>
-                <th className="px-4 py-2">Balanced acc.</th>
+                <th className="px-4 py-2">Accuracy (subject mean)</th>
+                <th className="px-4 py-2">Macro-F1 (subject mean)</th>
+                <th className="px-4 py-2">Balanced accuracy (pooled)</th>
               </tr>
             </thead>
             <tbody>
@@ -132,8 +133,8 @@ const ModelComparison: React.FC = () => {
       </Panel>
 
       <div className={`grid grid-cols-1 ${task === 'binary' ? 'lg:grid-cols-2' : ''} gap-6`}>
-        <Panel title="LOSO accuracy">
-          <Chart label={`${task} LOSO accuracy by model, from highest to lowest.`}
+        <Panel title="LOSO accuracy · subject means">
+          <Chart label={`${task} mean subject LOSO accuracy by model, from highest to lowest.`}
             option={barChartOption({ labels: barData.map((d) => d.name), values: barData.map((d) => d.accuracy),
               colors: barData.map((_, i) => i === 0 ? '#38A169' : '#3182CE'),
               axisName: 'Accuracy', maximum: 100, percent: true, precision: 1 })}
@@ -141,17 +142,17 @@ const ModelComparison: React.FC = () => {
         </Panel>
 
         {task === 'binary' && (
-          <Panel title="Binary XGBoost · full-data SHAP">
+          <Panel title={shapContext.title}>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-              Descriptive mean |SHAP| on the training data; not held-out or causal evidence.
+              {shapContext.description} These values do not measure held-out performance or causal effects.
             </p>
             {shap.length > 0 ? (
-              <Chart label="Binary XGBoost full-data mean absolute SHAP contributions."
+              <Chart label={`${shapContext.title}: mean absolute feature contributions.`}
                 option={barChartOption({ labels: shap.map((d) => d.feature), values: shap.map((d) => d.mean_abs_shap),
                   colors: ['#805AD5'], horizontal: true, axisName: 'mean |SHAP|' })}
               />
             ) : (
-              <p className="text-sm text-gray-500">Run the experiment to populate SHAP values.</p>
+              <p role="status" className="text-sm text-gray-500 dark:text-gray-400">SHAP values are unavailable for this benchmark.</p>
             )}
           </Panel>
         )}

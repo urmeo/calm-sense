@@ -1,22 +1,28 @@
 # Contributing
 
-Python 3.11+; macOS: `brew install libomp`.
+The sole contributor and maintainer is [urmeo](https://github.com/urmeo).
+
+Use Python 3.11 or later and Node.js 24 with npm. On macOS, install the OpenMP library with `brew install libomp`. Follow the [README setup](README.md#run-locally), then run these checks from the repository root:
 
 ```bash
-python -m venv .venv && source .venv/bin/activate
-python -m pip install -r requirements.txt
 python -m black --check src/ tests/ scripts/
 python -m pyflakes src/ tests/ scripts/
 python -m pyright src/
 python -m coverage run --source=src -m unittest discover -s tests
 python -m coverage report --fail-under=60
-cd frontend && node tooling.mjs test && node tooling.mjs build
+node frontend/tooling.mjs install
+node frontend/tooling.mjs test
+node frontend/tooling.mjs build
 ```
 
-- Target `main`; submit one focused change with tests.
+- Target `main`. Keep each change focused and add tests for behavior that changes.
+- Use short commit messages that describe the change, such as `updated readme`, `updated results`, or `updated work`.
 - Fit preprocessing and calibration on training subjects only.
-- Exclude local data and `outputs/generated/`; preserve [published results](README.md#protocol--provenance).
-- Datasets: verify download checksums; specify units and labels.
+- Keep raw data, caches, and generated files out of commits. Preserve the [recorded results](README.md#protocol--provenance) unless the change includes a documented rerun.
+- Verify dataset download checksums. Document signal units, label mappings, and evaluation conditions.
+- Edit frontend dependency and TypeScript settings in `frontend/config/`. The tooling generates the local JSON files. After changing dependencies, run `node frontend/tooling.mjs update` and review both tracked dependency files.
+- Keep README `AUTOGEN` markers. Run `python scripts/update_readme_tables.py` after updating calibration or personalization results.
 
-**Bug reports:** command, expected/actual result, OS/Python version.
-[Report security issues privately](https://github.com/urmeo/CalmSense/security/advisories/new).
+For bug reports, include the command, expected and actual behavior, operating system, and Python or Node.js version. Include the error output when available. Do not attach private recordings or identifiers.
+
+[Report security issues privately](https://github.com/urmeo/calm-sense/security/advisories/new).

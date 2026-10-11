@@ -43,30 +43,31 @@ def run():
         d = loader.load_subject(sid)
         chest = d["chest"]
         labels = np.asarray(d["label"]).flatten()
-        ecg = chest["ECG"].flatten()
-        eda = chest["EDA"].flatten()
-        temp = chest["Temp"].flatten()
         acc = np.asarray(chest["ACC"])
         if acc.shape != (len(labels), 3):
             raise ValueError(
                 f"{sid}: chest ACC must align with labels and contain three axes"
             )
 
-        chans = {"ecg": [], "eda": [], "temp": [], "accX": [], "accY": [], "accZ": []}
+        signals = {
+            "ecg": chest["ECG"].flatten(),
+            "eda": chest["EDA"].flatten(),
+            "temp": chest["Temp"].flatten(),
+            "accX": acc[:, 0],
+            "accY": acc[:, 1],
+            "accZ": acc[:, 2],
+        }
+        channels = {name: [] for name in signals}
         conditions = []
         for label, name in CONDITIONS.items():
-            sig_slices = {
-                "ecg": _slice(ecg, labels, label, want),
-                "eda": _slice(eda, labels, label, want),
-                "temp": _slice(temp, labels, label, want),
-                "accX": _slice(acc[:, 0], labels, label, want),
-                "accY": _slice(acc[:, 1], labels, label, want),
-                "accZ": _slice(acc[:, 2], labels, label, want),
+            clips = {
+                channel: _slice(signal, labels, label, want)
+                for channel, signal in signals.items()
             }
-            if any(v is None for v in sig_slices.values()):
+            if any(clip is None for clip in clips.values()):
                 continue
-            for k, v in sig_slices.items():
-                chans[k].extend(np.round(resample(v, out_n), 3).tolist())
+            for channel, clip in clips.items():
+                channels[channel].extend(np.round(resample(clip, out_n), 3).tolist())
             conditions.extend([name] * out_n)
 
         n = len(conditions)
@@ -74,7 +75,7 @@ def run():
             raise ValueError(f"{sid}: no condition contains a complete {SECONDS}s clip")
         data[sid] = {
             "time": np.round(np.arange(n) / OUT_FS, 3).tolist(),
-            **chans,
+            **channels,
             "conditions": conditions,
         }
         print(f"{sid}: {n} points ({n / OUT_FS:.0f}s real signal)")

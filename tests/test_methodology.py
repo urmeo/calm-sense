@@ -235,6 +235,69 @@ class MethodologyTests(unittest.TestCase):
         self.assertTrue(point["ppv"] == 0.5 and point["npv"] is None)
         json.dumps(point, allow_nan=False)
 
+    def test_threshold_results_save_exact_roc_and_finite_thresholds(self):
+        import json
+        from sklearn.metrics import auc
+        from scripts import threshold_metrics
+
+        y = np.array([0, 0, 1, 1])
+        for scores, expected_auc in (
+            ([0.1, 0.4, 0.35, 0.8], 0.75),
+            ([0.5, 0.5, 0.5, 0.5], 0.5),
+        ):
+            with self.subTest(scores=scores):
+                p1 = np.array(scores)
+                with (
+                    patch.object(threshold_metrics, "RESULTS_DIR", self.tmp_path),
+                    patch.object(threshold_metrics, "FEATURE_MODELS", ["lr", "rf"]),
+                    patch.object(
+                        threshold_metrics, "load_cached", lambda: (None, None)
+                    ),
+                    patch.object(
+                        threshold_metrics,
+                        "prepare_task",
+                        lambda *args: (None, y, None, None, None),
+                    ),
+                    patch.object(
+                        threshold_metrics, "loso_pos_proba", lambda *args: (y, p1)
+                    ),
+                ):
+                    threshold_metrics.run()
+                result = json.loads(
+                    (self.tmp_path / "threshold_metrics.json").read_text()
+                )
+                json.dumps(result, allow_nan=False)
+                self.assertEqual(result["n_windows"], 4)
+                self.assertEqual(len(result["models"]), 2)
+                for row in result["models"]:
+                    self.assertIs(row["available"], True)
+                    curve = row["roc_curve"]
+                    fpr, tpr, thresholds = (
+                        curve["fpr"],
+                        curve["tpr"],
+                        curve["thresholds"],
+                    )
+                    self.assertEqual(len(fpr), len(tpr))
+                    self.assertEqual(len(fpr), len(thresholds))
+                    self.assertEqual((fpr[0], tpr[0]), (0.0, 0.0))
+                    self.assertEqual((fpr[-1], tpr[-1]), (1.0, 1.0))
+                    self.assertIsNone(thresholds[0])
+                    self.assertAlmostEqual(auc(fpr, tpr), expected_auc)
+                    self.assertAlmostEqual(row["auroc"], expected_auc)
+                    for false_positive_rate, true_positive_rate, threshold in zip(
+                        fpr[1:], tpr[1:], thresholds[1:]
+                    ):
+                        self.assertTrue(np.isfinite(threshold))
+                        predicted_stress = p1 >= threshold
+                        self.assertEqual(
+                            false_positive_rate, predicted_stress[y == 0].mean()
+                        )
+                        self.assertEqual(
+                            true_positive_rate, predicted_stress[y == 1].mean()
+                        )
+                self.assertNotIn("operating_point", result["models"][0])
+                self.assertIn("operating_point", result["models"][1])
+
     def _case_threshold_results_mark_undefined_scores_unavailable(self, invalid_case):
         tmp_path = self.tmp_path
         import json

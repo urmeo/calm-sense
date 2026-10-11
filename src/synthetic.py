@@ -1,4 +1,4 @@
-"""Synthetic scores are not real performance."""
+"""Generate WESAD-shaped signals for testing, not performance evaluation."""
 
 import pickle
 from pathlib import Path
@@ -159,15 +159,15 @@ def features(
         raise ValueError(
             "Synthetic features cannot replace real-data caches; use cache=False"
         )
-    import shutil
-    import tempfile
+    from tempfile import TemporaryDirectory
 
     from .dataset import WindowedDataset
 
-    tmp = Path(tempfile.mkdtemp(prefix="calmsense_synth_"))
-    try:
-        root = write_dataset(tmp, n_subjects=n_subjects, block_sec=block_sec, seed=seed)
-        ds = WindowedDataset(data_path=root)
-        return ds.build(subjects=ds.loader.subjects, cache=cache)
-    finally:
-        shutil.rmtree(tmp, ignore_errors=True)
+    with TemporaryDirectory(
+        prefix="calmsense_synth_", ignore_cleanup_errors=True
+    ) as directory:
+        root = write_dataset(
+            Path(directory), n_subjects=n_subjects, block_sec=block_sec, seed=seed
+        )
+        dataset = WindowedDataset(data_path=root)
+        return dataset.build(subjects=dataset.loader.subjects, cache=cache)

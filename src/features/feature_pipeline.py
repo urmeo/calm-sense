@@ -20,6 +20,8 @@ FEATURE_SCHEMA_VERSION = 2
 
 
 class FeatureExtractionPipeline(LoggerMixin):
+    """Extract a fixed feature schema from preprocessed sensor windows."""
+
     _GROUPS = {
         "hrv_time": ("HRV_", "HRV Time-Domain"),
         "hrv_frequency": ("HRV_", "HRV Frequency-Domain"),
@@ -62,79 +64,65 @@ class FeatureExtractionPipeline(LoggerMixin):
         self._feature_names: Optional[List[str]] = None
 
     def extract_window_features(self, window_data: Dict[str, Any]) -> Dict[str, float]:
-        rr = window_data.get("rr_intervals")
-
         features: Dict[str, float] = {}
-        self._add(features, "hrv_time", "HRV_", lambda: self._hrv(rr, "hrv_time"))
-        self._add(
-            features, "hrv_frequency", "HRV_", lambda: self._hrv(rr, "hrv_frequency")
-        )
-        self._add(
-            features, "hrv_nonlinear", "HRV_", lambda: self._hrv(rr, "hrv_nonlinear")
-        )
-        self._add(features, "eda", "EDA_", lambda: self._eda(window_data))
-        self._add(
-            features, "temperature", "TEMP_", lambda: self._temperature(window_data)
-        )
-        self._add(
-            features, "respiration", "RESP_", lambda: self._respiration(window_data)
-        )
-        self._add(
-            features, "accelerometer", "ACC_", lambda: self._accelerometer(window_data)
-        )
+        for group, (prefix, _) in self._GROUPS.items():
+            if not self.feature_config.get(group, True):
+                continue
+            result = self._extract_group_features(group, window_data)
+            if result is None:
+                result = dict.fromkeys(
+                    self.extractors[group].get_feature_descriptions(), np.nan
+                )
+            features.update(
+                {
+                    name if name.startswith(prefix) else prefix + name: value
+                    for name, value in result.items()
+                }
+            )
         return features
 
-    def _add(self, features, group, prefix, compute) -> None:
-        if not self.feature_config.get(group, True):
-            return
-        result = compute()
-        if result is None:
-            result = dict.fromkeys(
-                self.extractors[group].get_feature_descriptions(), np.nan
+    def _extract_group_features(
+        self, group: str, window_data: Dict[str, Any]
+    ) -> Optional[Dict[str, float]]:
+        extractor = self.extractors[group]
+        if group.startswith("hrv_"):
+            rr = window_data.get("rr_intervals")
+            return None if rr is None else extractor.extract_all(rr)
+
+        if group == "temperature":
+            temperature = window_data.get("temperature")
+            return None if temperature is None else extractor.extract_all(temperature)
+
+        if group == "eda":
+            tonic, raw = window_data.get("eda_tonic"), window_data.get("eda_raw")
+            if tonic is None and raw is None:
+                return None
+            decomposed = {"tonic": tonic, "phasic": window_data.get("eda_phasic")}
+            return extractor.extract_all(decomposed, window_data.get("scr_peaks"), raw)
+
+        if group == "respiration":
+            respiration = window_data.get("respiration")
+            if respiration is None:
+                return None
+            return extractor.extract_all(
+                respiration,
+                breath_peaks=window_data.get("breath_peaks"),
+                breath_troughs=window_data.get("breath_troughs"),
+                breath_intervals=window_data.get("breath_intervals"),
             )
-        features.update(
-            {k if k.startswith(prefix) else prefix + k: v for k, v in result.items()}
-        )
 
-    def _hrv(self, rr, group):
-        return None if rr is None else self.extractors[group].extract_all(rr)
-
-    def _eda(self, w):
-        tonic, raw = w.get("eda_tonic"), w.get("eda_raw")
-        if tonic is None and raw is None:
+        accelerometer = window_data.get("accelerometer")
+        if accelerometer is None:
             return None
-        decomposed = {"tonic": tonic, "phasic": w.get("eda_phasic")}
-        return self.extractors["eda"].extract_all(decomposed, w.get("scr_peaks"), raw)
-
-    def _temperature(self, w):
-        temp = w.get("temperature")
-        return (
-            None if temp is None else self.extractors["temperature"].extract_all(temp)
-        )
-
-    def _respiration(self, w):
-        resp = w.get("respiration")
-        if resp is None:
-            return None
-        return self.extractors["respiration"].extract_all(
-            resp,
-            breath_peaks=w.get("breath_peaks"),
-            breath_troughs=w.get("breath_troughs"),
-            breath_intervals=w.get("breath_intervals"),
-        )
-
-    def _accelerometer(self, w):
-        acc = w.get("accelerometer")
-        if acc is None:
-            return None
-        extractor = self.extractors["accelerometer"]
-        if not isinstance(acc, dict):
-            return extractor.extract_from_magnitude(acc)
-        if "magnitude" in acc:
-            return extractor.extract_from_magnitude(acc["magnitude"])
+        if not isinstance(accelerometer, dict):
+            return extractor.extract_from_magnitude(accelerometer)
+        if "magnitude" in accelerometer:
+            return extractor.extract_from_magnitude(accelerometer["magnitude"])
         empty = np.array([])
         return extractor.extract_all(
-            acc.get("x", empty), acc.get("y", empty), acc.get("z", empty)
+            accelerometer.get("x", empty),
+            accelerometer.get("y", empty),
+            accelerometer.get("z", empty),
         )
 
     def extract_all_features(
@@ -234,13 +222,12 @@ class FeatureExtractionPipeline(LoggerMixin):
 
         if file_format == "csv":
             return pd.read_csv(input_path)
-        elif file_format == "parquet":
+        if file_format == "parquet":
             return pd.read_parquet(input_path)
-        elif file_format in ("pickle", "pkl"):
+        if file_format in ("pickle", "pkl"):
             with open(input_path, "rb") as f:
                 return pickle.load(f)
-        else:
-            raise ValueError(f"Unknown format: {file_format}")
+        raise ValueError(f"Unknown format: {file_format}")
 
     def get_feature_groups(self) -> Dict[str, List[str]]:
         enabled = set(self.get_feature_names())

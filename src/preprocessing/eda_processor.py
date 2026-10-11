@@ -49,7 +49,7 @@ class EDAProcessor(LoggerMixin):
     def decompose_eda(
         self, eda: np.ndarray, method: str = "highpass"
     ) -> Tuple[np.ndarray, np.ndarray]:
-        """cvxEDA failure uses median decomposition."""
+        """Split EDA into tonic and phasic signals; cvxEDA failures use a median filter."""
         if method not in {"highpass", "median", "cvxeda"}:
             raise ValueError(
                 "EDA decomposition method must be 'highpass', 'median', or 'cvxeda'"
@@ -62,10 +62,9 @@ class EDAProcessor(LoggerMixin):
 
         if method == "cvxeda":
             return self._decompose_cvxeda(eda)
-        elif method == "median":
+        if method == "median":
             return self._decompose_median(eda)
-        else:
-            return self._decompose_highpass(eda)
+        return self._decompose_highpass(eda)
 
     def _decompose_highpass(
         self, eda: np.ndarray, cutoff: float = 0.05

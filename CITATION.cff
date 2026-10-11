@@ -1,14 +1,16 @@
 cff-version: 1.2.0
 message: "Cite CalmSense when using this software."
 type: software
-title: "CalmSense: Subject-Independent Stress Detection and Calibration on WESAD"
+title: "CalmSense: Wearable Stress Classification and Calibration on WESAD"
 version: 1.0.0
 date-released: 2026-07-03
-url: "https://github.com/urmeo/CalmSense"
-repository-code: "https://github.com/urmeo/CalmSense"
+url: "https://github.com/urmeo/calm-sense"
+repository-code: "https://github.com/urmeo/calm-sense"
 license: MIT
 authors:
   - given-names: "Urme"
+    alias: "urmeo"
+    website: "https://github.com/urmeo"
 keywords:
   - stress-detection
   - wearables
@@ -17,13 +19,14 @@ keywords:
   - electrodermal-activity
   - leave-one-subject-out
   - model-calibration
-  - reproducible-research
   - wesad
 abstract: >-
-  CalmSense evaluates wearable stress detection on WESAD using Leave-One-Subject-Out
-  testing. It includes signal processing, 60 registered features,
-  classical classifiers, a 1D-CNN, SHAP, calibration, decision curves,
-  personalization, and cross-dataset transfer.
+  CalmSense compares four feature-based classifiers and a 1D convolutional neural
+  network on WESAD using leave-one-subject-out evaluation. It processes ECG, EDA,
+  temperature, respiration, and motion signals. The project also evaluates
+  probability calibration, personalization, chest and wrist recordings, and
+  transfer to the PhysioNet Non-EEG dataset. A static dashboard displays saved
+  results and recorded signal excerpts.
 references:
   - type: conference-paper
     authors:

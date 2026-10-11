@@ -1,12 +1,10 @@
 import React from 'react';
 import { Activity, Brain, Layers, Award } from 'lucide-react';
-import results from '../data';
+import results, { shapContext } from '../data';
 import Panel from '../components/Panel';
 import Chart from '../components/Chart';
 import { barChartOption } from '../lib/charts';
 import { formatPercent as pct, matchedGap } from '../lib/benchmarks';
-
-const r = results;
 
 const CARD_COLORS: Record<string, string> = {
   blue: 'bg-blue-100 dark:bg-blue-900/30',
@@ -34,14 +32,17 @@ const MetricCard: React.FC<{
 
 const FeatureImportanceChart: React.FC = () => {
   const palette = ['#3182CE', '#38A169', '#D69E2E', '#E53E3E', '#805AD5', '#DD6B20', '#319795', '#D53F8C'];
-  const data = (r.shap || []).slice(0, 8).map((s, i) => ({
-    name: s.feature,
-    value: s.mean_abs_shap,
+  const data = [...(results.shap ?? [])]
+    .sort((a, b) => b.mean_abs_shap - a.mean_abs_shap)
+    .slice(0, 8).map((feature, i) => ({
+    name: feature.feature,
+    value: feature.mean_abs_shap,
     color: palette[i % palette.length],
   }));
 
   return (
-    <Panel title="Top features (binary XGBoost, full-data SHAP)">
+    <Panel title={`Top features · ${shapContext.title}`}>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{shapContext.description}</p>
       {data.length === 0 ? <p role="status" className="text-sm text-gray-500 dark:text-gray-400">SHAP values are unavailable for this benchmark.</p> : <Chart
         label="Top eight features by mean absolute SHAP contribution."
         option={barChartOption({ labels: data.map((d) => d.name), values: data.map((d) => d.value),
@@ -52,9 +53,8 @@ const FeatureImportanceChart: React.FC = () => {
 };
 
 const OptimismGapChart: React.FC = () => {
-  const b = r.binary;
-  const loso = b.loso_matched_accuracy;
-  const within = b.within_subject_accuracy;
+  const loso = results.binary.loso_matched_accuracy;
+  const within = results.binary.within_subject_accuracy;
   const gap = matchedGap(loso, within);
   const hasMatched = gap !== undefined;
   const data = [
@@ -64,7 +64,7 @@ const OptimismGapChart: React.FC = () => {
   return (
     <Panel title="Optimism gap">
       <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-        {hasMatched ? `Pooled subject-mixed minus LOSO accuracy: ${gap?.toFixed(1)} points on matched non-overlapping windows` : 'Matched-window comparison is unavailable for the selected benchmark model.'}
+        {hasMatched ? `${results.binary.best_model}: subject-mixed accuracy minus LOSO accuracy is ${gap.toFixed(1)} percentage points. Both pool predictions from the same non-overlapping windows.` : 'The matched-window comparison is unavailable for the selected benchmark model.'}
       </p>
       {hasMatched && <Chart height={250}
         label={`Matched LOSO versus subject-mixed accuracy. Optimism gap: ${gap?.toFixed(1)} percentage points.`}
@@ -77,7 +77,7 @@ const OptimismGapChart: React.FC = () => {
 };
 
 const ModelComparisonList: React.FC = () => {
-  const models = [...((r.binary).models || [])].sort(
+  const models = [...results.binary.models].sort(
     (a, b) => b.accuracy_mean - a.accuracy_mean
   );
   return (
@@ -103,14 +103,14 @@ const ModelComparisonList: React.FC = () => {
 };
 
 const DatasetSummary: React.FC = () => {
-  const b = r.binary;
-  const m = r.multiclass;
+  const { binary, multiclass } = results;
   const rows: [string, string | number][] = [
-    ['Dataset', `WESAD (chest, ${b.n_subjects ?? 15} subjects)`],
-    ['Windows (binary)', b.n_windows],
-    ['Features', b.n_features],
-    ['Binary classes', (b.classes || []).join(', ')],
-    ['3-class classes', (m.classes || []).join(', ')],
+    ['Dataset', 'WESAD (chest signals)'],
+    ['Subjects', binary.n_subjects ?? 'Not recorded'],
+    ['Windows (binary)', binary.n_windows],
+    ['Features', binary.n_features],
+    ['Binary classes', binary.classes.join(', ')],
+    ['3-class classes', multiclass.classes.join(', ')],
     ['Validation', 'Leave-One-Subject-Out'],
   ];
   return (
@@ -128,23 +128,24 @@ const DatasetSummary: React.FC = () => {
 };
 
 const Dashboard: React.FC = () => {
-  const b = r.binary;
-  const m = r.multiclass;
+  const { binary, multiclass } = results;
 
   return (
     <div className="space-y-6 animate-fade-in">
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
         <p className="text-gray-500 dark:text-gray-400">
-          Subject-independent stress detection: real LOSO results
+          Saved WESAD experiments. Leave-one-subject-out (LOSO) validation tests each
+          person with a model trained on the other subjects. Accuracy below is the
+          mean across held-out subjects.
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <MetricCard title="Binary LOSO accuracy" value={pct(b.loso_accuracy)} icon={<Activity className="w-6 h-6 text-blue-600" />} color="blue" />
-        <MetricCard title="3-class LOSO accuracy" value={pct(m.loso_accuracy)} icon={<Brain className="w-6 h-6 text-green-600" />} color="green" />
-        <MetricCard title="Saved features" value={b.n_features} icon={<Layers className="w-6 h-6 text-purple-600" />} color="purple" />
-        <MetricCard title="Highest observed accuracy" value={b.best_model} icon={<Award className="w-6 h-6 text-orange-600" />} color="orange" />
+        <MetricCard title="Binary LOSO accuracy" value={pct(binary.loso_accuracy)} icon={<Activity className="w-6 h-6 text-blue-600" />} color="blue" />
+        <MetricCard title="3-class LOSO accuracy" value={pct(multiclass.loso_accuracy)} icon={<Brain className="w-6 h-6 text-green-600" />} color="green" />
+        <MetricCard title="Saved features" value={binary.n_features} icon={<Layers className="w-6 h-6 text-purple-600" />} color="purple" />
+        <MetricCard title="Highest binary accuracy" value={binary.best_model} icon={<Award className="w-6 h-6 text-orange-600" />} color="orange" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

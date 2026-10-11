@@ -57,6 +57,7 @@ CLF_NAMES = {
     "rf": "Random Forest",
     "xgb": "XGBoost",
     "lgbm": "LightGBM",
+    "cnn": "1D-CNN",
 }
 
 
@@ -411,24 +412,26 @@ def run():
                 f"  {'1D-CNN':20s} acc={cnn_res['accuracy_mean']:.3f} f1={cnn_res['f1_macro_mean']:.3f}"
             )
 
-        best_key = max(rows, key=lambda r: r["accuracy_mean"])["model"]
-        best = max(results.items(), key=lambda kv: kv[1]["accuracy_mean"])
+        best_key, best_result = max(
+            results.items(), key=lambda item: item[1]["accuracy_mean"]
+        )
+        best_name = CLF_NAMES[best_key]
 
         plot_model_comparison(rows, figures_dir / f"{task}_model_comparison.png")
         plot_confusion(
-            best[1],
+            best_result,
             cfg["names"],
-            f"{task} ({best_key})",
+            f"{task} ({best_name})",
             figures_dir / f"{task}_confusion.png",
         )
         plot_per_subject(
-            best[1]["per_subject"], figures_dir / f"{task}_per_subject.png"
+            best_result["per_subject"], figures_dir / f"{task}_per_subject.png"
         )
         plot_embedding(X, y, cfg["names"], figures_dir / f"{task}_pca.png")
 
-        if best[0] in CLASSIFIERS:
+        if best_key in CLASSIFIERS:
             m = nonoverlap_mask(groups)
-            gap_factory = lambda k=best[0]: build_pipeline(k)
+            gap_factory = lambda k=best_key: build_pipeline(k)
             loso_matched = loso_evaluate(gap_factory, X[m], y[m], groups[m])[
                 "pooled_accuracy"
             ]
@@ -444,7 +447,7 @@ def run():
         )
         atomic_write_text(
             results_dir / f"{task}_per_subject.csv",
-            best[1]["per_subject"].to_csv(index=False),
+            best_result["per_subject"].to_csv(index=False),
         )
 
         summary[task] = {
@@ -454,9 +457,9 @@ def run():
             "feature_schema_version": FEATURE_SCHEMA_VERSION,
             "classes": cfg["names"],
             "models": rows,
-            "best_model": best_key,
-            "loso_accuracy": best[1]["accuracy_mean"],
-            "loso_pooled_accuracy": best[1]["pooled_accuracy"],
+            "best_model": best_name,
+            "loso_accuracy": best_result["accuracy_mean"],
+            "loso_pooled_accuracy": best_result["pooled_accuracy"],
             "loso_matched_accuracy": loso_matched,
             "within_subject_accuracy": kf_acc,
             "optimism_gap_pts": (
@@ -464,7 +467,7 @@ def run():
                 if kf_acc is not None and loso_matched is not None
                 else None
             ),
-            "per_subject": best[1]["per_subject"].to_dict("records"),
+            "per_subject": best_result["per_subject"].to_dict("records"),
         }
 
         if task == "binary":

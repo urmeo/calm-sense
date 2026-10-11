@@ -2,17 +2,13 @@ import React from 'react';
 import Chart from '../components/Chart';
 import { barChartOption } from '../lib/charts';
 import { FileSearch, Info, AlertTriangle } from 'lucide-react';
-import results from '../data';
+import results, { shapContext } from '../data';
 import Panel from '../components/Panel';
 
-const prettify = (f: string) => f.replace(/_/g, ' ');
-
-const shap = results.shap ?? [];
-const importance = shap
-  .slice()
+const importance = [...(results.shap ?? [])]
   .sort((a, b) => b.mean_abs_shap - a.mean_abs_shap)
   .slice(0, 12)
-  .map((d) => ({ feature: prettify(d.feature), value: d.mean_abs_shap }));
+  .map((entry) => ({ feature: entry.feature.replace(/_/g, ' '), value: entry.mean_abs_shap }));
 const maxImportance = Math.max(...importance.map((d) => d.value), 0);
 
 const ExplainabilityDashboard: React.FC = () => {
@@ -23,8 +19,8 @@ const ExplainabilityDashboard: React.FC = () => {
           <FileSearch className="w-6 h-6" /> Explainability
         </h1>
         <p className="text-gray-500 dark:text-gray-400">
-          Global mean |SHAP| from binary XGBoost fitted and explained on the full dataset.
-          These summaries describe that fit, not held-out performance or causal effects.
+          {shapContext.title}. {shapContext.description}
+          {' '}These values do not measure held-out performance or causal effects.
         </p>
       </div>
 
@@ -67,7 +63,7 @@ const ExplainabilityDashboard: React.FC = () => {
               across the training rows; it is not a per-person physiological assessment.
             </p>
           ) : (
-            <p>Run the experiment to populate SHAP values.</p>
+            <p>SHAP values are unavailable for this benchmark.</p>
           )}
           <div className="flex items-start gap-2 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
             <AlertTriangle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5 shrink-0" />

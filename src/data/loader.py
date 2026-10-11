@@ -9,7 +9,7 @@ from ..logging_config import LoggerMixin
 
 
 class WESADLoader(LoggerMixin):
-    """Trusted pickles; native sampling rates."""
+    """Load trusted WESAD pickles at their recorded sampling rates."""
 
     VALID_SUBJECTS = VALID_SUBJECTS
     LABELS = LABEL_NAMES
