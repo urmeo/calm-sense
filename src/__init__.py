@@ -1,5 +1,5 @@
 __version__ = "1.0.0"
-__author__ = "Urme"
+__author__ = "urme"
 
 from .config import (
     CONDITION_COLORS,
