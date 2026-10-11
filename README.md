@@ -5,10 +5,57 @@ CalmSense classifies stress from wearable ECG, skin conductance, temperature, re
 [Results dashboard](https://urmeo.github.io/calm-sense/) · [Colab demo](https://colab.research.google.com/github/urmeo/calm-sense/blob/main/notebooks/CalmSense.ipynb) · [Methodology](docs/methodology.md) · [Reproduction](docs/reproduction.md) · [Repository map](docs/structure.md)
 
 <p align="center">
-<a href="https://urmeo.github.io/calm-sense/"><img src="outputs/figures/demo.gif" width="800" alt="Recorded dashboard preview showing the saved research results"></a>
+<a href="https://urmeo.github.io/calm-sense/"><img src="frontend/public/media/current-dashboard.png" width="1000" alt="Current CalmSense dashboard showing saved WESAD results and mean accuracy across held-out subjects"></a>
 </p>
 
-The preview above shows an earlier dashboard interface. The current dashboard displays saved research results and recorded signal excerpts; it does not run live inference.
+The dashboard displays saved research results and recorded signal excerpts. It does not run live inference.
+
+## Images and videos
+
+These recordings show the current interface. Select an animated preview to play the full MP4 video, or download the file to watch locally. Both videos are silent.
+
+<table width="100%">
+<tr>
+<td align="center" width="50%"><strong>Dashboard tour · 32 s</strong></td>
+<td align="center" width="50%"><strong>Signal exploration · 24 s</strong></td>
+</tr>
+<tr>
+<td align="center"><a href="https://urmeo.github.io/calm-sense/media/dashboard-tour.mp4"><img src="frontend/public/media/dashboard-tour.gif" width="420" alt="Animated preview of the current dashboard tour; select to play the full video"></a></td>
+<td align="center"><a href="https://urmeo.github.io/calm-sense/media/signal-explorer.mp4"><img src="frontend/public/media/signal-explorer.gif" width="420" alt="Animated preview of recorded WESAD signal exploration; select to play the full video"></a></td>
+</tr>
+<tr>
+<td>Saved LOSO results, binary and three-class model comparison, calibration, and the research pipeline.</td>
+<td>Select a WESAD subject, toggle signal channels, zoom, and reset the view.</td>
+</tr>
+<tr>
+<td align="center"><a href="https://urmeo.github.io/calm-sense/media/dashboard-tour.mp4">Watch video</a> · <a href="frontend/public/media/dashboard-tour.mp4">Repository copy</a></td>
+<td align="center"><a href="https://urmeo.github.io/calm-sense/media/signal-explorer.mp4">Watch video</a> · <a href="frontend/public/media/signal-explorer.mp4">Repository copy</a></td>
+</tr>
+</table>
+
+<table width="100%">
+<tr>
+<td align="center" width="50%"><strong>Recorded chest signals</strong></td>
+<td align="center" width="50%"><strong>Research pipeline</strong></td>
+</tr>
+<tr>
+<td align="center"><a href="frontend/public/media/signal-explorer.png"><img src="frontend/public/media/signal-explorer.png" width="420" alt="Current Signal Explorer showing recorded ECG, EDA, temperature, and acceleration with condition labels"></a></td>
+<td align="center"><a href="frontend/public/media/research-pipeline.png"><img src="frontend/public/media/research-pipeline.png" width="420" alt="Current About page showing the research pipeline and subject-held-out evaluation boundaries"></a></td>
+</tr>
+<tr>
+<td>The clips are downsampled and concatenated for display. The time axis does not represent one continuous recording.</td>
+<td>The feature and CNN paths have separate training rules. Each evaluation fold holds out one complete person.</td>
+</tr>
+</table>
+
+<details>
+<summary>Earlier dashboard preview</summary>
+
+![Recorded preview of an earlier dashboard interface](outputs/figures/demo.gif)
+
+This original preview shows an older interface. The screenshots and videos above show the current dashboard.
+
+</details>
 
 ## Pipeline
 

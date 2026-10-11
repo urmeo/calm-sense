@@ -29,6 +29,7 @@ calm-sense/
 ├── frontend/
 │   ├── config/               Tracked dependency and build settings
 │   ├── public/               Browser icons and static files
+│   │   └── media/            README screenshots, GIF previews, and MP4 recordings
 │   ├── src/
 │   │   ├── components/       Shared charts, panels, cards, and layout
 │   │   │   └── layout/       Header and sidebar
