@@ -1,8 +1,27 @@
 # CalmSense
 
-CalmSense compares four feature-based stress classifiers and a 1D CNN on recorded wearable signals. The main benchmark uses WESAD chest ECG, skin conductance, temperature, respiration, and motion. Separate analyses examine probability calibration, personalization, chest and wrist recordings, and transfer to PhysioNet Non-EEG.
+CalmSense compares four feature-based classifiers and a 1D CNN for stress classification from recorded wearable signals. The main benchmark tests on unseen people using WESAD chest recordings. Separate experiments examine calibration, personalization, sensor placement, and transfer to PhysioNet Non-EEG.
 
-Signal processing uses NumPy, pandas, SciPy, and NeuroKit2. The feature models use scikit-learn, XGBoost, and LightGBM; the CNN uses PyTorch.
+[![CalmSense research pipeline: recorded chest signals, windowing, separate training and held-out people, feature and CNN paths, independent predictions, and saved results](docs/assets/pipeline.svg)](docs/assets/pipeline.svg)
+
+Each fold uses 14 people for training and validation, then tests on the remaining person. The feature models and CNN are evaluated independently. Select the diagram to open it at full size.
+
+| WESAD subjects | Saved chest features | Binary windows | Three-class windows |
+| :--: | :--: | :--: | :--: |
+| 15 | 58 | 869 | 1,032 |
+
+<details>
+<summary>Benchmark protocol and feature inputs</summary>
+
+Each leave-one-subject-out (LOSO) fold holds out one complete person. The other 14 subjects form the training pool. Median imputation and scaling use only this pool. The CNN splits it into training and validation subjects. Its normalization uses inner training windows only.
+
+The feature registry contains 60 entries. Two respiration features are entirely missing in this benchmark, leaving 58 inputs for the feature models. The CNN uses five processed signal channels: ECG, skin conductance (EDA), temperature, respiration, and acceleration magnitude.
+
+Calibration, personalization, ablation, wrist comparison, transfer, statistics, and nested tuning are [separate research runs](docs/reproduction.md#additional-analyses), each with its own evaluation protocol. Transfer uses 18 shared features from WESAD wrist and Non-EEG. The exported Random Forest and descriptive XGBoost SHAP values come from separate full-data fits. See the [methodology](docs/methodology.md) for the full protocols.
+
+</details>
+
+Python signal processing uses NumPy, pandas, SciPy, and NeuroKit2. The feature models use scikit-learn, XGBoost, and LightGBM; the CNN uses PyTorch. The results dashboard uses React and TypeScript.
 
 [Results dashboard](https://urmeo.github.io/calm-sense/) · [Run locally](#run-locally) · [Colab demo](https://colab.research.google.com/github/urmeo/calm-sense/blob/main/notebooks/CalmSense.ipynb) · [Methodology](docs/methodology.md) · [Reproduction](docs/reproduction.md) · [Repository map](docs/structure.md)
 
@@ -55,24 +74,6 @@ Select a WESAD subject, toggle signal channels, zoom, and reset the view. [Watch
 This preview predates the current screenshots and videos above.
 
 </details>
-
-## Pipeline
-
-[![CalmSense pipeline: five steps, separate training and test people, feature and CNN paths, and recorded evidence](docs/assets/pipeline.svg)](docs/assets/pipeline.svg)
-
-The primary benchmark holds out one person before fitting either model path. Blue marks training; teal marks the held-out test. [Edit the figure in Figma](https://www.figma.com/design/tfPEQsLyRoAj9yT3HrPaob?node-id=3-2).
-
-| WESAD subjects | Saved chest features | Binary windows | Three-class windows |
-| :--: | :--: | :--: | :--: |
-| 15 | 58 | 869 | 1,032 |
-
-Each leave-one-subject-out (LOSO) fold holds out one complete person. The other 14 subjects form the training pool. Median imputation and scaling use only this pool. The CNN splits it into training and validation subjects. Its normalization uses inner training windows only.
-
-The feature registry contains 60 entries. Two respiration features are entirely missing in this benchmark, leaving 58 inputs for the feature models. The CNN uses five processed signal channels.
-
-Calibration, personalization, ablation, wrist comparison, transfer, statistics, and nested tuning are [separate research runs](docs/reproduction.md#additional-analyses), each with its own evaluation protocol. Transfer uses 18 shared features from WESAD wrist and Non-EEG. The exported Random Forest and descriptive XGBoost SHAP values come from separate full-data fits. See the [methodology](docs/methodology.md) for the full protocols.
-
-Python, NumPy, pandas, SciPy, and NeuroKit2 handle signals and features. Models use scikit-learn, XGBoost, LightGBM, and PyTorch. The dashboard uses React and TypeScript.
 
 ## Recorded results
 
