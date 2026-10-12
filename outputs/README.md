@@ -22,7 +22,7 @@ The saved benchmark was recorded on 4 October 2026. [provenance.json](results/pr
 
 The [calibration curves](../docs/assets/calibration-curves.svg) and [transfer chart](../docs/assets/transfer.svg) also summarize the saved metrics. Regenerate these SVG charts with `python -m scripts.plot_results` from the repository root.
 
-The ROC curves use [roc_curves.json](results/roc_curves.json), a supplemental replay made on 12 October 2026 (Asia/Dhaka). It uses archived source `4f5c02f` and verified cached WESAD features. AUROC and AUPRC match the original threshold file exactly for all four models. Its provenance records the replay source, cache hashes, and comparisons. The original 33 research files are unchanged; this replay does not evaluate the modified pipeline.
+The ROC curves use [roc_curves.json](results/roc_curves.json), a supplemental replay made on 12 October 2026 (Asia/Dhaka). It uses archived source `4f5c02f` and verified cached WESAD features. AUROC and AUPRC match the original threshold file exactly for all four models. Its provenance records the replay source, cache hashes, and comparisons. The original 33 research files are unchanged. The replay adds curve coordinates; it does not measure later code changes.
 
 After running a new compatible benchmark, save its measured ROC points and redraw the charts:
 

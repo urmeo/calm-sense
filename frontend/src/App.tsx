@@ -1,5 +1,5 @@
-import React, { lazy, Suspense, useState, useEffect, useCallback } from 'react';
-import { BrowserRouter as Router, Link, Routes, Route } from 'react-router-dom';
+import React, { lazy, Suspense, useState, useEffect, useCallback, useRef } from 'react';
+import { BrowserRouter as Router, Link, Routes, Route, useLocation } from 'react-router-dom';
 
 import Dashboard from './pages/Dashboard';
 import ModelComparison from './pages/ModelComparison';
@@ -10,15 +10,40 @@ import Header from './components/layout/Header';
 import results from './data';
 import { readDarkMode, saveDarkMode } from './lib/preferences';
 import { benchmarkStatus } from './lib/benchmarks';
+import { dashboardRoutes } from './lib/routes';
 import { generated_at, provenance_kind } from '../../outputs/results/provenance.json';
 
 const SignalExplorer = lazy(() => import('./pages/SignalExplorer'));
 const ExplainabilityDashboard = lazy(() => import('./pages/ExplainabilityDashboard'));
 const CalibrationPanel = lazy(() => import('./pages/CalibrationPanel'));
 
+const pages = {
+  '/': Dashboard,
+  '/signals': SignalExplorer,
+  '/explain': ExplainabilityDashboard,
+  '/models': ModelComparison,
+  '/calibration': CalibrationPanel,
+  '/about': About,
+};
 const hasCalibration = Boolean(results.calibration);
+const availableRoutes = dashboardRoutes.filter(({ path }) => hasCalibration || path !== '/calibration');
 const status = benchmarkStatus(results,
   provenance_kind === 'validated_reproduction' ? generated_at : undefined);
+
+function PageContent({ children }: { children: React.ReactNode }) {
+  const { pathname } = useLocation();
+  const content = useRef<HTMLElement>(null);
+  const previousPath = useRef(pathname);
+
+  useEffect(() => {
+    if (previousPath.current === pathname) return;
+    previousPath.current = pathname;
+    content.current?.scrollTo(0, 0);
+    content.current?.focus({ preventScroll: true });
+  }, [pathname]);
+
+  return <main ref={content} tabIndex={-1} className="flex-1 overflow-y-auto p-4 lg:p-6">{children}</main>;
+}
 
 const App: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -47,7 +72,7 @@ const App: React.FC = () => {
           <div id="dashboard-content" className="flex-1 flex flex-col overflow-hidden">
             <Header sidebarOpen={sidebarOpen} onMenuClick={() => setSidebarOpen(true)} />
 
-            <main className="flex-1 overflow-y-auto p-4 lg:p-6">
+            <PageContent>
               <aside aria-label="Benchmark provenance" className="mb-6 space-y-2 text-sm">
                 <p role="note" className={`rounded-lg border p-3 ${status.historical
                   ? 'border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200'
@@ -62,14 +87,10 @@ const App: React.FC = () => {
               </aside>
               <Suspense fallback={<p role="status" className="text-gray-600 dark:text-gray-300">Loading charts…</p>}>
                 <Routes>
-                  <Route path="/" element={<ErrorBoundary key="dashboard"><Dashboard /></ErrorBoundary>} />
-                  <Route path="/signals" element={<ErrorBoundary key="signals"><SignalExplorer /></ErrorBoundary>} />
-                  <Route path="/explain" element={<ErrorBoundary key="explain"><ExplainabilityDashboard /></ErrorBoundary>} />
-                  <Route path="/models" element={<ErrorBoundary key="models"><ModelComparison /></ErrorBoundary>} />
-                  {hasCalibration && (
-                    <Route path="/calibration" element={<ErrorBoundary key="calibration"><CalibrationPanel /></ErrorBoundary>} />
-                  )}
-                  <Route path="/about" element={<ErrorBoundary key="about"><About /></ErrorBoundary>} />
+                  {availableRoutes.map(({ path }) => {
+                    const Page = pages[path];
+                    return <Route key={path} path={path} element={<ErrorBoundary key={path}><Page /></ErrorBoundary>} />;
+                  })}
                   <Route path="*" element={(
                     <div className="space-y-3 text-gray-900 dark:text-white">
                       <h1 className="text-2xl font-bold">Page not found</h1>
@@ -78,12 +99,12 @@ const App: React.FC = () => {
                   )} />
                 </Routes>
               </Suspense>
-            </main>
+            </PageContent>
 
             <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-3">
               <div className="text-center text-sm text-gray-500 dark:text-gray-400">
                 CalmSense · Saved WESAD research results · By{' '}
-                <a href="https://github.com/urmeo" className="underline hover:text-blue-600 dark:hover:text-blue-400">urmeo</a>
+                <a href="https://github.com/urmeo" className="underline hover:text-blue-600 dark:hover:text-blue-400">urme</a>
               </div>
             </footer>
           </div>

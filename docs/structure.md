@@ -54,7 +54,7 @@ calm-sense/
 ├── data/                     Ignored local datasets; created on download
 │   ├── raw/WESAD/            WESAD subject recordings
 │   └── external/noneeg/      PhysioNet Non-EEG recordings
-└── .github/workflows/        Dashboard deployment
+└── .github/workflows/        Code checks and dashboard deployment
 ```
 
 Local folders appear as commands create them. `.venv/`, `frontend/node_modules/`, frontend JSON settings, caches, raw data, and `outputs/generated/` are ignored by Git.

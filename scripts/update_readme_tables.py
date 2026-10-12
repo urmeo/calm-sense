@@ -15,23 +15,24 @@ README = ROOT / "README.md"
 RESULTS = RESULTS_DIR
 
 
-def _f(x: float) -> str:
-    if not math.isfinite(x):
+def _format_metric(value: float) -> str:
+    if not math.isfinite(value):
         raise ValueError("README metrics must be finite")
-    return f"{x:.3f}"
+    return f"{value:.3f}"
 
 
 def _replace(text: str, name: str, body: str) -> str:
     start, end = f"<!-- AUTOGEN:{name} START -->", f"<!-- AUTOGEN:{name} END -->"
-    pat = re.compile(re.escape(start) + r".*?" + re.escape(end), re.DOTALL)
-    if not pat.search(text):
+    pattern = re.compile(re.escape(start) + r".*?" + re.escape(end), re.DOTALL)
+    if not pattern.search(text):
         raise SystemExit(f"AUTOGEN markers for '{name}' not found in README.md")
-    return pat.sub(f"{start}\n{body}\n{end}", text)
+    return pattern.sub(f"{start}\n{body}\n{end}", text)
 
 
 def _calibration_table() -> str:
-    with open(RESULTS / "calibration.json") as fh:
-        d = normalize_binary_calibration(json.load(fh))
+    calibration = normalize_binary_calibration(
+        json.loads((RESULTS / "calibration.json").read_text())
+    )
     head = "| Evaluation | ECE | MCE | Brier |\n| --- | :-: | :-: | :-: |"
     rows = [
         ("Subject-mixed 5-fold, non-overlapping", "within_subject"),
@@ -39,27 +40,39 @@ def _calibration_table() -> str:
         ("LOSO, all windows", "loso"),
         ("LOSO, all windows + isotonic", "recalibrated_isotonic"),
     ]
-    lines = [
-        f"| {label} | {_f(d[k]['ece'])} | {_f(d[k]['mce'])} | {_f(d[k]['brier'])} |"
-        for label, k in rows
-    ]
-    return "\n".join([head] + lines)
+    lines = [head]
+    for label, key in rows:
+        metrics = calibration[key]
+        lines.append(
+            f"| {label} | {_format_metric(metrics['ece'])} | "
+            f"{_format_metric(metrics['mce'])} | {_format_metric(metrics['brier'])} |"
+        )
+    return "\n".join(lines)
 
 
 def _personalization_table() -> str:
-    with open(RESULTS / "personalization.json") as fh:
-        d = json.load(fh)
-    if d.get("brier_definition", BINARY_BRIER_DEFINITION) != BINARY_BRIER_DEFINITION:
+    personalization = json.loads((RESULTS / "personalization.json").read_text())
+    if (
+        personalization.get("brier_definition", BINARY_BRIER_DEFINITION)
+        != BINARY_BRIER_DEFINITION
+    ):
         raise ValueError("Personalization Brier values must use positive-class MSE")
     head = "| Recalibration / requested enrollment budget | ECE | Brier |\n| --- | :-: | :-: |"
     rows = [
-        ("None (LOSO)", d["uncalibrated"]),
-        ("Global (training subjects)", d["global"]),
+        ("None (LOSO)", personalization["uncalibrated"]),
+        ("Global (training subjects)", personalization["global"]),
     ]
-    for k in sorted(d["fewshot"], key=int):
-        rows.append((f"Per-subject, budget {k}", d["fewshot"][k]))
-    lines = [f"| {label} | {_f(s['ece'])} | {_f(s['brier'])} |" for label, s in rows]
-    return "\n".join([head] + lines)
+    for budget in sorted(personalization["fewshot"], key=int):
+        rows.append(
+            (f"Per-subject, budget {budget}", personalization["fewshot"][budget])
+        )
+    lines = [head]
+    for label, metrics in rows:
+        lines.append(
+            f"| {label} | {_format_metric(metrics['ece'])} | "
+            f"{_format_metric(metrics['brier'])} |"
+        )
+    return "\n".join(lines)
 
 
 def main() -> None:

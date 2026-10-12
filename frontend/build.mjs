@@ -4,6 +4,7 @@ import { cp, mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promi
 import { dirname, extname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import manifest from './config/manifest.mjs';
+import { dashboardRoutes } from './src/lib/routes.ts';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const output = resolve(root, '../outputs/generated/site');
@@ -62,6 +63,12 @@ async function publish(result) {
     html = html.replace('</body>', `<script type="module">new EventSource('${base}__reload').onmessage = () => location.reload();</script>\n  </body>`);
   }
   await writeFile(join(output, 'index.html'), html);
+  for (const { path } of dashboardRoutes) {
+    if (path === '/') continue;
+    const directory = join(output, path.slice(1));
+    await mkdir(directory, { recursive: true });
+    await writeFile(join(directory, 'index.html'), html);
+  }
   await writeFile(join(output, 'licenses.txt'), await notices(result.metafile.inputs));
   for (const response of clients) response.write('data: reload\n\n');
 }
@@ -87,6 +94,7 @@ async function serve() {
       let file = resolve(output, path.slice(base.length) || 'index.html');
       if (!file.startsWith(output + sep)) { response.writeHead(403).end(); return; }
       try {
+        if ((await stat(file)).isDirectory()) file = join(file, 'index.html');
         if (!(await stat(file)).isFile()) throw new Error('Not a file');
       } catch {
         if (extname(file)) { response.writeHead(404).end('Not found'); return; }

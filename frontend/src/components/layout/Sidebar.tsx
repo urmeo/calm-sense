@@ -13,6 +13,16 @@ import {
   Heart,
 } from 'lucide-react';
 import { containNavigationFocus } from '../../lib/navigation';
+import { dashboardRoutes } from '../../lib/routes';
+
+const routeIcons = {
+  '/': LayoutDashboard,
+  '/signals': Activity,
+  '/explain': FileSearch,
+  '/models': BarChart3,
+  '/calibration': Gauge,
+  '/about': Info,
+};
 
 const Sidebar: React.FC<{
   hasCalibration: boolean;
@@ -40,16 +50,9 @@ const Sidebar: React.FC<{
     };
   }, [isOpen, onClose]);
 
-  const navItems = [
-    { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
-    { path: '/signals', icon: Activity, label: 'Signal Explorer' },
-    { path: '/explain', icon: FileSearch, label: 'Explainability' },
-    { path: '/models', icon: BarChart3, label: 'Model Comparison' },
-    ...(hasCalibration ? [{ path: '/calibration', icon: Gauge, label: 'Calibration' }] : []),
-    { path: '/about', icon: Info, label: 'About' },
-  ];
-
-  const location = useLocation();
+  const navItems = dashboardRoutes.filter(({ path }) => hasCalibration || path !== '/calibration');
+  const { pathname } = useLocation();
+  const currentPath = pathname.replace(/\/+$/, '') || '/';
   const ThemeIcon = darkMode ? Sun : Moon;
 
   return (
@@ -68,14 +71,14 @@ const Sidebar: React.FC<{
         aria-modal={isOpen ? true : undefined}
         aria-label="Navigation"
         className={`
-          fixed top-0 left-0 z-30 h-full w-64
+          fixed top-0 left-0 z-30 h-full w-64 flex flex-col
           bg-primary-700 dark:bg-gray-900
           transform transition-transform duration-300 ease-in-out
           lg:translate-x-0 lg:static
           ${isOpen ? 'translate-x-0 visible' : '-translate-x-full invisible lg:visible'}
         `}
       >
-        <div className="flex items-center justify-between p-4 border-b border-primary-600 dark:border-gray-700">
+        <div className="flex items-center justify-between shrink-0 p-4 border-b border-primary-600 dark:border-gray-700">
           <div className="flex items-center space-x-2">
             <Heart className="w-8 h-8 text-red-400" />
             <span className="text-xl font-bold text-white">CalmSense</span>
@@ -89,10 +92,10 @@ const Sidebar: React.FC<{
           </button>
         </div>
 
-        <nav aria-label="Main navigation" className="p-4 space-y-2">
+        <nav aria-label="Main navigation" className="flex-1 overflow-y-auto p-4 space-y-2">
           {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            const Icon = item.icon;
+            const isActive = currentPath === item.path;
+            const Icon = routeIcons[item.path];
 
             return (
               <Link
@@ -116,7 +119,7 @@ const Sidebar: React.FC<{
           })}
         </nav>
 
-        <div className="absolute bottom-4 left-4 right-4">
+        <div className="shrink-0 p-4">
           <button
             onClick={toggleDarkMode}
             className="flex items-center justify-center w-full px-4 py-3

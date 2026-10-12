@@ -1,6 +1,6 @@
-# Running the experiments
+# Reproduce and build CalmSense
 
-Start with the Python installation steps in the [README](../README.md#run-locally). Run the commands below from the repository root with the virtual environment active. Defaults, paths, and seed `42` are defined in [src/config.py](../src/config.py).
+For experiments, install the Python dependencies in the [README](../README.md#run-locally). Run Python commands from the repository root with the virtual environment active. To use the saved dashboard, skip to [Refresh and build the dashboard](#refresh-and-build-the-dashboard); no datasets or Python environment are needed. Defaults, paths, and seed `42` are defined in [src/config.py](../src/config.py).
 
 The saved benchmark was generated on 4 October 2026 from source revision `4f5c02f`. Its [provenance record](../outputs/results/provenance.json) lists the package versions used. The dependency ranges in `requirements.txt` permit other versions; matching the protocol alone does not guarantee identical numbers across environments. The saved scikit-learn model requires version 1.6.1.
 
@@ -38,7 +38,7 @@ Real-data scripts write to `outputs/results/` and can replace the tracked resear
 
 ## Additional analyses
 
-Run the primary benchmark first. Most analysis scripts require its compatible cached features and record the primary benchmark's hash. Run them from the same source revision as the primary benchmark so the provenance checks can match their inputs.
+Run the primary benchmark first. Most analysis scripts require compatible cached features and record the primary benchmark's hash. Run them from the same source revision as the primary benchmark so the provenance checks can match their inputs.
 
 | Command | Output or purpose |
 | :-- | :-- |
@@ -71,7 +71,7 @@ python -m scripts.plot_results
 
 This writes SVGs to `docs/assets/`. Use `--results-dir` and `--output-dir` to select other folders. The charts cover subject accuracy, ROC/AUROC, reliability, decision curves, and dataset transfer. They join measured points without smoothing.
 
-The original `threshold_metrics.json` contains AUROC and AUPRC scores but no ROC coordinates. The supplemental [roc_curves.json](../outputs/results/roc_curves.json) records a later replay of its four feature models, using the original source revision, matching package versions, and cached inputs with matching file and frame hashes. Its provenance records those checks and the comparison with the original scores. This replay leaves the original benchmark artifacts intact.
+The saved `threshold_metrics.json` contains AUROC and AUPRC scores but no ROC coordinates. The supplemental [roc_curves.json](../outputs/results/roc_curves.json) records a later replay of its four feature models, using the original source revision, matching package versions, and cached inputs with matching file and frame hashes. Its provenance records those checks and the comparison with the original scores. This replay leaves the original benchmark artifacts intact.
 
 For a new experiment, run the primary benchmark and threshold analysis from the same source revision:
 

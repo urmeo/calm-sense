@@ -1,18 +1,20 @@
 # CalmSense
 
-CalmSense classifies stress from wearable ECG, skin conductance, temperature, respiration, and motion. It compares four feature-based classifiers and a 1D CNN, then examines calibration, personalization, chest and wrist signals, and transfer to a second dataset.
+CalmSense compares four feature-based stress classifiers and a 1D CNN on recorded wearable signals. The main benchmark uses WESAD chest ECG, skin conductance, temperature, respiration, and motion. Separate analyses examine probability calibration, personalization, chest and wrist recordings, and transfer to PhysioNet Non-EEG.
 
-[Results dashboard](https://urmeo.github.io/calm-sense/) · [Colab demo](https://colab.research.google.com/github/urmeo/calm-sense/blob/main/notebooks/CalmSense.ipynb) · [Methodology](docs/methodology.md) · [Reproduction](docs/reproduction.md) · [Repository map](docs/structure.md)
+Signal processing uses NumPy, pandas, SciPy, and NeuroKit2. The feature models use scikit-learn, XGBoost, and LightGBM; the CNN uses PyTorch.
+
+[Results dashboard](https://urmeo.github.io/calm-sense/) · [Run locally](#run-locally) · [Colab demo](https://colab.research.google.com/github/urmeo/calm-sense/blob/main/notebooks/CalmSense.ipynb) · [Methodology](docs/methodology.md) · [Reproduction](docs/reproduction.md) · [Repository map](docs/structure.md)
 
 <p align="center">
 <a href="https://urmeo.github.io/calm-sense/"><img src="frontend/public/media/current-dashboard.png" width="1000" alt="Current CalmSense dashboard showing saved WESAD results and mean accuracy across held-out subjects"></a>
 </p>
 
-The dashboard displays saved research results and recorded signal excerpts. It does not run live inference.
+The React dashboard displays saved research results and recorded signal excerpts. It does not run live inference.
 
 ## Images and videos
 
-These recordings show the current interface. Select an animated preview to play the full MP4 video, or download the file to watch locally. Both videos are silent.
+Select a preview to play or download the full video. Both recordings are silent.
 
 **Dashboard tour · 32 s**
 
@@ -50,7 +52,7 @@ Select a WESAD subject, toggle signal channels, zoom, and reset the view. [Watch
 
 ![Recorded preview of an earlier dashboard interface](outputs/figures/demo.gif)
 
-This original preview shows an older interface. The screenshots and videos above show the current dashboard.
+This preview predates the current screenshots and videos above.
 
 </details>
 
@@ -58,7 +60,7 @@ This original preview shows an older interface. The screenshots and videos above
 
 [![CalmSense pipeline: five steps, separate training and test people, feature and CNN paths, and recorded evidence](docs/assets/pipeline.svg)](docs/assets/pipeline.svg)
 
-The primary benchmark splits people before fitting either model path. Blue marks training; teal marks the held-out test. [Edit the figure in Figma](https://www.figma.com/design/tfPEQsLyRoAj9yT3HrPaob?node-id=3-2).
+The primary benchmark holds out one person before fitting either model path. Blue marks training; teal marks the held-out test. [Edit the figure in Figma](https://www.figma.com/design/tfPEQsLyRoAj9yT3HrPaob?node-id=3-2).
 
 | WESAD subjects | Saved chest features | Binary windows | Three-class windows |
 | :--: | :--: | :--: | :--: |
@@ -66,7 +68,7 @@ The primary benchmark splits people before fitting either model path. Blue marks
 
 Each leave-one-subject-out (LOSO) fold holds out one complete person. The other 14 subjects form the training pool. Median imputation and scaling use only this pool. The CNN splits it into training and validation subjects. Its normalization uses inner training windows only.
 
-The feature models use 58 features. The registry contains 60 entries; two respiration features are entirely missing in this benchmark. The CNN uses five processed signal channels.
+The feature registry contains 60 entries. Two respiration features are entirely missing in this benchmark, leaving 58 inputs for the feature models. The CNN uses five processed signal channels.
 
 Calibration, personalization, ablation, wrist comparison, transfer, statistics, and nested tuning are [separate research runs](docs/reproduction.md#additional-analyses), each with its own evaluation protocol. Transfer uses 18 shared features from WESAD wrist and Non-EEG. The exported Random Forest and descriptive XGBoost SHAP values come from separate full-data fits. See the [methodology](docs/methodology.md) for the full protocols.
 
@@ -169,7 +171,7 @@ These are the original plots from the saved benchmark. Click a plot to open it a
 
 ![ROC and AUROC results for the binary feature models](docs/assets/roc-auc.svg)
 
-ROC curves compare the true-positive rate with the false-positive rate as the stress-probability threshold changes. AUROC summarizes that curve. These binary scores pool held-out predictions; they are separate from the subject means above. The [curve replay](outputs/results/roc_curves.json) uses the original benchmark code and verified cached inputs; all four AUROC and AUPRC values match the saved scores exactly. The CNN has no recorded AUROC or AUPRC result.
+ROC curves show the true-positive and false-positive rates as the stress-probability threshold changes. AUROC summarizes the curve. These scores pool held-out binary predictions; the accuracy and macro-F1 values above are subject means. The [curve replay](outputs/results/roc_curves.json) uses the original benchmark code and verified cached inputs. All four AUROC and AUPRC values match the saved scores exactly. No CNN AUROC or AUPRC was recorded.
 
 ## Calibration and personalization
 
@@ -213,42 +215,44 @@ A budget of 5 selects 4 class-balanced enrollment windows. Limited class availab
 
 ## Run locally
 
-Use Python 3.11 or later. On macOS, install the OpenMP library for XGBoost and LightGBM with `brew install libomp`.
+Clone the repository:
 
 ```bash
 git clone https://github.com/urmeo/calm-sense.git
 cd calm-sense
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements.txt
 ```
 
-Run a calibration example without downloading datasets:
-
-```bash
-python scripts/calibration.py --synthetic
-```
-
-This writes demo metrics and figures to `outputs/generated/demo/`. Synthetic results check the pipeline; they do not reproduce the WESAD benchmark. The [notebook](notebooks/CalmSense.ipynb) runs the same example in Colab.
-
-To run the WESAD benchmark, review the dataset's research agreement, then download and verify its subject files:
-
-```bash
-python scripts/download_data.py --wesad
-python scripts/download_data.py --verify-wesad
-python scripts/run_experiment.py
-```
-
-You can also place the official files at `data/raw/WESAD/S2/S2.pkl`, and so on, before verification. Raw datasets are not included. Real-data experiments replace files in `outputs/results/` and `outputs/models/`. See the [reproduction guide](docs/reproduction.md) for analysis commands, storage requirements, and dashboard exports.
-
-The dashboard can run on its saved exports without Python or raw data. Use Node.js 24 and npm:
+**Dashboard.** Use Node.js 24 and npm. The app reads saved exports; it needs neither Python nor raw datasets.
 
 ```bash
 node frontend/tooling.mjs install
 node frontend/tooling.mjs dev
 ```
 
-Open [the local dashboard](http://127.0.0.1:5173/calm-sense/). To check the Python code and build the dashboard:
+Open [http://127.0.0.1:5173/calm-sense/](http://127.0.0.1:5173/calm-sense/).
+
+**Python experiments.** Use Python 3.11 or later. On macOS, first install OpenMP for XGBoost and LightGBM with `brew install libomp`.
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python scripts/calibration.py --synthetic
+```
+
+The synthetic example needs no dataset download. It writes demo metrics and figures to `outputs/generated/demo/`; it checks the pipeline without reproducing the WESAD benchmark. The [Colab notebook](notebooks/CalmSense.ipynb) runs the same example.
+
+For the full benchmark, review WESAD's research agreement, then download and verify its files:
+
+```bash
+python scripts/download_data.py --wesad
+python scripts/download_data.py --verify-wesad
+python scripts/run_experiment.py --rebuild
+```
+
+You can also place official files at `data/raw/WESAD/S2/S2.pkl`, and so on, before verification. Raw datasets are not included. Real-data runs can replace saved results and models. The [reproduction guide](docs/reproduction.md) covers storage, analysis commands, and dashboard exports.
+
+Check the code and build the dashboard:
 
 ```bash
 python -m unittest discover -s tests
@@ -256,13 +260,13 @@ node frontend/tooling.mjs test
 node frontend/tooling.mjs build
 ```
 
-Regenerate the documentation charts from saved results, without training models:
+Regenerate documentation charts from saved results, without training models:
 
 ```bash
 python -m scripts.plot_results
 ```
 
-See the [reproduction guide](docs/reproduction.md) for ROC curve generation and the commands for secondary analyses.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for formatting, type, and coverage checks.
 
 ## Protocol & provenance
 
@@ -288,4 +292,4 @@ Use physiological recordings with informed consent, limit collection to required
 
 ## Author and license
 
-[urmeo](https://github.com/urmeo) is the sole contributor and maintainer. The code is licensed under [MIT](LICENSE); dataset terms apply separately. See [CONTRIBUTING.md](CONTRIBUTING.md) for development checks and [CITATION.cff](CITATION.cff) for citation metadata.
+[urme](https://github.com/urmeo) (`urmeo`) is the sole contributor and maintainer. The code is licensed under [MIT](LICENSE); dataset terms apply separately. See [CONTRIBUTING.md](CONTRIBUTING.md) for development checks and [CITATION.cff](CITATION.cff) for citation metadata.

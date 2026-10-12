@@ -82,6 +82,41 @@ class CnnTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "finite"):
             model.fit(np.full((8, 1, 128), np.nan), np.tile([0, 1], 4))
 
+    def test_failed_cnn_fit_cannot_predict_partial_or_stale_weights(self):
+        torch = self._torch()
+        from sklearn.exceptions import NotFittedError
+        from src.models.dl import cnn_1d
+
+        class SmallNetwork(torch.nn.Module):
+            def __init__(self, in_channels, n_classes):
+                super().__init__()
+                self.linear = torch.nn.Linear(in_channels, n_classes)
+
+            def forward(self, X):
+                return self.linear(X.mean(dim=2))
+
+        rng = np.random.RandomState(3)
+        X = rng.randn(8, 1, 61).astype("float32")
+        y = np.tile([0, 1], 4)
+        self.stack.enter_context(patch.object(cnn_1d, "_Net", SmallNetwork))
+        model = cnn_1d.CNN1DClassifier(
+            in_channels=1, max_epochs=1, val_fraction=0.25, device="cpu"
+        )
+        for previously_fitted in (False, True):
+            with self.subTest(previously_fitted=previously_fitted):
+                if previously_fitted:
+                    model.fit(X, y)
+                    self.assertEqual(model.predict_proba(X).shape, (8, 2))
+                with patch.object(
+                    torch.optim.AdamW, "step", side_effect=RuntimeError("fit failed")
+                ):
+                    with self.assertRaisesRegex(RuntimeError, "fit failed"):
+                        model.fit(X, y + 2)
+                with self.assertRaises(NotFittedError):
+                    model.predict_proba(X)
+                with self.assertRaises(NotFittedError):
+                    model.predict(X)
+
     def test_cnn_retains_singleton_minimum_length_training_batch(self):
         self._torch()
         from src.models.dl.cnn_1d import CNN1DClassifier

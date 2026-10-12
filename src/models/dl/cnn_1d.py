@@ -178,6 +178,9 @@ class CNN1DClassifier(LoggerMixin):
 
     def fit(self, X: np.ndarray, y: np.ndarray, groups=None) -> "CNN1DClassifier":
         """Grouped validation subjects stay disjoint."""
+        self.model = None
+        self.classes_ = None
+        self._mean = self._std = None
         for name in ("in_channels", "max_epochs", "batch_size", "patience"):
             value = getattr(self, name)
             if (
@@ -223,9 +226,9 @@ class CNN1DClassifier(LoggerMixin):
             weight=torch.tensor(weights, dtype=torch.float32, device=self.device)
         )
 
-        self.model = _Net(self.in_channels, len(self.classes_)).to(self.device)
+        model = _Net(self.in_channels, len(self.classes_)).to(self.device)
         optimizer = torch.optim.AdamW(
-            self.model.parameters(), lr=self.lr, weight_decay=self.weight_decay
+            model.parameters(), lr=self.lr, weight_decay=self.weight_decay
         )
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
             optimizer, self.max_epochs
@@ -246,27 +249,25 @@ class CNN1DClassifier(LoggerMixin):
         stale = 0
 
         for _ in range(self.max_epochs):
-            self.model.train()
+            model.train()
             for xb, yb in loader:
                 xb, yb = xb.to(self.device), yb.to(self.device)
                 optimizer.zero_grad()
-                loss = criterion(self.model(xb), yb)
+                loss = criterion(model(xb), yb)
                 if not torch.isfinite(loss):
                     raise ValueError("CNN training produced a nonfinite loss")
                 loss.backward()
                 optimizer.step()
             scheduler.step()
 
-            self.model.eval()
+            model.eval()
             with torch.no_grad():
-                val_loss = criterion(self.model(x_val_t), y_val_t).item()
+                val_loss = criterion(model(x_val_t), y_val_t).item()
             if not np.isfinite(val_loss):
                 raise ValueError("CNN validation produced a nonfinite loss")
             if val_loss < best_loss - 1e-4:
                 best_loss = val_loss
-                best_state = {
-                    k: v.cpu().clone() for k, v in self.model.state_dict().items()
-                }
+                best_state = {k: v.cpu().clone() for k, v in model.state_dict().items()}
                 stale = 0
             else:
                 stale += 1
@@ -274,7 +275,8 @@ class CNN1DClassifier(LoggerMixin):
                     break
 
         if best_state is not None:
-            self.model.load_state_dict(best_state)
+            model.load_state_dict(best_state)
+        self.model = model
         return self
 
     def predict_proba(self, X: np.ndarray) -> np.ndarray:

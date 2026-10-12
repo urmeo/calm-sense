@@ -396,7 +396,7 @@ class DashboardDataTests(unittest.TestCase):
 
     def _case_readme_metrics_reject_nonfinite_values(self, value):
         with self.assertRaisesRegex(ValueError, "README metrics must be finite"):
-            update_readme_tables._f(value)
+            update_readme_tables._format_metric(value)
 
     def test_personalization_table_rejects_an_unknown_brier_scale(self):
         tmp_path = self.tmp_path
