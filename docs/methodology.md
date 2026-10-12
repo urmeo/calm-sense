@@ -8,6 +8,8 @@ The primary benchmark uses WESAD chest recordings at 700 Hz from 15 subjects: S2
 
 The pipeline filters signals and computes 60-second windows every 30 seconds. A window is retained only when at least 90% of its labels belong to the same eligible class. The recorded dataset contains 869 binary windows and 1,032 three-class windows. Chest channels are ECG, EDA, temperature, respiration, and acceleration magnitude. The CNN receives these processed channels resampled to 1,024 samples per window.
 
+Sixty-second windows limit interpretation of very-low-frequency HRV and long-term detrended fluctuation analysis.
+
 The feature registry contains 60 measurements:
 
 | Signal group | Registered features |
@@ -22,6 +24,8 @@ The recorded benchmark drops `RESP_inhale_exhale_ratio` and `RESP_variability`, 
 ## Models and evaluation
 
 The primary experiment uses 15 leave-one-subject-out folds. Each fold holds out one complete subject. Accuracy and macro-F1 are averaged over subject scores; macro-F1 uses the full task class set. Pooled accuracy and balanced accuracy combine held-out predictions across subjects. Binary AUROC and AUPRC are pooled metrics for the four feature models; they were not computed for the CNN.
+
+These measurements cover 15 laboratory participants. They do not establish performance in daily life or clinical settings. Live inference latency and wearable battery use have not been measured.
 
 | Model | Main settings |
 | :-- | :-- |
@@ -55,6 +59,8 @@ Pooled ECE on all LOSO windows changes from 0.077 to 0.026 with isotonic recalib
 Personalization first retains every other held-out window to remove overlap. It reserves a stratified half for evaluation and draws class-balanced labeled enrollment windows from the other half. Only the probability calibrator changes; the classifier is not retrained. Scores are means across subjects on this reserved half, so they are not directly comparable with pooled full-window calibration scores.
 
 Requested budgets are 5, 10, and 20 windows. A budget of 5 selects 4 balanced windows because the sampler takes the same integer count from both classes. Limited class availability can reduce other budgets. With a requested budget of 20, mean ECE changes from 0.162 without calibration to 0.078; the training-subject global calibrator gives 0.099. These results are exploratory and do not establish an enrollment procedure for live use. [Decision curves](../outputs/figures/calibration_decision_curve.png) are also an offline analysis, without a validated clinical decision threshold.
+
+Ablation, calibration, and personalization analyses have no multiplicity correction.
 
 ## Ablation, wrist recordings, and feature analysis
 

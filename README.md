@@ -4,7 +4,7 @@ CalmSense compares four feature-based classifiers and a 1D CNN for stress classi
 
 [![CalmSense project pipeline: recorded signals, separate training and test people, feature models and CNN, independent research runs, and saved results feeding charts and the dashboard](docs/assets/pipeline.svg)](docs/assets/pipeline.svg)
 
-The main benchmark tests each classifier on one unseen person at a time. Separate research runs reuse inputs, follow their own protocols, and save their results alongside the benchmark. Select the diagram to open it at full size.
+Select the diagram to open it at full size.
 
 | WESAD subjects | Saved chest features | Binary windows | Three-class windows |
 | :--: | :--: | :--: | :--: |
@@ -74,7 +74,7 @@ The [4 October 2026 benchmark](outputs/results/provenance.json) covers 15 WESAD 
 | LightGBM | 88.9% | 0.855 | 0.964 | 0.944 | 67.2% | 0.590 |
 | 1D-CNN | 73.3% | 0.654 | Not computed | Not computed | 49.9% | 0.401 |
 
-Accuracy and macro-F1 are means across subjects. AUROC and AUPRC use pooled held-out binary predictions. Random Forest has a pooled balanced accuracy of 89.9% and a subject-bootstrap 95% confidence interval of 85.8% to 95.6% for mean accuracy. The four feature models show no significant accuracy differences in the Friedman test (`p = 0.599`) or Holm-adjusted pairwise tests. [Metrics](outputs/results/metrics.json) and [statistics](outputs/results/stats.json) contain the recorded values.
+Accuracy and macro-F1 are means across held-out subjects. AUROC and AUPRC pool held-out binary predictions. See the [saved metrics](outputs/results/metrics.json) and [statistical comparisons](docs/methodology.md#models-and-evaluation) for details.
 
 ## Graphs and charts
 
@@ -159,7 +159,7 @@ These are the original plots from the saved benchmark. Click a plot to open it a
 
 ![ROC and AUROC results for the binary feature models](docs/assets/roc-auc.svg)
 
-ROC curves show the true-positive and false-positive rates as the stress-probability threshold changes. AUROC summarizes the curve. These scores pool held-out binary predictions; the accuracy and macro-F1 values above are subject means. The [curve replay](outputs/results/roc_curves.json) uses the original benchmark code and verified cached inputs. All four AUROC and AUPRC values match the saved scores exactly. No CNN AUROC or AUPRC was recorded.
+ROC curves show how true-positive and false-positive rates change with the stress-probability threshold. AUROC summarizes each curve. These curves pool held-out binary predictions from four feature models. No CNN ROC scores were recorded. See [curve provenance](docs/reproduction.md#roc-and-documentation-charts).
 
 ## Calibration and personalization
 
