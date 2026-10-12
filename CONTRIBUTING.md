@@ -2,7 +2,7 @@
 
 The sole contributor and maintainer is [urme](https://github.com/urmeo) (`urmeo`).
 
-Follow the [README setup](README.md#run-locally) for Python 3.11+ and Node.js 24. Run the relevant checks from the repository root:
+Follow the [Python setup](docs/reproduction.md#python-setup-and-demo) and [dashboard setup](README.md#run-locally). Run the relevant checks from the repository root:
 
 ```bash
 python -m black --check src/ tests/ scripts/

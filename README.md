@@ -10,19 +10,6 @@ The main benchmark tests each classifier on one unseen person at a time. Separat
 | :--: | :--: | :--: | :--: |
 | 15 | 58 | 869 | 1,032 |
 
-<details>
-<summary>Benchmark protocol and feature inputs</summary>
-
-Each leave-one-subject-out (LOSO) fold holds out one complete person. The other 14 subjects form the training pool. Median imputation and scaling use only this pool. The CNN splits it into training and validation subjects. Its normalization uses inner training windows only.
-
-The feature registry contains 60 entries. Two respiration features are entirely missing in this benchmark, leaving 58 inputs for the feature models. The CNN uses five processed signal channels: ECG, skin conductance (EDA), temperature, respiration, and acceleration magnitude.
-
-Calibration, personalization, ablation, wrist comparison, transfer, statistics, and nested tuning are [separate research runs](docs/reproduction.md#additional-analyses), each with its own evaluation protocol. Transfer uses 18 shared features from WESAD wrist and Non-EEG. The exported Random Forest and descriptive XGBoost SHAP values come from separate full-data fits. See the [methodology](docs/methodology.md) for the full protocols.
-
-</details>
-
-Python signal processing uses NumPy, pandas, SciPy, and NeuroKit2. The feature models use scikit-learn, XGBoost, and LightGBM; the CNN uses PyTorch. The results dashboard uses React and TypeScript.
-
 [Results dashboard](https://urmeo.github.io/calm-sense/) · [Run locally](#run-locally) · [Colab demo](https://colab.research.google.com/github/urmeo/calm-sense/blob/main/notebooks/CalmSense.ipynb) · [Methodology](docs/methodology.md) · [Reproduction](docs/reproduction.md) · [Repository map](docs/structure.md)
 
 <p align="center">
@@ -216,58 +203,18 @@ A budget of 5 selects 4 class-balanced enrollment windows. Limited class availab
 
 ## Run locally
 
-Clone the repository:
+Use Node.js 24 and npm. The dashboard reads saved results; no Python environment or dataset download is needed.
 
 ```bash
 git clone https://github.com/urmeo/calm-sense.git
 cd calm-sense
-```
-
-**Dashboard.** Use Node.js 24 and npm. The app reads saved exports; it needs neither Python nor raw datasets.
-
-```bash
 node frontend/tooling.mjs install
 node frontend/tooling.mjs dev
 ```
 
 Open [http://127.0.0.1:5173/calm-sense/](http://127.0.0.1:5173/calm-sense/).
 
-**Python experiments.** Use Python 3.11 or later. On macOS, first install OpenMP for XGBoost and LightGBM with `brew install libomp`.
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements.txt
-python scripts/calibration.py --synthetic
-```
-
-The synthetic example needs no dataset download. It writes demo metrics and figures to `outputs/generated/demo/`; it checks the pipeline without reproducing the WESAD benchmark. The [Colab notebook](notebooks/CalmSense.ipynb) runs the same example.
-
-For the full benchmark, review WESAD's research agreement, then download and verify its files:
-
-```bash
-python scripts/download_data.py --wesad
-python scripts/download_data.py --verify-wesad
-python scripts/run_experiment.py --rebuild
-```
-
-You can also place official files at `data/raw/WESAD/S2/S2.pkl`, and so on, before verification. Raw datasets are not included. Real-data runs can replace saved results and models. The [reproduction guide](docs/reproduction.md) covers storage, analysis commands, and dashboard exports.
-
-Check the code and build the dashboard:
-
-```bash
-python -m unittest discover -s tests
-node frontend/tooling.mjs test
-node frontend/tooling.mjs build
-```
-
-Regenerate documentation charts from saved results, without training models:
-
-```bash
-python -m scripts.plot_results
-```
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for formatting, type, and coverage checks.
+For Python setup, a synthetic demo, and the full benchmark, see the [reproduction guide](docs/reproduction.md). See [CONTRIBUTING.md](CONTRIBUTING.md) for code checks.
 
 ## Protocol & provenance
 

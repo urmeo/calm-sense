@@ -1,8 +1,21 @@
 # Reproduce and build CalmSense
 
-For experiments, install the Python dependencies in the [README](../README.md#run-locally). Run Python commands from the repository root with the virtual environment active. To use the saved dashboard, skip to [Refresh and build the dashboard](#refresh-and-build-the-dashboard); no datasets or Python environment are needed. Defaults, paths, and seed `42` are defined in [src/config.py](../src/config.py).
+Run commands from the repository root. To use the saved dashboard, follow the [README quick start](../README.md#run-locally); no datasets or Python environment are needed. Defaults, paths, and seed `42` are defined in [src/config.py](../src/config.py).
 
 The saved benchmark was generated on 4 October 2026 from source revision `4f5c02f`. Its [provenance record](../outputs/results/provenance.json) lists the package versions used. The dependency ranges in `requirements.txt` permit other versions; matching the protocol alone does not guarantee identical numbers across environments. The saved scikit-learn model requires version 1.6.1.
+
+## Python setup and demo
+
+Use Python 3.11 or later. On macOS, first install OpenMP for XGBoost and LightGBM with `brew install libomp`.
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python scripts/calibration.py --synthetic
+```
+
+Keep the virtual environment active for the Python commands below. The synthetic demo needs no dataset download. It writes metrics and figures to `outputs/generated/demo/`; it checks the pipeline without reproducing the WESAD benchmark. The [Colab notebook](../notebooks/CalmSense.ipynb) runs the same example.
 
 ## Data
 
