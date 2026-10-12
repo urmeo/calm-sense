@@ -56,7 +56,9 @@ This original preview shows an older interface. The screenshots and videos above
 
 ## Pipeline
 
-[![Research pipeline: five main steps, two model paths within each held-out fold, separate analyses, and saved outputs](docs/assets/pipeline.svg)](docs/assets/pipeline.svg)
+[![CalmSense pipeline: five steps, separate training and test people, feature and CNN paths, and recorded evidence](docs/assets/pipeline.svg)](docs/assets/pipeline.svg)
+
+The primary benchmark splits people before fitting either model path. Blue marks training; teal marks the held-out test. [Edit the figure in Figma](https://www.figma.com/design/tfPEQsLyRoAj9yT3HrPaob?node-id=3-2).
 
 | WESAD subjects | Saved chest features | Binary windows | Three-class windows |
 | :--: | :--: | :--: | :--: |
