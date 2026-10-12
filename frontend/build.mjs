@@ -125,6 +125,8 @@ try {
       entryNames: '[name]-[hash]', chunkNames: 'chunks/[name]-[hash]', assetNames: '[name]-[hash]',
       bundle: true, splitting: true, format: 'esm', platform: 'browser', target: 'es2022',
       jsx: 'automatic', minify: mode !== 'dev', legalComments: 'eof', metafile: true,
+      loader: { '.svg': 'file' },
+      publicPath: `${base}assets`,
       define: { 'import.meta.env.BASE_URL': JSON.stringify(base), 'process.env.NODE_ENV': JSON.stringify(mode === 'dev' ? 'development' : 'production') },
       logLevel: 'info', plugins: [{ name: 'dashboard-assets', setup(api) { api.onEnd(publish); } }],
     };

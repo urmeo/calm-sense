@@ -1,39 +1,8 @@
-import { Heart, BookOpen, Database, Cpu, ExternalLink, ArrowRight, Activity, Layers, Users, BarChart3 } from 'lucide-react';
+import { Heart, BookOpen, Cpu, ExternalLink, BarChart3 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import results, { shapContext } from '../data';
+import { shapContext } from '../data';
 import Panel from '../components/Panel';
-
-const pipeline = [
-  { title: 'Recordings', icon: Database, description: '15 WESAD subjects. Chest ECG, EDA, temperature, respiration, and motion.' },
-  { title: 'Prepare windows', icon: Activity, description: 'Filter signals. Keep 60 s windows with 50% overlap and at least 90% label purity.' },
-  { title: 'Two model paths', icon: Layers, description: `${results.binary.n_features} features for four classifiers, or 5 channels × 1,024 samples for the CNN.` },
-  { title: 'Hold out one person', icon: Users, description: 'Fit using the other subjects. Test the held-out person. Repeat for all 15 subjects.' },
-  { title: 'Held-out scores', icon: BarChart3, description: 'Report subject scores, pooled metrics, and binary ROC/AUC for the four feature models.' },
-];
-
-const foldSteps = [
-  {
-    title: 'Training pool · 14 subjects',
-    items: [
-      'Feature models: fit median imputation and scaling, then Logistic Regression, Random Forest, XGBoost, or LightGBM.',
-      'CNN: split the training pool by subject for training and validation. Normalize with inner training windows only.',
-    ],
-  },
-  {
-    title: 'Test · 1 untouched subject',
-    items: [
-      'Apply the fitted transforms and model to this person’s eligible windows.',
-      'Keep this person outside model fitting, validation, and global calibration.',
-    ],
-  },
-  {
-    title: 'Repeat · 15 folds',
-    items: [
-      'Average accuracy and macro-F1 across subjects. Pool held-out predictions for balanced accuracy.',
-      'Binary ROC curves and AUROC/AUPRC scores use the four feature models. CNN AUROC/AUPRC was not computed.',
-    ],
-  },
-];
+import ResearchPipeline from '../components/ResearchPipeline';
 
 const analyses = [
   {
@@ -70,7 +39,7 @@ const links = [
 
 export default function About() {
   return (
-    <div className="space-y-8 animate-fade-in max-w-4xl mx-auto">
+    <div className="about-page space-y-8 animate-fade-in mx-auto">
       <div className="text-center">
         <div className="flex items-center justify-center space-x-3 mb-4">
           <Heart className="w-12 h-12 text-red-500" />
@@ -79,44 +48,21 @@ export default function About() {
         <p className="text-xl text-gray-600 dark:text-gray-400">Wearable stress classification research</p>
       </div>
 
-      <Panel title="Research pipeline">
-        <ol className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))' }} aria-label="Research pipeline in five steps">
-          {pipeline.map(({ title, icon: Icon, description }, index) => (
-            <li key={title} className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-3 text-blue-600 dark:text-blue-400">
-                <Icon aria-hidden="true" className="w-5 h-5" />
-                <span className="font-mono text-sm">{String(index + 1).padStart(2, '0')}</span>
-                {index < pipeline.length - 1 && <ArrowRight aria-hidden="true" className="w-4 h-4 ml-auto" />}
-              </div>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{title}</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{description}</p>
-            </li>
-          ))}
-        </ol>
+      <div className="space-y-3">
+        <ResearchPipeline />
+        <p className="pipeline-caption text-gray-600 dark:text-gray-400">
+          <a href="https://www.figma.com/design/tfPEQsLyRoAj9yT3HrPaob?node-id=3-2" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 underline">View the pipeline in Figma</a>
+          {' · '}Binary ROC/AUC curves cover the four feature models. CNN AUROC/AUPRC was not computed.
+        </p>
+      </div>
 
-        <div className="mt-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
-          <h3 className="font-semibold text-gray-900 dark:text-white mb-3">How leave-one-subject-out (LOSO) evaluation works</h3>
-          <ol className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 210px), 1fr))' }} aria-label="Training, test, and aggregation">
-            {foldSteps.map(({ title, items }, index) => (
-              <li key={title}>
-                <h4 className="font-semibold text-blue-800 dark:text-blue-300 mb-2">
-                  <span className="font-mono mr-2">{index + 1}.</span>{title}
-                </h4>
-                <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-                  {items.map((item) => <li key={item}>{item}</li>)}
-                </ul>
-              </li>
-            ))}
-          </ol>
-        </div>
-
-        <div className="mt-4">
-          <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Separate research runs</h3>
+      <Panel title="Separate research runs">
+        <div>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">These experiments extend the benchmark with their own splits and evaluation conditions.</p>
           <ul className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 210px), 1fr))' }} aria-label="Additional research analyses">
             {analyses.map(({ title, items }) => (
               <li key={title} className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                <h4 className="font-semibold text-gray-900 dark:text-white mb-2">{title}</h4>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{title}</h3>
                 <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                   {items.map((item) => <li key={item}>{item}</li>)}
                 </ul>
