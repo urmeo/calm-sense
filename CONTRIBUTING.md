@@ -20,7 +20,7 @@ GitHub Actions runs these checks for pushes to `main` and pull requests.
 - Target `main`. Keep each change focused and add tests for behavior that changes.
 - Use short commit messages that describe the change, such as `updated readme`, `updated results`, or `updated code`.
 - Fit preprocessing and calibration on training subjects only.
-- Keep raw data, caches, and local build files out of commits. Preserve the [recorded results](README.md#protocol--provenance) unless the change includes a documented rerun.
+- Keep raw data, caches, and local build files out of commits. Preserve the [recorded results](README.md#recorded-results) unless the change includes a documented rerun.
 - Verify dataset download checksums. Document signal units, label mappings, and evaluation conditions.
 - Edit frontend dependency and TypeScript settings in `frontend/config/`. The tooling generates the local JSON files. After changing dependencies, run `node frontend/tooling.mjs update` and review both tracked dependency files.
 - Keep README `AUTOGEN` markers. Run `python scripts/update_readme_tables.py` after updating calibration or personalization results.

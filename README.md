@@ -216,28 +216,9 @@ Open [http://127.0.0.1:5173/calm-sense/](http://127.0.0.1:5173/calm-sense/).
 
 For Python setup, a synthetic demo, and the full benchmark, see the [reproduction guide](docs/reproduction.md). See [CONTRIBUTING.md](CONTRIBUTING.md) for code checks.
 
-## Protocol & provenance
-
-The saved results record source revision `4f5c02f`, seed `42`, feature schema and benchmark protocol version `2`, and portable feature schema version `3`. The [provenance record](outputs/results/provenance.json) contains package versions, dataset checksums, and artifact hashes. These describe the saved run; code changes require a new run to measure their effect.
-
-The [saved model](outputs/models/stress_classifier.joblib) is an uncalibrated chest Random Forest refitted on all 869 binary windows and 58 features with scikit-learn 1.6.1. Load it from a trusted checkout with `load_verified_joblib` in [src/utils.py](src/utils.py). Its full-data fit is separate from held-out evaluation. Tuning results do not change this model's defaults.
-
-## Limitations
-
-- WESAD contains 15 laboratory subjects. These results do not establish performance in daily life or clinical settings.
-- Sixty-second windows limit the interpretation of very-low-frequency HRV and long-term detrended fluctuation analysis. Ablation, calibration, and personalization are exploratory analyses without multiplicity correction; pairwise model tests use Holm correction.
-- Transfer is measured on one dataset pair with different devices, units, stressors, and labels. Balanced accuracy is 0.558 from WESAD to Non-EEG and 0.497 in reverse. [Transfer details](docs/methodology.md#cross-dataset-transfer) explain the label mapping and unit differences.
-- Live inference latency and wearable battery use have not been measured. Decision curves do not establish a clinical alert threshold.
-
-Use physiological recordings with informed consent, limit collection to required signals, and follow each dataset's terms. The project is for research use.
-
 ## References
 
 1. Schmidt et al. (2018). [Introducing WESAD, a Multimodal Dataset for Wearable Stress and Affect Detection](https://doi.org/10.1145/3242969.3242985). *ACM ICMI*, 400-408.
 2. ESC/NASPE Task Force (1996). [Heart Rate Variability: Standards of Measurement, Physiological Interpretation, and Clinical Use](https://doi.org/10.1161/01.CIR.93.5.1043). *Circulation*, 93(5), 1043-1065.
 3. Guo et al. (2017). [On Calibration of Modern Neural Networks](https://proceedings.mlr.press/v70/guo17a.html). *ICML*, PMLR 70, 1321-1330.
 4. Vos et al. (2023). [Generalizable Machine Learning for Stress Monitoring from Wearable Devices: A Systematic Literature Review](https://doi.org/10.1016/j.ijmedinf.2023.105026). *International Journal of Medical Informatics*, 173, 105026.
-
-## Author and license
-
-[urme](https://github.com/urmeo) (`urmeo`) is the sole contributor and maintainer. The code is licensed under [MIT](LICENSE); dataset terms apply separately. See [CONTRIBUTING.md](CONTRIBUTING.md) for development checks and [CITATION.cff](CITATION.cff) for citation metadata.
