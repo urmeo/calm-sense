@@ -1,121 +1,117 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="1370" viewBox="0 0 1280 1370" role="img" aria-labelledby="pipeline-title pipeline-description">
-  <title id="pipeline-title">CalmSense research pipeline: test on an unseen person</title>
-  <desc id="pipeline-description">WESAD chest recordings from 15 people are filtered and divided into 60-second windows with a 30-second step and at least 90 percent label agreement. Each leave-one-subject-out fold holds out one complete person before fitting. The other 14 people form the training pool. Four feature classifiers use 58 recorded features, with median imputation and scaling fitted on training people only. The independent PyTorch 1D CNN uses five processed channels resampled to 1,024 samples, separate inner training and validation people, normalization on inner training windows, and validation-based early stopping. Each fitted path predicts the held-out person; the five classifiers are evaluated independently. Accuracy and macro-F1 are averaged across 15 test people; balanced accuracy pools their predictions. Saved JSON and CSV results, figures, and provenance feed a static dashboard with no live inference. Binary ROC/AUC for the four feature models, calibration, personalization, ablation, wrist comparison, cross-dataset transfer, grouped tuning, and statistics use separate research runs and protocols.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="1280" viewBox="0 0 1280 1280" role="img" aria-labelledby="pipeline-title pipeline-description">
+  <title id="pipeline-title">CalmSense research pipeline: recordings, unseen-person evaluation, separate research runs, and saved outputs</title>
+  <desc id="pipeline-description">WESAD chest recordings from 15 people are filtered and divided into 60-second windows with a 30-second step and at least 90 percent label agreement. Each leave-one-subject-out fold holds out one complete person before fitting. The other 14 people form the training pool. Four feature classifiers use 58 recorded features, with median imputation and scaling fitted on training people only. The independent PyTorch 1D CNN uses five processed channels resampled to 1,024 samples, separate inner training and validation people, normalization on inner training windows, and validation-based early stopping. Each fitted path predicts the held-out person; the five classifiers are evaluated independently. Accuracy and macro-F1 are averaged across 15 test people; balanced accuracy pools their predictions. Saved JSON and CSV results, figures, and provenance feed a static dashboard with no live inference. Binary ROC/AUC for the four feature models, calibration, personalization, ablation, wrist comparison, cross-dataset transfer, grouped tuning, and statistics use separate research runs and protocols. Those runs reuse chest inputs or add separately processed WESAD wrist and PhysioNet Non-EEG recordings. Transfer uses 18 shared features. Separate full-data fits produce XGBoost SHAP values and a recorded Random Forest model file. Numeric results and SHAP summaries feed charts, README tables, and the static dashboard; the dashboard does not load the model file.</desc>
   <defs>
     <style>
       text { font-family: Arial, Helvetica, sans-serif; }
-      .heading { font-size: 27px; font-weight: 700; }
+      .heading { font-size: 24px; font-weight: 700; }
       .body { font-size: 21px; }
       .label { font-size: 20px; }
-      .eyebrow { font-size: 18px; font-weight: 700; letter-spacing: 1.4px; }
+      .eyebrow { font-size: 20px; font-weight: 700; }
+      .title { font-size: 32px; font-weight: 600; }
+      .small { font-size: 18px; }
       .connector { fill: none; stroke-width: 2.5; stroke-linejoin: round; }
     </style>
     <marker id="arrow-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 Z" fill="#60c6e2"/></marker>
     <marker id="arrow-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 Z" fill="#6edbc5"/></marker>
-    <marker id="arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 Z" fill="#82949e"/></marker>
+    <marker id="arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 Z" fill="#a8b5bd"/></marker>
+    <marker id="arrow-coral" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 Z" fill="#f08b79"/></marker>
   </defs>
-  <rect x="0" y="0" width="1280" height="1370" rx="0" fill="#141b1f" stroke="#141b1f" stroke-width="2" />
-  <text x="40" y="48" class="eyebrow" fill="#aab8c0" text-anchor="start">CALMSENSE / RESEARCH PIPELINE</text>
-  <text x="40" y="91" class="heading" fill="#e9eff2" text-anchor="start">Test on an unseen person</text>
-  <text x="1240" y="89" class="label" fill="#aab8c0" text-anchor="end">Primary WESAD chest benchmark</text>
-  <path d="M 40 112 H 1240" class="connector" stroke="#3c4b53"/>
+  <rect x="0" y="0" width="1280" height="1280" rx="0" fill="#14191c" stroke="#14191c" stroke-width="2" />
+  <text x="48" y="66" class="title" fill="#e9eff2" text-anchor="start">CALMSENSE PIPELINE</text>
+  <path d="M 48 90 H 1232" class="connector" stroke="#aab8c0"/>
+  <rect x="24" y="112" width="1232" height="1118" rx="8" fill="#1b2327" stroke="#303b41" stroke-width="2" />
+  <text x="48" y="151" class="eyebrow" fill="#e9eff2" text-anchor="start">PREPARE RECORDED CHEST SIGNALS</text>
   <g id="recordings">
-  <rect x="40" y="146" width="344" height="176" rx="10" fill="#1c252b" stroke="#3c4b53" stroke-width="2" />
-  <text x="64" y="181" class="eyebrow" fill="#aab8c0" text-anchor="start">01 / RECORDED DATA</text>
-  <text x="64" y="218" class="heading" fill="#e9eff2" text-anchor="start">WESAD chest</text>
-  <text x="64" y="250" class="body" fill="#aab8c0" text-anchor="start">15 people · 700 Hz</text>
-  <text x="64" y="277" class="body" fill="#aab8c0" text-anchor="start">ECG · EDA · temperature</text>
-  <text x="64" y="304" class="body" fill="#aab8c0" text-anchor="start">Respiration · motion</text>
+  <rect x="48" y="178" width="304" height="160" rx="10" fill="#1c252b" stroke="#cad4d9" stroke-width="2" />
+  <text x="72" y="216" class="heading" fill="#e9eff2" text-anchor="start">WESAD chest</text>
+  <text x="72" y="252" class="body" fill="#aab8c0" text-anchor="start">15 people · 700 Hz</text>
+  <text x="72" y="280" class="body" fill="#aab8c0" text-anchor="start">ECG · EDA · temperature</text>
+  <text x="72" y="308" class="body" fill="#aab8c0" text-anchor="start">Respiration · motion</text>
   </g>
-  <path d="M 384 234 H 434" class="connector" stroke="#82949e" marker-end="url(#arrow-gray)"/>
-  <g id="windowing">
-  <rect x="444" y="146" width="356" height="176" rx="10" fill="#1c252b" stroke="#3c4b53" stroke-width="2" />
-  <text x="468" y="181" class="eyebrow" fill="#aab8c0" text-anchor="start">02 / PREPARE WINDOWS</text>
-  <text x="468" y="218" class="heading" fill="#e9eff2" text-anchor="start">Filter and window</text>
-  <text x="468" y="250" class="body" fill="#aab8c0" text-anchor="start">60 s windows · 30 s step</text>
-  <text x="468" y="277" class="body" fill="#aab8c0" text-anchor="start">Keep ≥90% label agreement</text>
-  <text x="468" y="304" class="label" fill="#aab8c0" text-anchor="start">Baseline / stress / amusement</text>
+  <path d="M 354 258 H 400" class="connector" stroke="#60c6e2" marker-end="url(#arrow-cyan)"/>
+  <g id="windows">
+  <rect x="408" y="178" width="352" height="160" rx="10" fill="#1c252b" stroke="#cad4d9" stroke-width="2" />
+  <text x="432" y="216" class="heading" fill="#e9eff2" text-anchor="start">Filter + window</text>
+  <text x="432" y="252" class="body" fill="#aab8c0" text-anchor="start">60 s windows · 30 s step</text>
+  <text x="432" y="280" class="label" fill="#aab8c0" text-anchor="start">Keep ≥90% label agreement</text>
+  <text x="432" y="308" class="label" fill="#aab8c0" text-anchor="start">Baseline / stress / amusement</text>
   </g>
-  <path d="M 800 234 H 850" class="connector" stroke="#82949e" marker-end="url(#arrow-gray)"/>
-  <g id="person-split">
-  <rect x="860" y="146" width="380" height="176" rx="10" fill="#1c252b" stroke="#60c6e2" stroke-width="2" />
-  <text x="884" y="181" class="eyebrow" fill="#60c6e2" text-anchor="start">03 / SPLIT BY PERSON</text>
-  <text x="884" y="218" class="heading" fill="#e9eff2" text-anchor="start">Hold out one person</text>
-  <text x="884" y="250" class="body" fill="#aab8c0" text-anchor="start">Split before fitting</text>
-  <text x="884" y="277" class="body" fill="#aab8c0" text-anchor="start">14-person pool · 1 test person</text>
-  <text x="884" y="304" class="body" fill="#aab8c0" text-anchor="start">Repeat for all 15 people</text>
+  <path d="M 762 258 H 808" class="connector" stroke="#60c6e2" marker-end="url(#arrow-cyan)"/>
+  <g id="split">
+  <rect x="816" y="178" width="416" height="160" rx="10" fill="#1c252b" stroke="#60c6e2" stroke-width="2" />
+  <text x="840" y="216" class="heading" fill="#e9eff2" text-anchor="start">Hold out one person</text>
+  <text x="840" y="252" class="body" fill="#aab8c0" text-anchor="start">Split before fitting</text>
+  <text x="840" y="280" class="body" fill="#aab8c0" text-anchor="start">14-person pool · 1 test person</text>
+  <text x="840" y="308" class="body" fill="#aab8c0" text-anchor="start">Repeat for all 15 people</text>
   </g>
-  <path d="M 1050 322 V 358 H 436 V 398" class="connector" stroke="#60c6e2" marker-end="url(#arrow-cyan)"/>
-  <path d="M 1050 358 V 398" class="connector" stroke="#6edbc5" marker-end="url(#arrow-teal)"/>
-  <text x="708" y="347" class="label" fill="#60c6e2" text-anchor="middle">training windows</text>
-  <text x="1072" y="372" class="label" fill="#6edbc5" text-anchor="start">test windows</text>
-  <g id="training-pool">
-  <rect x="40" y="408" width="792" height="364" rx="10" fill="#17242c" stroke="#60c6e2" stroke-width="2" />
-  <text x="64" y="443" class="eyebrow" fill="#60c6e2" text-anchor="start">TRAINING + VALIDATION / 14 PEOPLE</text>
-  <g id="feature-path">
-  <rect x="64" y="466" width="350" height="278" rx="10" fill="#1c252b" stroke="#48616d" stroke-width="2" />
-  <text x="88" y="504" class="heading" fill="#e9eff2" text-anchor="start">Feature models</text>
-  <text x="88" y="539" class="body" fill="#aab8c0" text-anchor="start">58 recorded features</text>
-  <text x="88" y="574" class="label" fill="#aab8c0" text-anchor="start">Median imputation + scaling</text>
-  <text x="88" y="601" class="label" fill="#aab8c0" text-anchor="start">fit on training people only</text>
-  <path d="M 88 621 H 390" class="connector" stroke="#3c4b53"/>
-  <text x="88" y="651" class="label" fill="#e9eff2" text-anchor="start">Logistic Regression</text>
-  <text x="88" y="681" class="label" fill="#e9eff2" text-anchor="start">Random Forest</text>
-  <text x="88" y="711" class="label" fill="#e9eff2" text-anchor="start">XGBoost · LightGBM</text>
+  <path d="M 1024 338 V 390 H 440 V 424" class="connector" stroke="#60c6e2" marker-end="url(#arrow-cyan)"/>
+  <path d="M 1024 390 H 1066 V 424" class="connector" stroke="#6edbc5" marker-end="url(#arrow-teal)"/>
+  <path d="M 584 338 V 370 H 36 V 996 H 160 V 1016" class="connector" stroke="#f08b79" marker-end="url(#arrow-coral)" stroke-dasharray="6 7"/>
+  <text x="68" y="361" class="small" fill="#f08b79" text-anchor="start">shared chest inputs</text>
+  <g id="primary-training">
+  <rect x="48" y="432" width="784" height="310" rx="10" fill="#17242c" stroke="#60c6e2" stroke-width="2" />
+  <text x="72" y="466" class="eyebrow" fill="#60c6e2" text-anchor="start">PRIMARY BENCHMARK / TRAIN + VALIDATE ON 14 PEOPLE</text>
+  <g id="feature-models">
+  <rect x="72" y="488" width="340" height="230" rx="10" fill="#1c252b" stroke="#48616d" stroke-width="2" />
+  <text x="96" y="525" class="heading" fill="#e9eff2" text-anchor="start">4 feature models</text>
+  <text x="96" y="558" class="label" fill="#aab8c0" text-anchor="start">58 inputs · median imputation</text>
+  <text x="96" y="586" class="label" fill="#aab8c0" text-anchor="start">and scaling on training people</text>
+  <text x="96" y="620" class="label" fill="#e9eff2" text-anchor="start">Logistic Regression</text>
+  <text x="96" y="648" class="label" fill="#e9eff2" text-anchor="start">Random Forest</text>
+  <text x="96" y="676" class="label" fill="#e9eff2" text-anchor="start">XGBoost · LightGBM</text>
   </g>
-  <g id="cnn-path">
-  <rect x="438" y="466" width="370" height="278" rx="10" fill="#1c252b" stroke="#48616d" stroke-width="2" />
-  <text x="462" y="504" class="heading" fill="#e9eff2" text-anchor="start">1D CNN</text>
-  <text x="462" y="539" class="body" fill="#aab8c0" text-anchor="start">5 channels × 1,024 samples</text>
-  <text x="462" y="574" class="label" fill="#aab8c0" text-anchor="start">Separate training and</text>
-  <text x="462" y="601" class="label" fill="#aab8c0" text-anchor="start">validation people</text>
-  <path d="M 462 621 H 784" class="connector" stroke="#3c4b53"/>
-  <text x="462" y="651" class="label" fill="#e9eff2" text-anchor="start">Normalize on inner training</text>
-  <text x="462" y="681" class="label" fill="#e9eff2" text-anchor="start">windows only</text>
-  <text x="462" y="711" class="label" fill="#e9eff2" text-anchor="start">Early-stop on validation</text>
+  <g id="cnn">
+  <rect x="436" y="488" width="372" height="230" rx="10" fill="#1c252b" stroke="#48616d" stroke-width="2" />
+  <text x="460" y="525" class="heading" fill="#e9eff2" text-anchor="start">1D CNN</text>
+  <text x="460" y="558" class="label" fill="#aab8c0" text-anchor="start">5 channels × 1,024 samples</text>
+  <text x="460" y="586" class="label" fill="#aab8c0" text-anchor="start">Separate training / validation</text>
+  <text x="460" y="614" class="label" fill="#aab8c0" text-anchor="start">people</text>
+  <text x="460" y="646" class="label" fill="#e9eff2" text-anchor="start">Normalize on inner training</text>
+  <text x="460" y="674" class="label" fill="#e9eff2" text-anchor="start">windows only</text>
+  <text x="460" y="702" class="label" fill="#e9eff2" text-anchor="start">Early stopping: validation loss</text>
   </g>
   </g>
-  <g id="held-out-person">
-  <rect x="892" y="408" width="348" height="194" rx="10" fill="#162b2a" stroke="#6edbc5" stroke-width="2" />
-  <text x="916" y="443" class="eyebrow" fill="#6edbc5" text-anchor="start">HELD-OUT TEST / 1 PERSON</text>
-  <text x="916" y="480" class="heading" fill="#e9eff2" text-anchor="start">One unseen person</text>
-  <text x="916" y="515" class="label" fill="#aab8c0" text-anchor="start">Excluded from model fitting</text>
-  <text x="916" y="544" class="label" fill="#aab8c0" text-anchor="start">and validation</text>
-  <text x="916" y="579" class="label" fill="#aab8c0" text-anchor="start">Same feature / signal inputs</text>
+  <g id="primary-test">
+  <rect x="900" y="432" width="332" height="190" rx="10" fill="#162b2a" stroke="#6edbc5" stroke-width="2" />
+  <text x="924" y="466" class="eyebrow" fill="#6edbc5" text-anchor="start">HELD-OUT TEST / 1 PERSON</text>
+  <text x="924" y="506" class="heading" fill="#e9eff2" text-anchor="start">One unseen person</text>
+  <text x="924" y="542" class="label" fill="#aab8c0" text-anchor="start">Outside fitting + validation</text>
+  <text x="924" y="574" class="label" fill="#aab8c0" text-anchor="start">Same feature / signal inputs</text>
   </g>
-  <path d="M 239 744 V 816 H 623 V 744" class="connector" stroke="#60c6e2"/>
-  <circle cx="436" cy="816" r="4" fill="#60c6e2"/>
-  <path d="M 436 816 V 886" class="connector" stroke="#60c6e2" marker-end="url(#arrow-cyan)"/>
-  <text x="414" y="852" class="label" fill="#60c6e2" text-anchor="end">fitted transforms + models</text>
-  <path d="M 1066 602 V 886" class="connector" stroke="#6edbc5" marker-end="url(#arrow-teal)"/>
-  <text x="1088" y="781" class="label" fill="#6edbc5" text-anchor="start">test inputs</text>
-  <g id="predict">
-  <rect x="40" y="896" width="1200" height="102" rx="10" fill="#1c252b" stroke="#6edbc5" stroke-width="2" />
-  <text x="64" y="936" class="eyebrow" fill="#6edbc5" text-anchor="start">04 / PREDICT THE HELD-OUT PERSON</text>
-  <text x="64" y="975" class="body" fill="#e9eff2" text-anchor="start">Five classifiers, evaluated independently</text>
-  <text x="682" y="936" class="label" fill="#aab8c0" text-anchor="start">Apply each fitted path to the test inputs.</text>
-  <text x="682" y="975" class="label" fill="#aab8c0" text-anchor="start">Use test labels to score predictions.</text>
+  <path d="M 242 718 V 778 H 622 V 718" class="connector" stroke="#60c6e2"/>
+  <circle cx="440" cy="778" r="4" fill="#60c6e2"/>
+  <path d="M 440 778 V 840" class="connector" stroke="#60c6e2" marker-end="url(#arrow-cyan)"/>
+  <text x="418" y="815" class="label" fill="#60c6e2" text-anchor="end">fitted transforms + models</text>
+  <path d="M 1066 622 V 840" class="connector" stroke="#6edbc5" marker-end="url(#arrow-teal)"/>
+  <text x="1088" y="780" class="label" fill="#6edbc5" text-anchor="start">test inputs</text>
+  <g id="predict-and-score">
+  <rect x="48" y="850" width="1184" height="132" rx="10" fill="#1c252b" stroke="#6edbc5" stroke-width="2" />
+  <text x="72" y="889" class="heading" fill="#e9eff2" text-anchor="start">Predict + score</text>
+  <text x="72" y="922" class="label" fill="#e9eff2" text-anchor="start">Five classifiers, tested independently</text>
+  <text x="72" y="954" class="label" fill="#aab8c0" text-anchor="start">Repeat for all 15 held-out people</text>
+  <text x="682" y="889" class="label" fill="#aab8c0" text-anchor="start">Accuracy + macro-F1: mean across people</text>
+  <text x="682" y="922" class="label" fill="#aab8c0" text-anchor="start">Balanced accuracy: pooled predictions</text>
+  <text x="682" y="954" class="label" fill="#aab8c0" text-anchor="start">Apply fitted paths to test inputs</text>
   </g>
-  <path d="M 316 998 V 1052" class="connector" stroke="#82949e" marker-end="url(#arrow-gray)"/>
-  <g id="aggregate">
-  <rect x="40" y="1062" width="552" height="158" rx="10" fill="#1c252b" stroke="#3c4b53" stroke-width="2" />
-  <text x="64" y="1097" class="eyebrow" fill="#aab8c0" text-anchor="start">05 / COMBINE 15 TEST FOLDS</text>
-  <text x="64" y="1134" class="heading" fill="#e9eff2" text-anchor="start">Score unseen people</text>
-  <text x="64" y="1168" class="label" fill="#aab8c0" text-anchor="start">Accuracy + macro-F1: mean across people</text>
-  <text x="64" y="1198" class="label" fill="#aab8c0" text-anchor="start">Balanced accuracy: pooled predictions</text>
+  <path d="M 1040 982 V 1016" class="connector" stroke="#60c6e2" marker-end="url(#arrow-cyan)"/>
+  <text x="1064" y="1009" class="small" fill="#60c6e2" text-anchor="start">fold scores</text>
+  <g id="additional-runs">
+  <rect x="48" y="1026" width="744" height="182" rx="10" fill="#1c252b" stroke="#f08b79" stroke-width="2" />
+  <text x="72" y="1061" class="eyebrow" fill="#f08b79" text-anchor="start">ADDITIONAL ANALYSES + FULL-DATA FITS</text>
+  <text x="72" y="1092" class="label" fill="#aab8c0" text-anchor="start">Binary ROC/AUC (4 models) · calibration · personalization</text>
+  <text x="72" y="1122" class="label" fill="#aab8c0" text-anchor="start">Ablation · grouped tuning · statistics · chest / wrist comparison</text>
+  <text x="72" y="1152" class="label" fill="#aab8c0" text-anchor="start">Wrist + Non-EEG inputs → 18-feature dataset transfer</text>
+  <text x="72" y="1182" class="label" fill="#aab8c0" text-anchor="start">Full-data fits: RF → model file · XGBoost → SHAP</text>
   </g>
-  <path d="M 592 1141 H 678" class="connector" stroke="#82949e" marker-end="url(#arrow-gray)"/>
-  <g id="saved-results">
-  <rect x="688" y="1062" width="552" height="158" rx="10" fill="#1c252b" stroke="#3c4b53" stroke-width="2" />
-  <text x="712" y="1097" class="eyebrow" fill="#aab8c0" text-anchor="start">06 / SAVE AND INSPECT</text>
-  <text x="712" y="1134" class="heading" fill="#e9eff2" text-anchor="start">Results → charts + dashboard</text>
-  <text x="712" y="1168" class="label" fill="#aab8c0" text-anchor="start">JSON / CSV · plots · provenance</text>
-  <text x="712" y="1198" class="label" fill="#aab8c0" text-anchor="start">Dashboard shows saved data · no live inference</text>
+  <path d="M 794 1117 H 840" class="connector" stroke="#f08b79" marker-end="url(#arrow-coral)"/>
+  <g id="saved-outputs">
+  <rect x="848" y="1026" width="384" height="182" rx="10" fill="#1c252b" stroke="#cad4d9" stroke-width="2" />
+  <text x="872" y="1061" class="heading" fill="#e9eff2" text-anchor="start">Save + inspect</text>
+  <text x="872" y="1092" class="label" fill="#aab8c0" text-anchor="start">JSON / CSV + provenance</text>
+  <text x="872" y="1122" class="label" fill="#aab8c0" text-anchor="start">Charts + README tables</text>
+  <text x="872" y="1152" class="label" fill="#aab8c0" text-anchor="start">Static results dashboard</text>
+  <text x="872" y="1182" class="label" fill="#6edbc5" text-anchor="start">No live inference</text>
   </g>
-  <g id="separate-runs">
-  <path d="M 40 1258 H 1240" class="connector" stroke="#3c4b53" stroke-dasharray="6 7"/>
-  <text x="40" y="1292" class="eyebrow" fill="#aab8c0" text-anchor="start">SEPARATE RESEARCH RUNS / EACH HAS ITS OWN PROTOCOL</text>
-  <text x="40" y="1325" class="label" fill="#aab8c0" text-anchor="start">Binary ROC/AUC (4 feature models) · calibration · personalization · ablation</text>
-  <text x="40" y="1354" class="label" fill="#aab8c0" text-anchor="start">Chest vs wrist · cross-dataset transfer · grouped tuning · statistical comparisons</text>
-  </g>
+  <text x="48" y="1250" class="small" fill="#aab8c0" text-anchor="start">Dashed path reuses inputs. Each research run keeps its own evaluation protocol.</text>
 </svg>
