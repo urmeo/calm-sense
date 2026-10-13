@@ -8,22 +8,22 @@ const analyses = [
   {
     title: 'Calibration and personalization',
     items: [
-      'Global calibration of binary Random Forest probabilities: fit to grouped out-of-fold predictions from training subjects inside each LOSO fold.',
-      'Personalization: use disjoint, non-overlapping enrollment and evaluation windows from the held-out person. Recalibrate probabilities; keep the classifier fixed.',
+      'Calibrate binary Random Forest probabilities with grouped out-of-fold predictions from training subjects.',
+      'Personalize probabilities with labeled, non-overlapping enrollment windows. Keep evaluation windows separate and the classifier fixed.',
     ],
   },
   {
     title: 'Robustness',
     items: [
-      'Rerun feature ablations and compare the separate chest and wrist feature pipelines.',
-      'Test transfer between WESAD wrist and PhysioNet Non-EEG with 18 shared features. Devices, labels, and units differ.',
+      'Compare feature subsets and separate chest and wrist pipelines.',
+      'Transfer between WESAD wrist and PhysioNet Non-EEG with 18 shared features. Devices, labels, and units differ.',
     ],
   },
   {
     title: 'Evaluation checks',
     items: [
-      'Bootstrap subjects and compare feature models with Friedman and Holm-corrected paired Wilcoxon tests.',
-      'Compare matched LOSO and subject-mixed splits. Run tuning separately, with grouped inner folds inside outer LOSO.',
+      'Bootstrap subjects; compare feature models with Friedman and Holm-corrected paired Wilcoxon tests.',
+      'Compare matched LOSO and subject-mixed splits. Tune separately with grouped inner folds inside outer LOSO.',
     ],
   },
 ];
@@ -31,7 +31,7 @@ const analyses = [
 const repositoryUrl = 'https://github.com/urmeo/calm-sense';
 const links = [
   ['Repository', repositoryUrl],
-  ['Pipeline', `${repositoryUrl}#pipeline`],
+  ['Pipeline', `${repositoryUrl}/blob/main/docs/assets/pipeline.svg`],
   ['Methodology', `${repositoryUrl}/blob/main/docs/methodology.md`],
   ['References', `${repositoryUrl}#references`],
   ['License', `${repositoryUrl}/blob/main/LICENSE`],
@@ -51,14 +51,13 @@ export default function About() {
       <div className="space-y-3">
         <ResearchPipeline />
         <p className="pipeline-caption text-gray-600 dark:text-gray-400">
-          <a href="https://www.figma.com/design/tfPEQsLyRoAj9yT3HrPaob?node-id=3-2" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 underline">View the pipeline in Figma</a>
-          {' · '}Binary ROC/AUC curves cover the four feature models. CNN AUROC/AUPRC was not computed.
+          <a href={`${repositoryUrl}/blob/main/docs/assets/pipeline.svg`} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 underline">View the pipeline diagram</a>
         </p>
       </div>
 
       <Panel title="Separate research runs">
         <div>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">These experiments extend the benchmark with their own splits and evaluation conditions.</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Each study uses its own splits and evaluation protocol. Binary ROC/AUC covers the four feature models; CNN AUROC/AUPRC was not computed.</p>
           <ul className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 210px), 1fr))' }} aria-label="Additional research analyses">
             {analyses.map(({ title, items }) => (
               <li key={title} className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">

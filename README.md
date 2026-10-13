@@ -2,7 +2,7 @@
 
 CalmSense compares four feature-based classifiers and a 1D CNN for stress classification from recorded wearable signals. The main benchmark tests on unseen people using WESAD chest recordings. Separate experiments examine calibration, personalization, sensor placement, and transfer to PhysioNet Non-EEG.
 
-[![CalmSense project pipeline: recorded signals, separate training and test people, feature models and CNN, independent research runs, and saved results feeding charts and the dashboard](docs/assets/pipeline.svg)](docs/assets/pipeline.svg)
+[![CalmSense pipeline in five steps: recorded signals, windows, training, testing on an unseen person, and saved results. Supporting studies run separately.](docs/assets/pipeline.svg)](docs/assets/pipeline.svg)
 
 Select the diagram to open it at full size.
 
