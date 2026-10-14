@@ -10,6 +10,7 @@ from .config import (
     FS,
     PROCESSED_DATA_DIR,
     RR_CORRECTION_VERSION,
+    SCR_DETECTION_VERSION,
     VALID_SUBJECTS,
 )
 from .data.loader import WESADLoader
@@ -142,6 +143,7 @@ class WristDataset(LoggerMixin):
         )
         features_df.attrs["feature_schema_version"] = FEATURE_SCHEMA_VERSION
         features_df.attrs["rr_correction_version"] = RR_CORRECTION_VERSION
+        features_df.attrs["scr_detection_version"] = SCR_DETECTION_VERSION
         features_df.attrs["dataset_parameters"] = {
             "window_sec": self.window_sec,
             "overlap": self.overlap,
@@ -178,6 +180,7 @@ def load_wrist() -> Optional[pd.DataFrame]:
     if (
         frame.attrs.get("feature_schema_version") != FEATURE_SCHEMA_VERSION
         or frame.attrs.get("rr_correction_version") != RR_CORRECTION_VERSION
+        or frame.attrs.get("scr_detection_version") != SCR_DETECTION_VERSION
         or frame.attrs.get("dataset_parameters") != parameters
     ):
         return None

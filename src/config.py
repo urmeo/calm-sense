@@ -9,6 +9,7 @@ SEED: int = 42
 RR_MIN_MS: float = 200.0
 RR_MAX_MS: float = 2500.0
 RR_CORRECTION_VERSION: int = 1
+SCR_DETECTION_VERSION: int = 1
 
 DATA_DIR = PROJECT_ROOT / "data"
 RAW_DATA_DIR = DATA_DIR / "raw"

@@ -405,6 +405,7 @@ class FeaturesTests(unittest.TestCase):
             {
                 "feature_schema_version": FEATURE_SCHEMA_VERSION,
                 "rr_correction_version": dataset.RR_CORRECTION_VERSION,
+                "scr_detection_version": dataset.SCR_DETECTION_VERSION,
                 "dataset_parameters": {
                     "fs": 700.0,
                     "window_samples": 42000,

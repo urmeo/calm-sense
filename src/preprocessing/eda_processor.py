@@ -121,6 +121,7 @@ class EDAProcessor(LoggerMixin):
         min_rise_time: float = 0.5,
         max_rise_time: float = 4.0,
     ) -> Tuple[np.ndarray, List[Dict]]:
+        """Detect SCRs using prominence, onset-relative amplitude, and rise time."""
         phasic = np.asarray(phasic, dtype=float).flatten()
         min_amplitude = _positive_number(min_amplitude, "min_amplitude")
         min_rise_time = _positive_number(min_rise_time, "min_rise_time")
@@ -133,12 +134,12 @@ class EDAProcessor(LoggerMixin):
         min_rise_samples = int(min_rise_time * self.sampling_rate)
         max_rise_samples = int(max_rise_time * self.sampling_rate)
         min_distance = max(1, min_rise_samples)
+        amplitude_tolerance = min_amplitude * 1e-12
 
         peaks, _ = signal.find_peaks(
             phasic,
-            height=min_amplitude,
             distance=min_distance,
-            prominence=min_amplitude / 2,
+            prominence=min_amplitude / 2 - amplitude_tolerance,
         )
 
         scr_features = []
@@ -162,7 +163,7 @@ class EDAProcessor(LoggerMixin):
 
             amplitude = phasic[peak_idx] - phasic[onset_idx]
 
-            if amplitude < min_amplitude:
+            if amplitude < min_amplitude - amplitude_tolerance:
                 continue
 
             recovery_target = phasic[peak_idx] - amplitude / 2

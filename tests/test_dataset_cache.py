@@ -9,7 +9,13 @@ import numpy as np
 import pandas as pd
 
 from src import dataset, dataset_wrist
-from src.config import FILTER_PARAMS, FS, RR_CORRECTION_VERSION, VALID_SUBJECTS
+from src.config import (
+    FILTER_PARAMS,
+    FS,
+    RR_CORRECTION_VERSION,
+    SCR_DETECTION_VERSION,
+    VALID_SUBJECTS,
+)
 from src.features.feature_pipeline import FEATURE_SCHEMA_VERSION
 from src.utils import feature_frame_sha256, sha256_file
 
@@ -39,6 +45,7 @@ class DatasetCacheTests(unittest.TestCase):
         self.frame.attrs = {
             "feature_schema_version": FEATURE_SCHEMA_VERSION,
             "rr_correction_version": RR_CORRECTION_VERSION,
+            "scr_detection_version": SCR_DETECTION_VERSION,
             "dataset_parameters": {
                 "fs": 700.0,
                 "window_samples": 42000,
@@ -161,7 +168,20 @@ class DatasetCacheTests(unittest.TestCase):
                 frame.to_parquet(self.feature_path, index=False)
                 self.assertIsNone(dataset.load_cached())
 
-    def test_fresh_builds_record_rr_correction_version(self):
+    def test_chest_cache_requires_current_scr_detection(self):
+        self.builder._save(self.frame, self.raw)
+        self.assertIsNotNone(dataset.load_cached())
+        for version in (None, SCR_DETECTION_VERSION - 1, SCR_DETECTION_VERSION + 1):
+            with self.subTest(version=version):
+                frame = pd.read_parquet(self.feature_path)
+                if version is None:
+                    frame.attrs.pop("scr_detection_version", None)
+                else:
+                    frame.attrs["scr_detection_version"] = version
+                frame.to_parquet(self.feature_path, index=False)
+                self.assertIsNone(dataset.load_cached())
+
+    def test_fresh_builds_record_processing_versions(self):
         loader = SimpleNamespace(subjects=["S2"])
         with (
             patch.object(dataset, "WESADLoader", return_value=loader),
@@ -179,6 +199,9 @@ class DatasetCacheTests(unittest.TestCase):
                     frame = result[0] if isinstance(result, tuple) else result
                     self.assertEqual(
                         frame.attrs["rr_correction_version"], RR_CORRECTION_VERSION
+                    )
+                    self.assertEqual(
+                        frame.attrs["scr_detection_version"], SCR_DETECTION_VERSION
                     )
                     self.assertEqual(
                         frame.attrs["feature_schema_version"], FEATURE_SCHEMA_VERSION
@@ -245,6 +268,21 @@ class DatasetCacheTests(unittest.TestCase):
                         frame.attrs.pop("rr_correction_version", None)
                     else:
                         frame.attrs["rr_correction_version"] = version
+                    frame.to_parquet(cache, index=False)
+                    self.assertIsNone(dataset_wrist.load_wrist())
+
+    def test_wrist_cache_requires_current_scr_detection(self):
+        cache = self.directory / "features_wrist.parquet"
+        with patch.object(dataset_wrist, "PROCESSED_DATA_DIR", self.directory):
+            self.wrist_builder().build()
+            self.assertIsNotNone(dataset_wrist.load_wrist())
+            for version in (None, SCR_DETECTION_VERSION - 1, SCR_DETECTION_VERSION + 1):
+                with self.subTest(version=version):
+                    frame = pd.read_parquet(cache)
+                    if version is None:
+                        frame.attrs.pop("scr_detection_version", None)
+                    else:
+                        frame.attrs["scr_detection_version"] = version
                     frame.to_parquet(cache, index=False)
                     self.assertIsNone(dataset_wrist.load_wrist())
 

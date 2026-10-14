@@ -12,6 +12,7 @@ from .config import (
     FS,
     PROCESSED_DATA_DIR,
     RR_CORRECTION_VERSION,
+    SCR_DETECTION_VERSION,
     VALID_SUBJECTS,
 )
 from .data.loader import WESADLoader
@@ -175,6 +176,7 @@ class WindowedDataset(LoggerMixin):
         )
         features_df.attrs["feature_schema_version"] = FEATURE_SCHEMA_VERSION
         features_df.attrs["rr_correction_version"] = RR_CORRECTION_VERSION
+        features_df.attrs["scr_detection_version"] = SCR_DETECTION_VERSION
         features_df.attrs["dataset_parameters"] = {
             "fs": self.fs,
             "window_samples": self.window_samples,
@@ -242,6 +244,7 @@ def load_cached() -> Optional[Tuple[pd.DataFrame, np.ndarray]]:
     if (
         features_df.attrs.get("feature_schema_version") != FEATURE_SCHEMA_VERSION
         or features_df.attrs.get("rr_correction_version") != RR_CORRECTION_VERSION
+        or features_df.attrs.get("scr_detection_version") != SCR_DETECTION_VERSION
         or features_df.attrs.get("dataset_parameters") != default_parameters
     ):
         return None
