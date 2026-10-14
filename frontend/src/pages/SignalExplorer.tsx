@@ -71,10 +71,6 @@ const SignalPlots: React.FC<{ signalData: SignalRecording; subject: string }> = 
       { id: 'signal-slider', type: 'slider', xAxisIndex: axisIndices, filterMode: 'none', bottom: 35, height: 20,
         startValue: xRange[0], endValue: xRange[1], rangeMode: ['value', 'value'], minValueSpan: sampleStep },
     ],
-    toolbox: { right: 20, top: 25, feature: {
-      dataZoom: { xAxisIndex: axisIndices, yAxisIndex: 'none' },
-      saveAsImage: { title: 'Download chart' },
-    } },
     series: visiblePanels.flatMap((panel, i) => panel.series.map((series, j) => ({
       name: series.name, type: 'line', xAxisIndex: i, yAxisIndex: i,
       data: signalData.time.map((time, index) => [time, signalData[series.y][index]]),
@@ -128,7 +124,7 @@ const SignalPlots: React.FC<{ signalData: SignalRecording; subject: string }> = 
           <p role="status" className="text-gray-600 dark:text-gray-300">Select a signal to display.</p>
         ) : <Chart
           label={`Subject ${subject}: ${visiblePanels.map((panel) => panel.title).join(', ')}. Displayed clip time ${xRange[0].toFixed(1)} to ${xRange[1].toFixed(1)} seconds. Use zoom controls or drag the slider to inspect a range.`}
-          height={600} option={option}
+          height={600} option={option} downloadFilename={`signal-${subject}.svg`}
           onDataZoom={(event) => {
             const range = dataZoomRange(event, duration);
             if (range) setXRange(range);
