@@ -1,4 +1,4 @@
-from typing import cast, Dict, List, Tuple
+from typing import cast, Dict, List, Optional, Tuple
 
 import numpy as np
 from scipy import signal
@@ -16,27 +16,31 @@ class EDAProcessor(LoggerMixin):
     def lowpass_filter(
         self,
         eda: np.ndarray,
-        cutoff: float = FILTER_PARAMS.EDA_LOWPASS,
+        cutoff: Optional[float] = None,
         order: int = FILTER_PARAMS.EDA_FILTER_ORDER,
     ) -> np.ndarray:
+        """Default to 1 Hz for 4 Hz wrist EDA and 5 Hz at other sampling rates."""
         eda = np.asarray(eda, dtype=float).flatten()
+        if cutoff is None:
+            cutoff = (
+                FILTER_PARAMS.WRIST_EDA_LOWPASS
+                if self.sampling_rate == FS.WRIST_EDA
+                else FILTER_PARAMS.EDA_LOWPASS
+            )
         cutoff = _positive_number(cutoff, "cutoff")
         order = _positive_integer(order, "order")
         if not np.isfinite(eda).all():
             raise ValueError("EDA filter input must contain only finite samples")
+
+        nyq = 0.5 * self.sampling_rate
+        if cutoff >= nyq:
+            raise ValueError(
+                f"EDA cutoff must be below Nyquist ({nyq} Hz), got {cutoff} Hz"
+            )
         if len(eda) == 0:
             return eda
 
-        nyq = 0.5 * self.sampling_rate
-        cutoff_norm = cutoff / nyq
-
-        if cutoff_norm >= 1.0:
-            self.logger.warning(
-                f"Cutoff {cutoff} Hz exceeds Nyquist {nyq} Hz, returning unfiltered"
-            )
-            return eda
-
-        sos = signal.butter(order, cutoff_norm, btype="low", output="sos")
+        sos = signal.butter(order, cutoff / nyq, btype="low", output="sos")
         return signal.sosfiltfilt(sos, eda)
 
     def remove_artifacts(

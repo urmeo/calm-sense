@@ -58,6 +58,7 @@ class FilterParams:
     ECG_FILTER_ORDER: int = 4
 
     EDA_LOWPASS: float = 5.0
+    WRIST_EDA_LOWPASS: float = 1.0
     EDA_MEDIAN_SIZE: int = 5
     EDA_FILTER_ORDER: int = 4
 

@@ -5,7 +5,13 @@ from typing import Any, cast, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 
-from .config import FS, PROCESSED_DATA_DIR, RR_CORRECTION_VERSION, VALID_SUBJECTS
+from .config import (
+    FILTER_PARAMS,
+    FS,
+    PROCESSED_DATA_DIR,
+    RR_CORRECTION_VERSION,
+    VALID_SUBJECTS,
+)
 from .data.loader import WESADLoader
 from .dataset import CONDITION_LABELS, window_label
 from .features.feature_pipeline import FEATURE_SCHEMA_VERSION, FeatureExtractionPipeline
@@ -55,7 +61,7 @@ class WristDataset(LoggerMixin):
         acc_mag = np.sqrt(np.sum(acc**2, axis=1))
 
         peaks = self._bvp_peaks(bvp)
-        eda_filt = self.eda.lowpass_filter(eda)
+        eda_filt = self.eda.lowpass_filter(eda, cutoff=FILTER_PARAMS.WRIST_EDA_LOWPASS)
         tonic, phasic = self.eda.decompose_eda(eda_filt)
         _, scr_features = self.eda.detect_scr_peaks(phasic)
         scr_peak_indices = np.array([scr["peak_idx"] for scr in scr_features])
@@ -140,6 +146,9 @@ class WristDataset(LoggerMixin):
             "window_sec": self.window_sec,
             "overlap": self.overlap,
             "purity": self.purity,
+            "eda_sampling_rate": FS.WRIST_EDA,
+            "eda_lowpass_hz": FILTER_PARAMS.WRIST_EDA_LOWPASS,
+            "eda_filter_order": FILTER_PARAMS.EDA_FILTER_ORDER,
             "subjects": sorted(subjects),
         }
         if cache:
@@ -161,6 +170,9 @@ def load_wrist() -> Optional[pd.DataFrame]:
         "window_sec": 60.0,
         "overlap": 0.5,
         "purity": 0.9,
+        "eda_sampling_rate": FS.WRIST_EDA,
+        "eda_lowpass_hz": FILTER_PARAMS.WRIST_EDA_LOWPASS,
+        "eda_filter_order": FILTER_PARAMS.EDA_FILTER_ORDER,
         "subjects": sorted(VALID_SUBJECTS),
     }
     if (

@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 from src import dataset, dataset_wrist
-from src.config import RR_CORRECTION_VERSION, VALID_SUBJECTS
+from src.config import FILTER_PARAMS, FS, RR_CORRECTION_VERSION, VALID_SUBJECTS
 from src.features.feature_pipeline import FEATURE_SCHEMA_VERSION
 from src.utils import feature_frame_sha256, sha256_file
 
@@ -247,6 +247,32 @@ class DatasetCacheTests(unittest.TestCase):
                         frame.attrs["rr_correction_version"] = version
                     frame.to_parquet(cache, index=False)
                     self.assertIsNone(dataset_wrist.load_wrist())
+
+    def test_wrist_cache_requires_current_eda_filtering(self):
+        cache = self.directory / "features_wrist.parquet"
+        filtering = {
+            "eda_sampling_rate": FS.WRIST_EDA,
+            "eda_lowpass_hz": FILTER_PARAMS.WRIST_EDA_LOWPASS,
+            "eda_filter_order": FILTER_PARAMS.EDA_FILTER_ORDER,
+        }
+        with patch.object(dataset_wrist, "PROCESSED_DATA_DIR", self.directory):
+            expected = self.wrist_builder().build()
+            for name, value in filtering.items():
+                self.assertEqual(expected.attrs["dataset_parameters"][name], value)
+            pd.testing.assert_frame_equal(dataset_wrist.load_wrist(), expected)
+
+            for name, value in filtering.items():
+                for replacement in (None, value + 1):
+                    with self.subTest(parameter=name, value=replacement):
+                        frame = expected.copy(deep=True)
+                        frame.attrs = deepcopy(expected.attrs)
+                        parameters = frame.attrs["dataset_parameters"]
+                        if replacement is None:
+                            parameters.pop(name)
+                        else:
+                            parameters[name] = replacement
+                        frame.to_parquet(cache, index=False)
+                        self.assertIsNone(dataset_wrist.load_wrist())
 
     def test_wrist_serialization_failure_preserves_previous_cache(self):
         cache = self.directory / "features_wrist.parquet"
