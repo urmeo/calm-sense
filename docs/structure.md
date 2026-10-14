@@ -2,7 +2,7 @@
 
 ```text
 calm-sense/
-├── README.md                 Start here: pipeline, results, local setup
+├── README.md                 Pipeline, results, local setup
 ├── docs/
 │   ├── assets/               Pipeline diagrams and result summary charts
 │   ├── methodology.md        Evaluation conditions and limitations
@@ -57,7 +57,7 @@ calm-sense/
 └── .github/workflows/        Code checks and dashboard deployment
 ```
 
-Local folders appear as commands create them. `.venv/`, `frontend/node_modules/`, frontend JSON settings, caches, raw data, and `outputs/generated/` are ignored by Git.
+`.venv/`, `frontend/node_modules/`, frontend JSON settings, caches, raw data, and `outputs/generated/` are ignored by Git.
 
 ## Follow the files
 

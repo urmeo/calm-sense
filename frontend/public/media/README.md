@@ -2,7 +2,7 @@
 
 These are browser captures of the actual interface and controls.
 
-The pipeline has five steps: recorded signals, windows, training, unseen-person testing, and saved results. Its result cards use the saved 4 October 2026 benchmark. Refreshing these captures did not rerun the models.
+The pipeline result cards use the saved 4 October 2026 benchmark. Refreshing these captures did not rerun the models.
 
 Original captures were recorded on 12 October 2026 (Asia/Dhaka) at source revision [`e49f735`](https://github.com/urmeo/calm-sense/commit/e49f735f050d7676ede9c6c9206b2cf83a1f51f0). The pipeline screenshot and dashboard tour were refreshed on 14 October 2026 (Asia/Dhaka) from the modified frontend based on [`7a91a14`](https://github.com/urmeo/calm-sense/commit/7a91a1437e6f58bd6c18ce3815e7815817573841).
 

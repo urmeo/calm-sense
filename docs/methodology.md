@@ -1,6 +1,6 @@
 # Methodology and recorded analyses
 
-This document describes the saved 4 October 2026 experiments. The [README](../README.md#recorded-results) lists the primary scores. The [reproduction guide](reproduction.md) lists the commands. Machine-readable results are in [outputs/results/](../outputs/results/).
+Saved experiments: 4 October 2026. [Primary scores](../README.md#recorded-results) · [Run commands](reproduction.md) · [Machine-readable results](../outputs/results/)
 
 ## Data and windows
 
