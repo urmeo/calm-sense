@@ -8,6 +8,8 @@ The primary benchmark uses WESAD chest recordings at 700 Hz from 15 subjects: S2
 
 The pipeline filters signals and computes 60-second windows every 30 seconds. A window is retained only when at least 90% of its labels belong to the same eligible class. The recorded dataset contains 869 binary windows and 1,032 three-class windows. Chest channels are ECG, EDA, temperature, respiration, and acceleration magnitude. The CNN receives these processed channels resampled to 1,024 samples per window.
 
+Current chest respiration filtering passes the configured order (`4`) to [SciPy's Butterworth design](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.butter.html) and applies forward/backward filtering in second-order sections. Saved results predate this correction.
+
 Current chest and wrist processing detects skin conductance responses (SCRs) using peak prominence, amplitude above the preceding onset, and rise time.
 
 Sixty-second windows limit interpretation of very-low-frequency HRV and long-term detrended fluctuation analysis.
@@ -33,8 +35,8 @@ These measurements cover 15 laboratory participants. They do not establish perfo
 | :-- | :-- |
 | Logistic Regression | L2 penalty, `C=1`, balanced class weights |
 | Random Forest | 200 trees, maximum depth 10, minimum leaf size 5, balanced class weights |
-| XGBoost | 200 trees, maximum depth 7, learning rate 0.1, balanced training sample weights |
-| LightGBM | 200 trees, 50 leaves, learning rate 0.1, balanced class weights |
+| XGBoost | 200 boosting rounds, maximum depth 7, learning rate 0.1, balanced training sample weights |
+| LightGBM | 200 boosting rounds, 50 leaves, learning rate 0.1, balanced class weights, row bagging disabled |
 | 1D-CNN | Residual convolution blocks, AdamW, early stopping |
 
 The CNN separates training and validation subjects inside each outer fold. Normalization statistics use only the inner training windows. Tuning is a separate binary experiment with outer LOSO evaluation and inner grouped folds. The exported Random Forest uses the fixed defaults, not the tuning results. See [classifier defaults](../src/models/ml/classifiers.py) and [CNN training](../src/models/dl/cnn_1d.py) for the full settings.
