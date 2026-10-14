@@ -4,8 +4,6 @@ CalmSense compares four feature-based classifiers and a 1D CNN for stress classi
 
 [![CalmSense pipeline in five steps: recorded signals, windows, training, testing on an unseen person, and saved results. Supporting studies run separately.](docs/assets/pipeline.svg)](docs/assets/pipeline.svg)
 
-Select the diagram to open it at full size.
-
 | WESAD subjects | Saved chest features | Binary windows | Three-class windows |
 | :--: | :--: | :--: | :--: |
 | 15 | 58 | 869 | 1,032 |
@@ -58,8 +56,6 @@ Select a WESAD subject, toggle signal channels, zoom, and reset the view. [Watch
 
 ![Recorded preview of an earlier dashboard interface](outputs/figures/demo.gif)
 
-This preview predates the current screenshots and videos above.
-
 </details>
 
 ## Recorded results
@@ -78,7 +74,7 @@ Accuracy and macro-F1 are means across held-out subjects. AUROC and AUPRC pool h
 
 ## Graphs and charts
 
-These are the original plots from the saved benchmark. Click a plot to open it at full size.
+Original plots from the saved benchmark.
 
 <table width="100%">
 <tr>
