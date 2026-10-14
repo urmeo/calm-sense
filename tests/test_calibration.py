@@ -77,12 +77,51 @@ class CalibrationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Unknown binary Brier definition"):
             normalize_binary_calibration({"brier_definition": "unknown"})
 
-    def test_net_benefit_at_impossible_threshold_is_zero(self):
-        y = np.array([1, 0, 1, 0])
-        p = np.array([0.6, 0.3, 0.8, 0.2])
-        nb = net_benefit(y, p, np.array([0.5, 1.0]))
-        self.assertTrue(np.all(np.isfinite(nb)))
-        self.assertEqual(nb[1], 0.0)
+    def test_net_benefit_rejects_one_for_every_prediction_pattern(self):
+        for labels, probabilities in (
+            ([1, 0], [1.0, 0.0]),
+            ([1, 0], [0.0, 1.0]),
+            ([1, 0], [0.8, 0.2]),
+            ([0, 0], [1.0, 1.0]),
+            ([1, 1], [1.0, 1.0]),
+        ):
+            for thresholds in ([1.0], [0.5, 1.0]):
+                with self.subTest(labels=labels, probabilities=probabilities):
+                    with self.assertRaisesRegex(ValueError, r"\[0, 1\)"):
+                        net_benefit(labels, probabilities, thresholds)
+
+    def test_net_benefit_at_zero_is_prevalence_including_zero_probabilities(self):
+        np.testing.assert_array_equal(
+            net_benefit([1, 0, 1, 0], [0.0, 0.0, 1.0, 1.0], [0.0]), [0.5]
+        )
+
+    def test_net_benefit_just_below_one_keeps_the_false_positive_cost(self):
+        threshold = np.nextafter(1.0, 0.0)
+        expected = 0.5 - 0.5 * threshold / (1.0 - threshold)
+        actual = net_benefit([1, 0], [1.0, 1.0], [threshold])
+        np.testing.assert_array_equal(actual, [expected])
+        self.assertTrue(np.isfinite(actual).all())
+        self.assertLess(actual[0], 0)
+        np.testing.assert_array_equal(
+            net_benefit([1, 0], [1.0, 0.0], [threshold]), [0.5]
+        )
+
+    def test_net_benefit_uses_inclusive_thresholds_and_preserves_input_order(self):
+        labels = np.array([1, 0, 1, 0])
+        probabilities = np.array([0.8, 0.8, 0.5, 0.2])
+        thresholds = np.array([0.8, 0.5, 0.0, 0.5])
+        originals = [values.copy() for values in (labels, probabilities, thresholds)]
+        np.testing.assert_allclose(
+            net_benefit(labels, probabilities, thresholds),
+            [-0.75, 0.25, 0.5, 0.25],
+        )
+        for values, original in zip((labels, probabilities, thresholds), originals):
+            np.testing.assert_array_equal(values, original)
+
+    def test_net_benefit_accepts_an_empty_threshold_vector(self):
+        result = net_benefit([0, 1], [0.1, 0.9], [])
+        self.assertEqual(result.shape, (0,))
+        self.assertEqual(result.dtype, np.dtype(float))
 
     def test_perfect_calibration_has_zero_ece(self):
         y = np.array([1, 0, 1, 0, 1, 0, 1, 0, 1, 0])
@@ -172,7 +211,16 @@ class CalibrationTests(unittest.TestCase):
         )
 
     def test_net_benefit_rejects_invalid_thresholds(self):
-        for thresholds in [[-0.1], [1.1], [np.nan], [[0.5]]]:
+        for thresholds in [
+            [-0.1],
+            [1.0],
+            [1.1],
+            [np.nan],
+            [np.inf],
+            [-np.inf],
+            0.5,
+            [[0.5]],
+        ]:
             with self.subTest(thresholds=thresholds):
                 with self.assertRaisesRegex(ValueError, "Thresholds"):
                     net_benefit([0, 1], [0.1, 0.9], np.array(thresholds))

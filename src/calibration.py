@@ -140,6 +140,7 @@ def summary(y: Array, proba: Array, n_bins: int = 15) -> Dict[str, object]:
 
 
 def net_benefit(y: Array, p_pos: Array, thresholds: np.ndarray) -> np.ndarray:
+    """Compute net benefit for finite thresholds in [0, 1)."""
     y, p_pos = _validated_predictions(y, p_pos)
     if p_pos.ndim != 1:
         raise ValueError("net_benefit requires a positive-class probability vector")
@@ -147,15 +148,12 @@ def net_benefit(y: Array, p_pos: Array, thresholds: np.ndarray) -> np.ndarray:
     if (
         thresholds.ndim != 1
         or not np.isfinite(thresholds).all()
-        or np.any((thresholds < 0) | (thresholds > 1))
+        or np.any((thresholds < 0) | (thresholds >= 1))
     ):
-        raise ValueError("Thresholds must be a finite vector between zero and one")
+        raise ValueError("Thresholds must be a finite vector in [0, 1)")
     n = len(y)
     out = []
     for pt in thresholds:
-        if pt >= 1.0:
-            out.append(0.0)
-            continue
         flagged = p_pos >= pt
         tp = np.sum(flagged & (y == 1))
         fp = np.sum(flagged & (y == 0))
