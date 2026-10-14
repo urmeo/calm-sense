@@ -62,7 +62,9 @@ Pooled ECE on all LOSO windows changes from 0.077 to 0.026 with isotonic recalib
 
 Personalization first retains every other held-out window to remove overlap. It reserves a stratified half for evaluation and draws class-balanced labeled enrollment windows from the other half. Only the probability calibrator changes; the classifier is not retrained. Scores are means across subjects on this reserved half, so they are not directly comparable with pooled full-window calibration scores.
 
-Requested budgets are 5, 10, and 20 windows. A budget of 5 selects 4 balanced windows because the sampler takes the same integer count from both classes. Limited class availability can reduce other budgets. With a requested budget of 20, mean ECE changes from 0.162 without calibration to 0.078; the training-subject global calibrator gives 0.099. These results are exploratory and do not establish an enrollment procedure for live use. [Decision curves](../outputs/figures/calibration_decision_curve.png) are also an offline analysis, without a validated clinical decision threshold.
+Requested budgets are 5, 10, and 20 windows. A budget of 5 selects 4 balanced windows because the sampler takes the same integer count from both classes. Limited class availability can reduce other budgets. With a requested budget of 20, mean ECE changes from 0.162 without calibration to 0.078; the training-subject global calibrator gives 0.099. These results are exploratory and do not establish an enrollment procedure for live use.
+
+[Decision curves](../outputs/figures/calibration_decision_curve.png) are also an offline analysis, without a validated clinical decision threshold. Net benefit requires finite thresholds with `0 <= p_t < 1`. The saved curve uses 12 thresholds from 0.05 to 0.60.
 
 Ablation, calibration, and personalization analyses have no multiplicity correction.
 
