@@ -88,14 +88,6 @@ class SignalProcessor(LoggerMixin):
         if not np.isfinite(data).all():
             raise ValueError("Filter input must contain only finite samples")
 
-        low_norm = (
-            min(normalized_cutoff)
-            if isinstance(normalized_cutoff, tuple)
-            else normalized_cutoff
-        )
-        if low_norm < 0.01:
-            order = min(order, 2)
-
         sos = signal.butter(order, normalized_cutoff, btype=btype, output="sos")
         return signal.sosfiltfilt(sos, data)
 
