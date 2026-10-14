@@ -1,10 +1,10 @@
-from typing import Any, cast, Optional, Tuple
+from typing import Optional, Tuple
 
 import numpy as np
 from scipy import signal
-from scipy.interpolate import interp1d
+from scipy.interpolate import PchipInterpolator
 
-from ..config import FILTER_PARAMS, FS
+from ..config import FILTER_PARAMS, FS, RR_MAX_MS, RR_MIN_MS
 from ..logging_config import LoggerMixin
 from .filters import _positive_integer, _positive_number
 
@@ -154,31 +154,29 @@ class ECGProcessor(LoggerMixin):
         return rr_intervals
 
     def remove_ectopic_beats(
-        self, rr_intervals: np.ndarray, threshold: float = 0.2
+        self, rr_intervals: np.ndarray, threshold: float = 0.2, *, unit: str = "ms"
     ) -> Tuple[np.ndarray, np.ndarray]:
+        """Reject intervals outside 200–2500 ms and local median outliers."""
         rr = np.asarray(rr_intervals, dtype=float).flatten()
         threshold = _positive_number(threshold, "threshold")
-        valid_mask = np.isfinite(rr) & (rr > 0)
+        lower, upper = self._rr_bounds(unit)
+        physiological_mask = np.isfinite(rr) & (rr >= lower) & (rr <= upper)
+        valid_mask = physiological_mask.copy()
 
         if len(rr) < 3:
             return rr[valid_mask], valid_mask
 
-        window = 5
-
-        for i in range(len(rr)):
-            start = max(0, i - window // 2)
-            end = min(len(rr), i + window // 2 + 1)
+        for i in np.flatnonzero(physiological_mask):
+            start = max(0, i - 2)
+            end = min(len(rr), i + 3)
 
             local = rr[start:end]
-            local = local[np.isfinite(local) & (local > 0)]
-            if not len(local):
-                continue
+            local = local[physiological_mask[start:end]]
             local_median = np.median(local)
-
-            if local_median > 0:
-                relative_diff = abs(rr[i] - local_median) / local_median
-                if relative_diff > threshold:
-                    valid_mask[i] = False
+            relative_diff = abs(rr[i] - local_median) / local_median
+            valid_mask[i] = relative_diff <= threshold or np.isclose(
+                relative_diff, threshold, rtol=1e-12, atol=0
+            )
 
         return rr[valid_mask], valid_mask
 
@@ -186,22 +184,32 @@ class ECGProcessor(LoggerMixin):
         self,
         rr_intervals: np.ndarray,
         valid_mask: Optional[np.ndarray] = None,
-        method: str = "cubic",
+        method: str = "linear",
+        *,
+        unit: str = "ms",
     ) -> np.ndarray:
+        """Fill RR gaps within the 200–2500 ms bounds, converted to ``unit``.
+
+        Linear interpolation is the default; cubic uses shape-preserving PCHIP.
+        End gaps hold the nearest valid interval. No valid intervals yields NaNs.
+        """
+        if method not in ("linear", "cubic"):
+            raise ValueError("method must be 'linear' or 'cubic'")
+        lower, upper = self._rr_bounds(unit)
         rr = np.asarray(rr_intervals, dtype=float).flatten()
+        physiological_mask = np.isfinite(rr) & (rr >= lower) & (rr <= upper)
 
         if valid_mask is None:
-            return rr
-
-        valid_mask = np.asarray(valid_mask).flatten()
-        if not np.isin(valid_mask, [False, True]).all():
-            raise ValueError("valid_mask must contain only boolean values")
-
-        if len(valid_mask) != len(rr):
-            raise ValueError(
-                f"Mask length {len(valid_mask)} doesn't match RR length {len(rr)}"
-            )
-        valid_mask = valid_mask.astype(bool) & np.isfinite(rr) & (rr > 0)
+            valid_mask = physiological_mask
+        else:
+            valid_mask = np.asarray(valid_mask).flatten()
+            if not np.isin(valid_mask, [False, True]).all():
+                raise ValueError("valid_mask must contain only boolean values")
+            if len(valid_mask) != len(rr):
+                raise ValueError(
+                    f"Mask length {len(valid_mask)} doesn't match RR length {len(rr)}"
+                )
+            valid_mask = valid_mask.astype(bool) & physiological_mask
 
         if np.all(valid_mask):
             return rr
@@ -209,21 +217,35 @@ class ECGProcessor(LoggerMixin):
             self.logger.warning("All intervals marked as invalid, returning NaN")
             return np.full(len(rr), np.nan)
 
-        x_valid = np.where(valid_mask)[0]
+        x_valid = np.flatnonzero(valid_mask)
         x_all = np.arange(len(rr))
+        valid_rr = rr[valid_mask]
 
-        if len(x_valid) == 1:
-            return np.full_like(rr, float(rr[valid_mask][0]))
+        if method == "linear" or len(x_valid) < 3:
+            corrected = np.interp(x_all, x_valid, valid_rr)
+        else:
+            interpolator = PchipInterpolator(x_valid, valid_rr, extrapolate=False)
+            corrected = interpolator(np.clip(x_all, x_valid[0], x_valid[-1]))
+            corrected = np.clip(corrected, valid_rr.min(), valid_rr.max())
 
-        if method == "cubic" and len(x_valid) < 4:
-            method = "quadratic" if len(x_valid) >= 3 else "linear"
+        corrected[: x_valid[0]] = valid_rr[0]
+        corrected[x_valid[-1] + 1 :] = valid_rr[-1]
+        corrected[valid_mask] = valid_rr
+        if not (
+            np.isfinite(corrected).all()
+            and np.all(corrected >= lower)
+            and np.all(corrected <= upper)
+        ):
+            raise ValueError("Corrected RR intervals exceed physiological bounds")
+        return corrected
 
-        interpolator = interp1d(
-            x_valid,
-            rr[valid_mask],
-            kind=method,
-            fill_value=cast(Any, "extrapolate"),
-            bounds_error=False,
-        )
-
-        return interpolator(x_all)
+    def _rr_bounds(self, unit: str) -> Tuple[float, float]:
+        if unit == "ms":
+            scale = 1.0
+        elif unit == "s":
+            scale = 0.001
+        elif unit == "samples":
+            scale = self.sampling_rate / 1000
+        else:
+            raise ValueError(f"unit must be 'ms', 's', or 'samples', got {unit!r}")
+        return RR_MIN_MS * scale, RR_MAX_MS * scale

@@ -6,6 +6,10 @@ PROJECT_ROOT = Path(__file__).parent.parent.absolute()
 
 SEED: int = 42
 
+RR_MIN_MS: float = 200.0
+RR_MAX_MS: float = 2500.0
+RR_CORRECTION_VERSION: int = 1
+
 DATA_DIR = PROJECT_ROOT / "data"
 RAW_DATA_DIR = DATA_DIR / "raw"
 EXTERNAL_DATA_DIR = DATA_DIR / "external"

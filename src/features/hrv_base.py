@@ -2,10 +2,8 @@ from typing import Optional
 
 import numpy as np
 
+from ..config import RR_MAX_MS, RR_MIN_MS
 from ..logging_config import LoggerMixin
-
-RR_MIN_MS = 200.0
-RR_MAX_MS = 2500.0
 
 
 class BaseHRVExtractor(LoggerMixin):

@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 from src import dataset, dataset_wrist
-from src.config import VALID_SUBJECTS
+from src.config import RR_CORRECTION_VERSION, VALID_SUBJECTS
 from src.features.feature_pipeline import FEATURE_SCHEMA_VERSION
 from src.utils import feature_frame_sha256, sha256_file
 
@@ -38,6 +38,7 @@ class DatasetCacheTests(unittest.TestCase):
         )
         self.frame.attrs = {
             "feature_schema_version": FEATURE_SCHEMA_VERSION,
+            "rr_correction_version": RR_CORRECTION_VERSION,
             "dataset_parameters": {
                 "fs": 700.0,
                 "window_samples": 42000,
@@ -148,6 +149,41 @@ class DatasetCacheTests(unittest.TestCase):
         self.frame.to_parquet(self.feature_path, index=False)
         self.assertIsNone(dataset.load_cached())
 
+    def test_chest_cache_requires_current_rr_correction(self):
+        self.builder._save(self.frame, self.raw)
+        for version in (None, RR_CORRECTION_VERSION - 1):
+            with self.subTest(version=version):
+                frame = pd.read_parquet(self.feature_path)
+                if version is None:
+                    frame.attrs.pop("rr_correction_version", None)
+                else:
+                    frame.attrs["rr_correction_version"] = version
+                frame.to_parquet(self.feature_path, index=False)
+                self.assertIsNone(dataset.load_cached())
+
+    def test_fresh_builds_record_rr_correction_version(self):
+        loader = SimpleNamespace(subjects=["S2"])
+        with (
+            patch.object(dataset, "WESADLoader", return_value=loader),
+            patch.object(dataset_wrist, "WESADLoader", return_value=loader),
+        ):
+            for builder, subject_data in (
+                (dataset.WindowedDataset(), ([], [], [])),
+                (dataset_wrist.WristDataset(), ([], [])),
+            ):
+                with self.subTest(dataset=type(builder).__name__):
+                    with patch.object(
+                        builder, "_process_subject", return_value=subject_data
+                    ):
+                        result = builder.build(subjects=["S2"], cache=False)
+                    frame = result[0] if isinstance(result, tuple) else result
+                    self.assertEqual(
+                        frame.attrs["rr_correction_version"], RR_CORRECTION_VERSION
+                    )
+                    self.assertEqual(
+                        frame.attrs["feature_schema_version"], FEATURE_SCHEMA_VERSION
+                    )
+
     def test_interrupted_publication_cannot_load_mixed_generations(self):
         self.builder._save(self.frame, self.raw)
         old = self.snapshot()
@@ -196,6 +232,21 @@ class DatasetCacheTests(unittest.TestCase):
         builder._process_subject = lambda subject: ([{"subject_id": subject}], [])
         builder.window_sec, builder.overlap, builder.purity = 60.0, 0.5, 0.9
         return builder
+
+    def test_wrist_cache_requires_current_rr_correction(self):
+        cache = self.directory / "features_wrist.parquet"
+        with patch.object(dataset_wrist, "PROCESSED_DATA_DIR", self.directory):
+            self.wrist_builder().build()
+            self.assertIsNotNone(dataset_wrist.load_wrist())
+            for version in (None, RR_CORRECTION_VERSION - 1):
+                with self.subTest(version=version):
+                    frame = pd.read_parquet(cache)
+                    if version is None:
+                        frame.attrs.pop("rr_correction_version", None)
+                    else:
+                        frame.attrs["rr_correction_version"] = version
+                    frame.to_parquet(cache, index=False)
+                    self.assertIsNone(dataset_wrist.load_wrist())
 
     def test_wrist_serialization_failure_preserves_previous_cache(self):
         cache = self.directory / "features_wrist.parquet"

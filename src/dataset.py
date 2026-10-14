@@ -7,7 +7,13 @@ import numpy as np
 import pandas as pd
 from scipy.signal import resample
 
-from .config import FEATURE_PARAMS, FS, PROCESSED_DATA_DIR, VALID_SUBJECTS
+from .config import (
+    FEATURE_PARAMS,
+    FS,
+    PROCESSED_DATA_DIR,
+    RR_CORRECTION_VERSION,
+    VALID_SUBJECTS,
+)
 from .data.loader import WESADLoader
 from .features.feature_pipeline import FEATURE_SCHEMA_VERSION, FeatureExtractionPipeline
 from .logging_config import LoggerMixin
@@ -168,6 +174,7 @@ class WindowedDataset(LoggerMixin):
             cast(Any, CONDITION_LABELS)
         )
         features_df.attrs["feature_schema_version"] = FEATURE_SCHEMA_VERSION
+        features_df.attrs["rr_correction_version"] = RR_CORRECTION_VERSION
         features_df.attrs["dataset_parameters"] = {
             "fs": self.fs,
             "window_samples": self.window_samples,
@@ -234,6 +241,7 @@ def load_cached() -> Optional[Tuple[pd.DataFrame, np.ndarray]]:
     }
     if (
         features_df.attrs.get("feature_schema_version") != FEATURE_SCHEMA_VERSION
+        or features_df.attrs.get("rr_correction_version") != RR_CORRECTION_VERSION
         or features_df.attrs.get("dataset_parameters") != default_parameters
     ):
         return None

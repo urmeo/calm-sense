@@ -404,6 +404,7 @@ class FeaturesTests(unittest.TestCase):
         frame.attrs.update(
             {
                 "feature_schema_version": FEATURE_SCHEMA_VERSION,
+                "rr_correction_version": dataset.RR_CORRECTION_VERSION,
                 "dataset_parameters": {
                     "fs": 700.0,
                     "window_samples": 42000,

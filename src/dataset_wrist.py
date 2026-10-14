@@ -5,7 +5,7 @@ from typing import Any, cast, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 
-from .config import FS, PROCESSED_DATA_DIR, VALID_SUBJECTS
+from .config import FS, PROCESSED_DATA_DIR, RR_CORRECTION_VERSION, VALID_SUBJECTS
 from .data.loader import WESADLoader
 from .dataset import CONDITION_LABELS, window_label
 from .features.feature_pipeline import FEATURE_SCHEMA_VERSION, FeatureExtractionPipeline
@@ -135,6 +135,7 @@ class WristDataset(LoggerMixin):
             cast(Any, CONDITION_LABELS)
         )
         features_df.attrs["feature_schema_version"] = FEATURE_SCHEMA_VERSION
+        features_df.attrs["rr_correction_version"] = RR_CORRECTION_VERSION
         features_df.attrs["dataset_parameters"] = {
             "window_sec": self.window_sec,
             "overlap": self.overlap,
@@ -164,6 +165,7 @@ def load_wrist() -> Optional[pd.DataFrame]:
     }
     if (
         frame.attrs.get("feature_schema_version") != FEATURE_SCHEMA_VERSION
+        or frame.attrs.get("rr_correction_version") != RR_CORRECTION_VERSION
         or frame.attrs.get("dataset_parameters") != parameters
     ):
         return None
