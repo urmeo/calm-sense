@@ -8,6 +8,8 @@ The primary benchmark uses WESAD chest recordings at 700 Hz from 15 subjects: S2
 
 The pipeline filters signals and computes 60-second windows every 30 seconds. A window is retained only when at least 90% of its labels belong to the same eligible class. The recorded dataset contains 869 binary windows and 1,032 three-class windows. Chest channels are ECG, EDA, temperature, respiration, and acceleration magnitude. The CNN receives these processed channels resampled to 1,024 samples per window.
 
+Current chest and wrist processing detects skin conductance responses (SCRs) using peak prominence, amplitude above the preceding onset, and rise time.
+
 Sixty-second windows limit interpretation of very-low-frequency HRV and long-term detrended fluctuation analysis.
 
 The feature registry contains 60 measurements:
