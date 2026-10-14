@@ -77,7 +77,9 @@ The binary ablation experiment reruns Random Forest LOSO evaluation for each fea
 
 The high motion-only score is a reason to examine protocol effects before interpreting these features as specific measures of stress. The saved [ablation results](../outputs/results/ablation.csv) do not establish causation or performance outside the laboratory protocol.
 
-The wrist experiment uses WESAD wrist BVP, EDA, temperature, and acceleration at their native sampling rates. A comparison using Random Forest on both devices gives chest accuracy 0.910 and wrist accuracy 0.890. Wrist XGBoost has mean accuracy 0.901. These are separate feature pipelines and sensor sets; the same-model comparison holds the classifier choice fixed. See [wrist.json](../outputs/results/wrist.json).
+The wrist experiment uses WESAD wrist BVP, EDA, temperature, and acceleration at their native sampling rates. The recorded comparison using Random Forest on both devices gives chest accuracy 0.910 and wrist accuracy 0.890. Wrist XGBoost has mean accuracy 0.901. These are separate feature pipelines and sensor sets; the same-model comparison holds the classifier choice fixed. See [wrist.json](../outputs/results/wrist.json).
+
+Current wrist extraction applies a fourth-order Butterworth low-pass filter at 1 Hz to 4 Hz EDA before tonic/phasic decomposition. Forward/backward filtering gives zero phase. This cutoff is below the 2 Hz Nyquist frequency and has precedent in [Giorgi et al. (2023), section 2.5.3](https://www.frontiersin.org/journals/neurorobotics/articles/10.3389/fnbot.2023.1240933/full), whose decomposition method differs. The saved wrist scores above predate this correction.
 
 SHAP values describe a separate XGBoost model fitted on all binary feature windows. They are descriptive feature contributions for that fit, not held-out estimates or causal effects. [shap_top_features.csv](../outputs/results/shap_top_features.csv) records the mean absolute contributions.
 

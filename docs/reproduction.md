@@ -4,7 +4,7 @@ Run commands from the repository root. To use the saved dashboard, follow the [R
 
 The saved benchmark was generated on 4 October 2026 from source revision `4f5c02f`. Its [provenance record](../outputs/results/provenance.json) lists the package versions used. The dependency ranges in `requirements.txt` permit other versions; matching the protocol alone does not guarantee identical numbers across environments. The saved scikit-learn model requires version 1.6.1.
 
-The recorded results predate the bounded RR-interval correction and are unchanged. Older chest and wrist caches are invalidated. Before reporting revised results, rerun the chest benchmark with `python scripts/run_experiment.py --rebuild`; for wrist results, then run `python scripts/wrist.py`.
+The recorded results predate the bounded RR-interval and wrist EDA filtering corrections and are unchanged. Older chest and wrist caches are invalidated. Before reporting revised results, rerun the chest benchmark with `python scripts/run_experiment.py --rebuild`; for wrist results, then run `python scripts/wrist.py`.
 
 ## Python setup and demo
 
