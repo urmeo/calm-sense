@@ -38,7 +38,6 @@ HYPERPARAMS: Dict[str, Dict[str, Any]] = {
         "n_estimators": 200,
         "learning_rate": 0.1,
         "max_depth": -1,
-        "subsample": 0.8,
         "colsample_bytree": 0.8,
         "reg_alpha": 0,
         "reg_lambda": 0,
