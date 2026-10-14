@@ -1,7 +1,7 @@
 import React from 'react';
 import Chart, { type ChartOption } from '../components/Chart';
 import { barChartOption } from '../lib/charts';
-import { Gauge, Target, AlertTriangle, TrendingDown, Info } from 'lucide-react';
+import { Gauge, Target, AlertTriangle, TrendingDown } from 'lucide-react';
 import results from '../data';
 import Panel from '../components/Panel';
 import SummaryCard from '../components/SummaryCard';
@@ -58,8 +58,8 @@ const CalibrationPanel: React.FC = () => {
         <p className="text-gray-500 dark:text-gray-400">
           Saved binary {model} probabilities for held-out subjects
           ({cal.n_windows} windows, {cal.n_bins} confidence bins).
-          Recalibration uses only training subjects. The optimism comparison
-          uses a separate subset of non-overlapping windows.
+          Recalibration uses out-of-fold probabilities from training subjects only.
+          The optimism comparison uses a separate subset of non-overlapping windows.
         </p>
       </div>
 
@@ -169,14 +169,6 @@ const CalibrationPanel: React.FC = () => {
           </table>
         </div>
       </Panel>
-
-      <div className="flex items-start gap-2 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-sm">
-        <Info className="w-5 h-5 text-blue-500 mt-0.5 shrink-0" />
-        <p className="text-blue-800 dark:text-blue-300">
-          Recalibration fits out-of-fold probabilities from the training subjects; the held-out
-          subject is excluded. Research use only; no clinical validation.
-        </p>
-      </div>
     </div>
   );
 };

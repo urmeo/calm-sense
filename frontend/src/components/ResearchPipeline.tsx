@@ -24,7 +24,6 @@ const evidence = [
   },
 ];
 
-/** Recorded WESAD inputs, training boundaries, and held-out evaluation. */
 export default function ResearchPipeline() {
   return (
     <section className="research-pipeline" aria-labelledby="pipeline-title">
