@@ -47,7 +47,7 @@ python scripts/run_experiment.py --rebuild
 
 This extracts chest features, evaluates all five models on both tasks, writes summaries and figures, computes full-data XGBoost SHAP values, and refits a binary feature model on all available training windows. With the recorded results, that refit is Random Forest. The script saves the model and its SHA-256 file.
 
-Later runs can reuse a compatible cache by omitting `--rebuild`. Chest caches store a checksum linking features to CNN windows. Older caches without it need one rebuild. `--no-cnn` skips the CNN. `--subjects S2 S3 S4` limits extraction to specified subjects. These options change the experiment and do not reproduce the complete five-model, 15-subject benchmark.
+Later runs can reuse a compatible cache by omitting `--rebuild`. Chest and wrist caches verify extraction code, filter settings, and SHA-256 hashes of the complete raw WESAD files. Raw recordings must remain available for cache verification, including portable transfer caches. Legacy or stale caches need rebuilding; restore missing raw files first. Chest caches also store a checksum linking features to CNN windows. `--no-cnn` skips the CNN. `--subjects S2 S3 S4` limits extraction to specified subjects. These options change the experiment and do not reproduce the complete five-model, 15-subject benchmark.
 
 Real-data scripts write to `outputs/results/` and can replace the tracked research artifacts. The primary script also replaces the saved model in `outputs/models/`. Use a separate checkout when preserving the original artifacts matters. Newly generated plots go to `outputs/generated/figures/`; they do not replace the tracked figure snapshots in `outputs/figures/`.
 
