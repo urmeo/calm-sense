@@ -19,6 +19,7 @@ import pandas as pd
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, f1_score
 
 from scripts.run_experiment import build_pipeline, loso_evaluate
+from src.cache import verified_input
 from src.config import (
     FIGURES_DIR,
     FS,
@@ -119,12 +120,21 @@ def _validate_frame(frame):
 
 
 def _load_or_build_cache(dataset, builder, source_provenance=None, *, rebuild=False):
+    if source_provenance is not None and not callable(source_provenance):
+        raise TypeError("source_provenance must be callable to recheck raw inputs")
+    read_source = (
+        source_provenance
+        if source_provenance is not None
+        else lambda: _raw_provenance(dataset)
+    )
     PROCESSED_DATA_DIR.mkdir(parents=True, exist_ok=True)
     cache = (
         PROCESSED_DATA_DIR / f"portable_{dataset}_v{PORTABLE_SCHEMA_VERSION}.parquet"
     )
     sidecar = cache.with_suffix(".json")
     schema = _cache_schema(dataset)
+    source = read_source()
+    raw_identity = _raw_identity(source)
     if cache.exists() and not rebuild:
         try:
             metadata = json.loads(sidecar.read_text())
@@ -138,17 +148,21 @@ def _load_or_build_cache(dataset, builder, source_provenance=None, *, rebuild=Fa
             raise ValueError(
                 f"Portable cache schema mismatch: {cache}; rebuild from raw data"
             )
-        if metadata.get("cache_sha256") != sha256_file(cache):
-            raise ValueError(f"Portable cache checksum mismatch: {cache}")
-        frame = pd.read_parquet(cache)
+        if _raw_identity(metadata.get("source_provenance")) != raw_identity:
+            raise ValueError(
+                f"Portable cache raw inputs changed: {cache}; rebuild from raw data"
+            )
+        with verified_input(cache) as (stream, digest):
+            if metadata.get("cache_sha256") != digest:
+                raise ValueError(f"Portable cache checksum mismatch: {cache}")
+            frame = pd.read_parquet(stream)
     else:
         frame = builder()
         _validate_frame(frame)
-        source = (
-            source_provenance()
-            if callable(source_provenance)
-            else source_provenance or {}
-        )
+        if _raw_identity(read_source()) != raw_identity:
+            raise ValueError("Raw inputs changed during portable feature extraction")
+        if _cache_schema(dataset) != schema:
+            raise ValueError("Pipeline changed during portable feature extraction")
         with TemporaryDirectory(dir=PROCESSED_DATA_DIR) as temporary:
             new_cache = Path(temporary) / cache.name
             new_sidecar = Path(temporary) / sidecar.name
@@ -164,17 +178,43 @@ def _load_or_build_cache(dataset, builder, source_provenance=None, *, rebuild=Fa
     return frame, metadata
 
 
+def _raw_identity(source):
+    if not isinstance(source, dict):
+        raise ValueError("Missing portable raw input metadata; rebuild from raw data")
+    manifest = source.get("raw_file_sha256")
+    if not isinstance(manifest, dict) or not manifest:
+        raise ValueError("Missing portable raw input manifest; rebuild from raw data")
+    digest = hashlib.sha256(json.dumps(manifest, sort_keys=True).encode()).hexdigest()
+    if source.get("manifest_sha256") != digest:
+        raise ValueError("Invalid portable raw input manifest; rebuild from raw data")
+    return manifest, digest
+
+
 def _raw_provenance(dataset):
-    files = (
-        [WESAD_DIR / sid / f"{sid}.pkl" for sid in VALID_SUBJECTS]
-        if dataset == "wesad"
-        else sorted(non_eeg.DATA_DIR.glob("Subject*"))
-    )
-    manifest = {
-        path.relative_to(PROJECT_ROOT).as_posix(): sha256_file(path)
-        for path in files
-        if path.is_file()
-    }
+    if dataset == "wesad":
+        directory = WESAD_DIR
+        files = [directory / sid / f"{sid}.pkl" for sid in VALID_SUBJECTS]
+    elif dataset == "noneeg":
+        directory = non_eeg.DATA_DIR
+        files = [
+            directory / f"Subject{subject}_{record}.{extension}"
+            for subject in range(1, 21)
+            for record, extensions in (
+                ("AccTempEDA", ("hea", "dat", "atr")),
+                ("SpO2HR", ("hea", "dat")),
+            )
+            for extension in extensions
+        ]
+    else:
+        raise ValueError(f"Unknown portable dataset: {dataset}")
+    if not files:
+        raise ValueError("Cannot verify an empty portable raw input manifest")
+    manifest = {}
+    for path in files:
+        if not path.is_file():
+            raise FileNotFoundError(f"Required raw input not found: {path}")
+        with verified_input(path) as (_, digest):
+            manifest[path.relative_to(directory).as_posix()] = digest
     return {
         "feature_source": "raw_reextraction",
         "raw_file_sha256": manifest,

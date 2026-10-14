@@ -8,6 +8,7 @@ import pickle
 import numpy as np
 import pandas as pd
 from src import dataset, features, synthetic
+from src.cache import cache_fingerprint
 from src.config import VALID_SUBJECTS
 from src.data.loader import WESADLoader
 from src.dataset import WindowedDataset
@@ -24,6 +25,7 @@ from src.features.hrv_time_domain import HRVTimeDomainExtractor
 from src.features.respiration_features import RespirationFeatureExtractor
 from src.features.temperature_features import TemperatureFeatureExtractor
 from src.preprocessing.ecg_processor import ECGProcessor
+from tests.cache_fixtures import source_loader
 
 
 class FeaturesTests(unittest.TestCase):
@@ -389,6 +391,9 @@ class FeaturesTests(unittest.TestCase):
     def test_cached_chest_features_require_current_protocol_and_aligned_rows(self):
         tmp_path = self.tmp_path
         self.stack.enter_context(patch.object(dataset, "PROCESSED_DATA_DIR", tmp_path))
+        source_path = self.stack.enter_context(TemporaryDirectory())
+        loader = source_loader(source_path)
+        self.stack.enter_context(patch.object(dataset, "WESAD_DIR", loader.data_path))
         columns = dataset.FeatureExtractionPipeline().get_feature_names()
         frame = pd.DataFrame(
             {
@@ -406,6 +411,9 @@ class FeaturesTests(unittest.TestCase):
                 "feature_schema_version": FEATURE_SCHEMA_VERSION,
                 "rr_correction_version": dataset.RR_CORRECTION_VERSION,
                 "scr_detection_version": dataset.SCR_DETECTION_VERSION,
+                "extraction_fingerprint": cache_fingerprint(
+                    "chest", loader.data_path, VALID_SUBJECTS
+                ),
                 "dataset_parameters": {
                     "fs": 700.0,
                     "window_samples": 42000,
@@ -417,6 +425,7 @@ class FeaturesTests(unittest.TestCase):
             }
         )
         builder = dataset.WindowedDataset.__new__(dataset.WindowedDataset)
+        builder.loader = loader
         builder._save(frame, np.zeros((1, 5, 1024)))
         self.assertEqual(dataset.load_cached()[1].shape, (1, 5, 1024))
         frame = pd.read_parquet(tmp_path / "features.parquet")

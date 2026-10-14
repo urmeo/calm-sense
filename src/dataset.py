@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 from scipy.signal import resample
 
+from .cache import cache_fingerprint, extraction_context
 from .config import (
     FEATURE_PARAMS,
     FS,
@@ -14,10 +15,11 @@ from .config import (
     RR_CORRECTION_VERSION,
     SCR_DETECTION_VERSION,
     VALID_SUBJECTS,
+    WESAD_DIR,
 )
 from .data.loader import WESADLoader
 from .features.feature_pipeline import FEATURE_SCHEMA_VERSION, FeatureExtractionPipeline
-from .logging_config import LoggerMixin
+from .logging_config import get_logger, LoggerMixin
 from .preprocessing.ecg_processor import ECGProcessor
 from .preprocessing.eda_processor import EDAProcessor
 from .preprocessing.filters import (
@@ -154,6 +156,7 @@ class WindowedDataset(LoggerMixin):
         subjects = self.loader.subjects if subjects is None else subjects
         if not subjects or len(set(subjects)) != len(subjects):
             raise ValueError("subjects must be a nonempty list without duplicates")
+        context = extraction_context("chest")
 
         frames, all_raw, all_y = [], [], []
         for subject_id in subjects:
@@ -185,6 +188,13 @@ class WindowedDataset(LoggerMixin):
             "cnn_length": self.cnn_length,
             "subjects": sorted(subjects),
         }
+        features_df.attrs["extraction_fingerprint"] = cache_fingerprint(
+            "chest",
+            self.loader.data_path,
+            subjects,
+            context=context,
+            loaded_inputs=self.loader.raw_input_sha256,
+        )
         x_raw = (
             np.stack(all_raw)
             if all_raw
@@ -223,7 +233,9 @@ class WindowedDataset(LoggerMixin):
         self.logger.info(f"Cached dataset to {PROCESSED_DATA_DIR}")
 
 
-def load_cached() -> Optional[Tuple[pd.DataFrame, np.ndarray]]:
+def load_cached(
+    data_path: Optional[Union[str, Path]] = None,
+) -> Optional[Tuple[pd.DataFrame, np.ndarray]]:
     feat_path = PROCESSED_DATA_DIR / "features.parquet"
     raw_path = PROCESSED_DATA_DIR / "raw_windows.npz"
     if not feat_path.exists() or not raw_path.exists():
@@ -247,6 +259,23 @@ def load_cached() -> Optional[Tuple[pd.DataFrame, np.ndarray]]:
         or features_df.attrs.get("scr_detection_version") != SCR_DETECTION_VERSION
         or features_df.attrs.get("dataset_parameters") != default_parameters
     ):
+        return None
+    fingerprint = features_df.attrs.get("extraction_fingerprint")
+    if not isinstance(fingerprint, dict):
+        return None
+    try:
+        current = cache_fingerprint(
+            "chest",
+            Path(data_path) if data_path is not None else WESAD_DIR,
+            VALID_SUBJECTS,
+        )
+    except (OSError, RuntimeError) as error:
+        get_logger(__name__).warning("Cannot validate chest cache", reason=str(error))
+        return None
+    if fingerprint != current:
+        get_logger(__name__).warning(
+            "Chest cache extraction inputs changed; rebuild it"
+        )
         return None
     expected_raw_hash = features_df.attrs.pop("raw_windows_sha256", None)
     if not isinstance(expected_raw_hash, str):

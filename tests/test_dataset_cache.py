@@ -1,5 +1,8 @@
 import unittest
+import os
+import pickle
 from copy import deepcopy
+from dataclasses import replace
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace
@@ -8,7 +11,8 @@ from unittest.mock import patch
 import numpy as np
 import pandas as pd
 
-from src import dataset, dataset_wrist
+from src import cache, config, dataset, dataset_wrist
+from src.cache import cache_fingerprint, raw_input_sha256
 from src.config import (
     FILTER_PARAMS,
     FS,
@@ -18,6 +22,7 @@ from src.config import (
 )
 from src.features.feature_pipeline import FEATURE_SCHEMA_VERSION
 from src.utils import feature_frame_sha256, sha256_file
+from tests.cache_fixtures import source_loader
 
 
 class DatasetCacheTests(unittest.TestCase):
@@ -25,9 +30,17 @@ class DatasetCacheTests(unittest.TestCase):
         directory = TemporaryDirectory()
         self.addCleanup(directory.cleanup)
         self.directory = Path(directory.name)
-        patcher = patch.object(dataset, "PROCESSED_DATA_DIR", self.directory)
-        patcher.start()
-        self.addCleanup(patcher.stop)
+        sources = TemporaryDirectory()
+        self.addCleanup(sources.cleanup)
+        self.loader = source_loader(sources.name)
+        for module in (dataset, dataset_wrist):
+            for name, value in (
+                ("PROCESSED_DATA_DIR", self.directory),
+                ("WESAD_DIR", self.loader.data_path),
+            ):
+                patcher = patch.object(module, name, value)
+                patcher.start()
+                self.addCleanup(patcher.stop)
         self.feature_path = self.directory / "features.parquet"
         self.raw_path = self.directory / "raw_windows.npz"
         self.frame = pd.DataFrame(
@@ -46,6 +59,9 @@ class DatasetCacheTests(unittest.TestCase):
             "feature_schema_version": FEATURE_SCHEMA_VERSION,
             "rr_correction_version": RR_CORRECTION_VERSION,
             "scr_detection_version": SCR_DETECTION_VERSION,
+            "extraction_fingerprint": cache_fingerprint(
+                "chest", self.loader.data_path, VALID_SUBJECTS
+            ),
             "dataset_parameters": {
                 "fs": 700.0,
                 "window_samples": 42000,
@@ -57,6 +73,7 @@ class DatasetCacheTests(unittest.TestCase):
         }
         self.raw = np.zeros((2, 5, 1024), dtype=np.float32)
         self.builder = dataset.WindowedDataset.__new__(dataset.WindowedDataset)
+        self.builder.loader = self.loader
 
     def snapshot(self):
         return {
@@ -64,6 +81,158 @@ class DatasetCacheTests(unittest.TestCase):
             for path in (self.feature_path, self.raw_path)
             if path.exists()
         }
+
+    def save_caches(self):
+        self.builder._save(self.frame, self.raw)
+        self.wrist_builder().build()
+        self.assertIsNotNone(dataset.load_cached())
+        self.assertIsNotNone(dataset_wrist.load_wrist())
+        return {path.name: path.read_bytes() for path in self.directory.iterdir()}
+
+    def test_cache_loaders_accept_an_explicit_source_path(self):
+        self.save_caches()
+        missing = self.loader.data_path / "missing"
+        with (
+            patch.object(dataset, "WESAD_DIR", missing),
+            patch.object(dataset_wrist, "WESAD_DIR", missing),
+        ):
+            self.assertIsNotNone(dataset.load_cached(self.loader.data_path))
+            self.assertIsNotNone(dataset_wrist.load_wrist(str(self.loader.data_path)))
+            self.assertIsNone(dataset.load_cached())
+            self.assertIsNone(dataset_wrist.load_wrist())
+
+    def test_caches_require_a_matching_extraction_fingerprint(self):
+        self.save_caches()
+        for path, load in (
+            (self.feature_path, dataset.load_cached),
+            (self.directory / "features_wrist.parquet", dataset_wrist.load_wrist),
+        ):
+            for fingerprint in (None, {"different": True}):
+                with self.subTest(cache=path.name, fingerprint=fingerprint):
+                    frame = pd.read_parquet(path)
+                    if fingerprint is None:
+                        frame.attrs.pop("extraction_fingerprint", None)
+                    else:
+                        frame.attrs["extraction_fingerprint"] = fingerprint
+                    frame.to_parquet(path, index=False)
+                    self.assertIsNone(load())
+
+    def test_caches_reject_raw_byte_changes_with_unchanged_size_and_mtime(self):
+        before = self.save_caches()
+        path = self.loader.data_path / "S2" / "S2.pkl"
+        state = path.stat()
+        record = pickle.loads(path.read_bytes())
+        record["signal"]["wrist"]["EDA"][0, 0] = 1.0
+        path.write_bytes(pickle.dumps(record, protocol=4))
+        os.utime(path, ns=(state.st_atime_ns, state.st_mtime_ns))
+        self.assertEqual(path.stat().st_size, state.st_size)
+        self.assertEqual(path.stat().st_mtime_ns, state.st_mtime_ns)
+        self.assertIsNone(dataset.load_cached())
+        self.assertIsNone(dataset_wrist.load_wrist())
+        self.assertEqual(
+            {path.name: path.read_bytes() for path in self.directory.iterdir()}, before
+        )
+
+    def test_caches_reject_missing_raw_recordings(self):
+        before = self.save_caches()
+        (self.loader.data_path / "S2" / "S2.pkl").unlink()
+        self.assertIsNone(dataset.load_cached())
+        self.assertIsNone(dataset_wrist.load_wrist())
+        self.assertEqual(
+            {path.name: path.read_bytes() for path in self.directory.iterdir()}, before
+        )
+
+    def test_caches_reject_changed_filter_parameters(self):
+        self.save_caches()
+        changed = replace(config.FILTER_PARAMS, EDA_FILTER_ORDER=6)
+        with patch.object(config, "FILTER_PARAMS", changed):
+            self.assertIsNone(dataset.load_cached())
+            self.assertIsNone(dataset_wrist.load_wrist())
+
+    def test_caches_reject_extraction_source_changes(self):
+        with TemporaryDirectory() as directory:
+            source_root = Path(directory)
+            for relative in cache.IMPORTED_SOURCE_SHA256:
+                path = source_root / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes((cache.SOURCE_ROOT / relative).read_bytes())
+            with patch.object(cache, "SOURCE_ROOT", source_root):
+                self.save_caches()
+                source = source_root / "src" / "features" / "eda_features.py"
+                source.write_text(
+                    source.read_text() + "\n# Changed extraction source.\n"
+                )
+                self.assertIsNone(dataset.load_cached())
+                self.assertIsNone(dataset_wrist.load_wrist())
+
+    def test_build_rejects_raw_changes_after_loading_before_saving(self):
+        before = self.save_caches()
+        path = self.loader.data_path / "S2" / "S2.pkl"
+        original = path.read_bytes()
+        for builder_type in (dataset.WindowedDataset, dataset_wrist.WristDataset):
+            with self.subTest(dataset=builder_type.__name__):
+                builder = builder_type(data_path=self.loader.data_path)
+
+                def process(subject):
+                    builder.loader.load_subject(subject)
+                    record = pickle.loads(original)
+                    record["signal"]["wrist"]["EDA"][0, 0] = 1.0
+                    path.write_bytes(pickle.dumps(record, protocol=4))
+                    return (
+                        ([], [], [])
+                        if builder_type is dataset.WindowedDataset
+                        else ([], [])
+                    )
+
+                try:
+                    with (
+                        patch.object(builder, "_process_subject", process),
+                        patch.object(
+                            pd.DataFrame,
+                            "to_parquet",
+                            side_effect=AssertionError("published changed inputs"),
+                        ),
+                        self.assertRaisesRegex(RuntimeError, "Raw recordings changed"),
+                    ):
+                        builder.build(subjects=["S2"])
+                finally:
+                    path.write_bytes(original)
+                self.assertEqual(
+                    {path.name: path.read_bytes() for path in self.directory.iterdir()},
+                    before,
+                )
+
+    def test_build_rejects_filter_changes_during_processing_before_saving(self):
+        before = self.save_caches()
+        original = config.FILTER_PARAMS
+        for builder_type in (dataset.WindowedDataset, dataset_wrist.WristDataset):
+            with self.subTest(dataset=builder_type.__name__):
+                builder = builder_type(data_path=self.loader.data_path)
+
+                def process(subject):
+                    builder.loader.load_subject(subject)
+                    config.FILTER_PARAMS = replace(original, EDA_FILTER_ORDER=6)
+                    return (
+                        ([], [], [])
+                        if builder_type is dataset.WindowedDataset
+                        else ([], [])
+                    )
+
+                with (
+                    patch.object(config, "FILTER_PARAMS", original),
+                    patch.object(builder, "_process_subject", process),
+                    patch.object(
+                        pd.DataFrame,
+                        "to_parquet",
+                        side_effect=AssertionError("published changed settings"),
+                    ),
+                    self.assertRaisesRegex(RuntimeError, "Extraction settings changed"),
+                ):
+                    builder.build(subjects=["S2"])
+                self.assertEqual(
+                    {path.name: path.read_bytes() for path in self.directory.iterdir()},
+                    before,
+                )
 
     def test_save_binds_files_without_changing_caller_or_feature_identity(self):
         before = deepcopy(self.frame.attrs)
@@ -182,7 +351,11 @@ class DatasetCacheTests(unittest.TestCase):
                 self.assertIsNone(dataset.load_cached())
 
     def test_fresh_builds_record_processing_versions(self):
-        loader = SimpleNamespace(subjects=["S2"])
+        loader = SimpleNamespace(
+            subjects=["S2"],
+            data_path=self.loader.data_path,
+            raw_input_sha256=raw_input_sha256(self.loader.data_path, ["S2"]),
+        )
         with (
             patch.object(dataset, "WESADLoader", return_value=loader),
             patch.object(dataset_wrist, "WESADLoader", return_value=loader),
@@ -205,6 +378,18 @@ class DatasetCacheTests(unittest.TestCase):
                     )
                     self.assertEqual(
                         frame.attrs["feature_schema_version"], FEATURE_SCHEMA_VERSION
+                    )
+                    self.assertEqual(
+                        frame.attrs["extraction_fingerprint"],
+                        cache_fingerprint(
+                            (
+                                "chest"
+                                if isinstance(builder, dataset.WindowedDataset)
+                                else "wrist"
+                            ),
+                            loader.data_path,
+                            ["S2"],
+                        ),
                     )
 
     def test_interrupted_publication_cannot_load_mixed_generations(self):
@@ -235,9 +420,10 @@ class DatasetCacheTests(unittest.TestCase):
 
         def replace_after_hash(stream, algorithm):
             result = digest(stream, algorithm)
-            replacement = self.directory / "replacement.npz"
-            replacement.write_bytes(b"replacement after hash")
-            replacement.replace(self.raw_path)
+            if Path(stream.name) == self.raw_path:
+                replacement = self.directory / "replacement.npz"
+                replacement.write_bytes(b"replacement after hash")
+                replacement.replace(self.raw_path)
             return result
 
         with patch.object(dataset.hashlib, "file_digest", replace_after_hash):
@@ -246,7 +432,7 @@ class DatasetCacheTests(unittest.TestCase):
 
     def wrist_builder(self):
         builder = dataset_wrist.WristDataset.__new__(dataset_wrist.WristDataset)
-        builder.loader = SimpleNamespace(subjects=VALID_SUBJECTS)
+        builder.loader = self.loader
         builder.features = SimpleNamespace(
             extract_all_features=lambda windows, **kwargs: self.frame.assign(
                 subject_id=windows[0]["subject_id"]

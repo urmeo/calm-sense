@@ -1,10 +1,11 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Any, cast, List, Optional, Tuple
+from typing import Any, cast, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
 
+from .cache import cache_fingerprint, extraction_context
 from .config import (
     FILTER_PARAMS,
     FS,
@@ -12,11 +13,12 @@ from .config import (
     RR_CORRECTION_VERSION,
     SCR_DETECTION_VERSION,
     VALID_SUBJECTS,
+    WESAD_DIR,
 )
 from .data.loader import WESADLoader
 from .dataset import CONDITION_LABELS, window_label
 from .features.feature_pipeline import FEATURE_SCHEMA_VERSION, FeatureExtractionPipeline
-from .logging_config import LoggerMixin
+from .logging_config import get_logger, LoggerMixin
 from .preprocessing.ecg_processor import ECGProcessor
 from .preprocessing.eda_processor import EDAProcessor
 from .preprocessing.filters import _window_parameters
@@ -26,14 +28,18 @@ class WristDataset(LoggerMixin):
     """Build features from WESAD wrist windows using the chest label timeline."""
 
     def __init__(
-        self, window_sec: float = 60.0, overlap: float = 0.5, purity: float = 0.9
+        self,
+        window_sec: float = 60.0,
+        overlap: float = 0.5,
+        purity: float = 0.9,
+        data_path: Optional[Union[str, Path]] = None,
     ):
         _window_parameters(window_sec, overlap, purity, FS.WRIST_EDA)
         self.window_sec = float(window_sec)
         self.overlap = float(overlap)
         self.purity = float(purity)
         self.label_fs = FS.CHEST
-        self.loader = WESADLoader()
+        self.loader = WESADLoader(data_path=data_path)
         self.eda = EDAProcessor(sampling_rate=FS.WRIST_EDA)
         self.rr = ECGProcessor(sampling_rate=FS.WRIST_BVP)
         self.features = FeatureExtractionPipeline(
@@ -125,6 +131,7 @@ class WristDataset(LoggerMixin):
         subjects = self.loader.subjects if subjects is None else subjects
         if not subjects or len(set(subjects)) != len(subjects):
             raise ValueError("subjects must be a nonempty list without duplicates")
+        context = extraction_context("wrist")
         frames = []
         for subject_id in subjects:
             windows, _ = self._process_subject(subject_id)
@@ -153,6 +160,13 @@ class WristDataset(LoggerMixin):
             "eda_filter_order": FILTER_PARAMS.EDA_FILTER_ORDER,
             "subjects": sorted(subjects),
         }
+        features_df.attrs["extraction_fingerprint"] = cache_fingerprint(
+            "wrist",
+            self.loader.data_path,
+            subjects,
+            context=context,
+            loaded_inputs=self.loader.raw_input_sha256,
+        )
         if cache:
             PROCESSED_DATA_DIR.mkdir(parents=True, exist_ok=True)
             with TemporaryDirectory(dir=PROCESSED_DATA_DIR) as directory:
@@ -163,7 +177,7 @@ class WristDataset(LoggerMixin):
         return features_df
 
 
-def load_wrist() -> Optional[pd.DataFrame]:
+def load_wrist(data_path: Optional[Union[str, Path]] = None) -> Optional[pd.DataFrame]:
     path = Path(PROCESSED_DATA_DIR) / "features_wrist.parquet"
     if not path.exists():
         return None
@@ -183,6 +197,23 @@ def load_wrist() -> Optional[pd.DataFrame]:
         or frame.attrs.get("scr_detection_version") != SCR_DETECTION_VERSION
         or frame.attrs.get("dataset_parameters") != parameters
     ):
+        return None
+    fingerprint = frame.attrs.get("extraction_fingerprint")
+    if not isinstance(fingerprint, dict):
+        return None
+    try:
+        current = cache_fingerprint(
+            "wrist",
+            Path(data_path) if data_path is not None else WESAD_DIR,
+            VALID_SUBJECTS,
+        )
+    except (OSError, RuntimeError) as error:
+        get_logger(__name__).warning("Cannot validate wrist cache", reason=str(error))
+        return None
+    if fingerprint != current:
+        get_logger(__name__).warning(
+            "Wrist cache extraction inputs changed; rebuild it"
+        )
         return None
     columns = [
         column

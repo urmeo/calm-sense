@@ -4,6 +4,7 @@ from typing import Dict, List, Optional, Union
 
 import numpy as np
 
+from ..cache import verified_input
 from ..config import FS, LABEL_NAMES, VALID_SUBJECTS, WESAD_DIR
 from ..logging_config import LoggerMixin
 
@@ -24,6 +25,7 @@ class WESADLoader(LoggerMixin):
         self.data_path = Path(data_path) if data_path else WESAD_DIR
         self._validate_path()
         self.subjects = self._discover_subjects()
+        self.raw_input_sha256: Dict[str, str] = {}
 
     def _validate_path(self) -> None:
         if not self.data_path.is_dir():
@@ -61,8 +63,8 @@ class WESADLoader(LoggerMixin):
         self.logger.info(f"Loading subject {subject_id} from {pkl_path}")
 
         try:
-            with open(pkl_path, "rb") as f:
-                data = pickle.load(f, encoding="latin1")
+            with verified_input(pkl_path) as (stream, digest):
+                data = pickle.load(stream, encoding="latin1")
         except Exception as e:
             self.logger.error(f"Failed to load {subject_id}: {e}")
             raise
@@ -131,6 +133,7 @@ class WESADLoader(LoggerMixin):
             "wrist": wrist_signals,
             "label": labels,
         }
+        self.raw_input_sha256[f"{subject_id}/{subject_id}.pkl"] = digest
 
         self.logger.info(
             f"Loaded {subject_id}: {len(result['label'])} samples "

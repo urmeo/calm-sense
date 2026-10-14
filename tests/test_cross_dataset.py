@@ -1,4 +1,6 @@
 import unittest
+import hashlib
+import os
 from contextlib import ExitStack
 from unittest.mock import patch
 from tempfile import TemporaryDirectory
@@ -30,6 +32,30 @@ class CrossDatasetTests(unittest.TestCase):
         self.addCleanup(self.stack.close)
         self.tmp_path = Path(self.stack.enter_context(TemporaryDirectory()))
         self.features = features()
+        raw_path = Path(self.stack.enter_context(TemporaryDirectory()))
+        self.wesad_path, self.noneeg_path = raw_path / "wesad", raw_path / "noneeg"
+        for subject in ("S2", "S3"):
+            directory = self.wesad_path / subject
+            directory.mkdir(parents=True)
+            (directory / f"{subject}.pkl").write_bytes(subject.encode())
+        self.noneeg_path.mkdir()
+        for subject in range(1, 21):
+            for record, extensions in (
+                ("AccTempEDA", ("hea", "dat", "atr")),
+                ("SpO2HR", ("hea", "dat")),
+            ):
+                for extension in extensions:
+                    name = f"Subject{subject}_{record}.{extension}"
+                    (self.noneeg_path / name).write_bytes(name.encode())
+        self.stack.enter_context(
+            patch.object(cross_dataset, "WESAD_DIR", self.wesad_path)
+        )
+        self.stack.enter_context(
+            patch.object(cross_dataset, "VALID_SUBJECTS", ["S2", "S3"])
+        )
+        self.stack.enter_context(
+            patch.object(cross_dataset.non_eeg, "DATA_DIR", self.noneeg_path)
+        )
 
     def test_legacy_cache_is_ignored_and_current_cache_is_verified(self):
         tmp_path = self.tmp_path
@@ -78,6 +104,185 @@ class CrossDatasetTests(unittest.TestCase):
         )
         self.assertEqual(metadata["sampling_rates_hz"], {"eda": 8, "temp": 8})
         self.assertEqual(metadata["signal_units"], PORTABLE_SIGNAL_UNITS["noneeg"])
+
+    def test_raw_manifests_cover_every_consumed_file(self):
+        for dataset, count in (("wesad", 2), ("noneeg", 100)):
+            with self.subTest(dataset=dataset):
+                source = cross_dataset._raw_provenance(dataset)
+                self.assertEqual(len(source["raw_file_sha256"]), count)
+                self.assertEqual(
+                    cross_dataset._raw_identity(source)[1], source["manifest_sha256"]
+                )
+        with patch.object(cross_dataset, "VALID_SUBJECTS", []):
+            with self.assertRaisesRegex(ValueError, "empty"):
+                cross_dataset._raw_provenance("wesad")
+
+    def test_same_size_raw_changes_with_preserved_mtime_require_rebuilding(self):
+        for dataset, raw in (
+            ("wesad", self.wesad_path / "S3/S3.pkl"),
+            ("noneeg", self.noneeg_path / "Subject20_SpO2HR.dat"),
+        ):
+            with self.subTest(dataset=dataset), patch.object(
+                cross_dataset, "PROCESSED_DATA_DIR", self.tmp_path / dataset
+            ):
+                _, before = cross_dataset._load_or_build_cache(
+                    dataset, lambda: self.features
+                )
+                state = raw.stat()
+                payload = raw.read_bytes()
+                raw.write_bytes(bytes([payload[0] ^ 1]) + payload[1:])
+                os.utime(raw, ns=(state.st_atime_ns, state.st_mtime_ns))
+                self.assertEqual(raw.stat().st_size, state.st_size)
+                self.assertEqual(raw.stat().st_mtime_ns, state.st_mtime_ns)
+                builder = Mock(return_value=self.features)
+                with self.assertRaisesRegex(ValueError, "raw inputs changed"):
+                    cross_dataset._load_or_build_cache(dataset, builder)
+                builder.assert_not_called()
+                _, after = cross_dataset._load_or_build_cache(
+                    dataset, builder, rebuild=True
+                )
+                builder.assert_called_once_with()
+                self.assertNotEqual(
+                    before["source_provenance"]["manifest_sha256"],
+                    after["source_provenance"]["manifest_sha256"],
+                )
+
+    def test_missing_or_unreadable_raw_files_prevent_cache_reuse(self):
+        for dataset, raw in (
+            ("wesad", self.wesad_path / "S3/S3.pkl"),
+            ("noneeg", self.noneeg_path / "Subject20_SpO2HR.dat"),
+        ):
+            with self.subTest(dataset=dataset), patch.object(
+                cross_dataset, "PROCESSED_DATA_DIR", self.tmp_path / dataset
+            ):
+                cross_dataset._load_or_build_cache(dataset, lambda: self.features)
+                builder = Mock(return_value=self.features)
+                payload = raw.read_bytes()
+                raw.unlink()
+                with self.assertRaisesRegex(FileNotFoundError, "Required raw input"):
+                    cross_dataset._load_or_build_cache(dataset, builder)
+                raw.write_bytes(payload)
+                verified_input = cross_dataset.verified_input
+
+                def unreadable(path):
+                    if path == raw:
+                        raise PermissionError(f"Unreadable raw file: {path}")
+                    return verified_input(path)
+
+                with patch.object(cross_dataset, "verified_input", unreadable):
+                    with self.assertRaises(PermissionError):
+                        cross_dataset._load_or_build_cache(dataset, builder)
+                builder.assert_not_called()
+
+    def test_raw_changes_during_extraction_never_publish_a_cache(self):
+        raw = self.wesad_path / "S3/S3.pkl"
+        for existing in (False, True):
+            with self.subTest(existing=existing), patch.object(
+                cross_dataset, "PROCESSED_DATA_DIR", self.tmp_path / str(existing)
+            ):
+                cache = (
+                    cross_dataset.PROCESSED_DATA_DIR
+                    / f"portable_wesad_v{PORTABLE_SCHEMA_VERSION}.parquet"
+                )
+                sidecar = cache.with_suffix(".json")
+                if existing:
+                    cross_dataset._load_or_build_cache("wesad", lambda: self.features)
+                before = (
+                    (cache.read_bytes(), sidecar.read_bytes()) if existing else None
+                )
+
+                def changed_raw():
+                    payload = raw.read_bytes()
+                    raw.write_bytes(bytes([payload[0] ^ 1]) + payload[1:])
+                    return self.features
+
+                with self.assertRaisesRegex(ValueError, "changed during.*extraction"):
+                    cross_dataset._load_or_build_cache(
+                        "wesad", changed_raw, rebuild=True
+                    )
+                if existing:
+                    self.assertEqual((cache.read_bytes(), sidecar.read_bytes()), before)
+                else:
+                    self.assertFalse(cache.exists() or sidecar.exists())
+
+    def test_raw_identity_ignores_generation_context_changes(self):
+        def current_source():
+            source = cross_dataset._raw_provenance("wesad")
+            source["extraction_context"] = {
+                "git_sha": str(provider.call_count),
+                "generated_at": str(provider.call_count),
+            }
+            return source
+
+        provider = Mock(side_effect=current_source)
+        with patch.object(cross_dataset, "PROCESSED_DATA_DIR", self.tmp_path):
+            expected, metadata = cross_dataset._load_or_build_cache(
+                "wesad", lambda: self.features, provider
+            )
+            builder = Mock(return_value=self.features)
+            actual, again = cross_dataset._load_or_build_cache(
+                "wesad", builder, provider
+            )
+        self.assertEqual(provider.call_count, 3)
+        builder.assert_not_called()
+        pd.testing.assert_frame_equal(actual, expected)
+        self.assertEqual(metadata, again)
+        self.assertEqual(
+            metadata["source_provenance"]["extraction_context"]["git_sha"], "1"
+        )
+
+    def test_static_provenance_cannot_bypass_raw_input_verification(self):
+        builder = Mock(return_value=self.features)
+        with self.assertRaisesRegex(TypeError, "must be callable"):
+            cross_dataset._load_or_build_cache(
+                "wesad", builder, cross_dataset._raw_provenance("wesad")
+            )
+        builder.assert_not_called()
+
+    def test_missing_partial_or_invalid_raw_metadata_is_rejected(self):
+        with patch.object(cross_dataset, "PROCESSED_DATA_DIR", self.tmp_path):
+            _, original = cross_dataset._load_or_build_cache(
+                "wesad", lambda: self.features
+            )
+            sidecar = self.tmp_path / f"portable_wesad_v{PORTABLE_SCHEMA_VERSION}.json"
+            for fault in ("missing", "empty", "partial", "bad_digest"):
+                with self.subTest(fault=fault):
+                    metadata = json.loads(json.dumps(original))
+                    source = metadata["source_provenance"]
+                    if fault == "missing":
+                        metadata.pop("source_provenance")
+                    elif fault == "empty":
+                        source["raw_file_sha256"] = {}
+                    elif fault == "partial":
+                        source["raw_file_sha256"].pop("S3/S3.pkl")
+                        source["manifest_sha256"] = hashlib.sha256(
+                            json.dumps(
+                                source["raw_file_sha256"], sort_keys=True
+                            ).encode()
+                        ).hexdigest()
+                    else:
+                        source["manifest_sha256"] = "0" * 64
+                    sidecar.write_text(json.dumps(metadata))
+                    builder = Mock(return_value=self.features)
+                    with self.assertRaisesRegex(ValueError, "raw input"):
+                        cross_dataset._load_or_build_cache("wesad", builder)
+                    builder.assert_not_called()
+
+    def test_raw_replacement_while_hashing_is_rejected(self):
+        raw = self.wesad_path / "S3/S3.pkl"
+        file_digest = hashlib.file_digest
+
+        def replace_after_hash(stream, algorithm):
+            digest = file_digest(stream, algorithm)
+            if Path(stream.name) == raw:
+                replacement = raw.with_suffix(".replacement")
+                replacement.write_bytes(raw.read_bytes())
+                replacement.replace(raw)
+            return digest
+
+        with patch.object(hashlib, "file_digest", replace_after_hash):
+            with self.assertRaisesRegex(RuntimeError, "Input changed"):
+                cross_dataset._raw_provenance("wesad")
 
     def _case_unverified_current_cache_is_rejected(self, fault):
         tmp_path = self.tmp_path
@@ -163,7 +368,10 @@ class CrossDatasetTests(unittest.TestCase):
             cross_dataset._load_or_build_cache(
                 "wesad",
                 lambda: changed,
-                source_provenance={"invalid": object()},
+                source_provenance=lambda: {
+                    **cross_dataset._raw_provenance("wesad"),
+                    "invalid": object(),
+                },
                 rebuild=True,
             )
         self.assertEqual((cache.read_bytes(), sidecar.read_bytes()), before)

@@ -15,6 +15,7 @@ from src.features.feature_pipeline import (
 )
 from src.models.ml.classifiers import HYPERPARAMS, get_classifier
 from src.synthetic import features
+from tests.cache_fixtures import source_loader
 
 
 class PipelineSmokeTests(unittest.TestCase):
@@ -94,6 +95,7 @@ class PipelineSmokeTests(unittest.TestCase):
             with self.subTest(device=device):
                 builder_type = WindowedDataset if device == "chest" else WristDataset
                 builder = builder_type.__new__(builder_type)
+                builder.loader = source_loader(self.tmp_path, ["S2", "S3", "S4"])
                 builder.features = FeatureExtractionPipeline(
                     {
                         group: group == "temperature"
@@ -160,6 +162,7 @@ class PipelineSmokeTests(unittest.TestCase):
             with self.subTest(device=device):
                 builder_type = WindowedDataset if device == "chest" else WristDataset
                 builder = builder_type.__new__(builder_type)
+                builder.loader = source_loader(self.tmp_path, ["S2"])
                 builder.features = FeatureExtractionPipeline()
                 builder.purity = 0.9
                 builder.fs, builder.window_samples, builder.step, builder.cnn_length = (
