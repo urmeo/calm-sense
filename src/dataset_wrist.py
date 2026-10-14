@@ -1,4 +1,5 @@
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from typing import Any, cast, List, Optional, Tuple
 
 import numpy as np
@@ -142,9 +143,10 @@ class WristDataset(LoggerMixin):
         }
         if cache:
             PROCESSED_DATA_DIR.mkdir(parents=True, exist_ok=True)
-            features_df.to_parquet(
-                PROCESSED_DATA_DIR / "features_wrist.parquet", index=False
-            )
+            with TemporaryDirectory(dir=PROCESSED_DATA_DIR) as directory:
+                staged = Path(directory) / "features_wrist.parquet"
+                features_df.to_parquet(staged, index=False)
+                staged.replace(PROCESSED_DATA_DIR / staged.name)
             self.logger.info(f"Cached wrist features ({len(features_df)} windows)")
         return features_df
 

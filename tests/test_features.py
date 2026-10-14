@@ -417,6 +417,7 @@ class FeaturesTests(unittest.TestCase):
         builder = dataset.WindowedDataset.__new__(dataset.WindowedDataset)
         builder._save(frame, np.zeros((1, 5, 1024)))
         self.assertEqual(dataset.load_cached()[1].shape, (1, 5, 1024))
+        frame = pd.read_parquet(tmp_path / "features.parquet")
         frame["window_id"] = 700
         frame.to_parquet(tmp_path / "features.parquet", index=False)
         with self.assertRaisesRegex(ValueError, "not aligned"):

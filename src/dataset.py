@@ -1,4 +1,6 @@
+import hashlib
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from typing import Any, cast, Dict, List, Optional, Tuple, Union
 
 import numpy as np
@@ -16,6 +18,7 @@ from .preprocessing.filters import (
     _positive_integer,
     _window_parameters,
 )
+from .utils import replace_verified_pair, sha256_file
 
 CONDITION_LABELS = {1: "baseline", 2: "stress", 3: "amusement"}
 CNN_CHANNELS = ["ECG", "EDA", "Temp", "Resp", "ACC"]
@@ -185,15 +188,29 @@ class WindowedDataset(LoggerMixin):
 
     def _save(self, features_df: pd.DataFrame, x_raw: np.ndarray) -> None:
         PROCESSED_DATA_DIR.mkdir(parents=True, exist_ok=True)
-        features_df.to_parquet(PROCESSED_DATA_DIR / "features.parquet", index=False)
-        np.savez_compressed(
-            PROCESSED_DATA_DIR / "raw_windows.npz",
-            x=x_raw,
-            feature_schema_version=FEATURE_SCHEMA_VERSION,
-            subject=features_df["subject_id"].to_numpy(dtype=str),
-            label=features_df["label"].to_numpy(dtype=int),
-            window_id=features_df["window_id"].to_numpy(dtype=int),
-        )
+        with TemporaryDirectory(dir=PROCESSED_DATA_DIR) as directory:
+            feature_path = Path(directory) / "features.parquet"
+            raw_path = Path(directory) / "raw_windows.npz"
+            np.savez_compressed(
+                raw_path,
+                x=x_raw,
+                feature_schema_version=FEATURE_SCHEMA_VERSION,
+                subject=features_df["subject_id"].to_numpy(dtype=str),
+                label=features_df["label"].to_numpy(dtype=int),
+                window_id=features_df["window_id"].to_numpy(dtype=int),
+            )
+            cached_features = features_df.copy(deep=False)
+            cached_features.attrs = {
+                **features_df.attrs,
+                "raw_windows_sha256": sha256_file(raw_path),
+            }
+            cached_features.to_parquet(feature_path, index=False)
+            replace_verified_pair(
+                feature_path,
+                raw_path,
+                PROCESSED_DATA_DIR / feature_path.name,
+                PROCESSED_DATA_DIR / raw_path.name,
+            )
         self.logger.info(f"Cached dataset to {PROCESSED_DATA_DIR}")
 
 
@@ -220,33 +237,42 @@ def load_cached() -> Optional[Tuple[pd.DataFrame, np.ndarray]]:
         or features_df.attrs.get("dataset_parameters") != default_parameters
     ):
         return None
+    expected_raw_hash = features_df.attrs.pop("raw_windows_sha256", None)
+    if not isinstance(expected_raw_hash, str):
+        return None
     metadata = {"subject_id", "window_id", "label", "label_name"}
     columns = [column for column in features_df if column not in metadata]
     if columns != FeatureExtractionPipeline().get_feature_names() or not all(
         pd.api.types.is_numeric_dtype(features_df[column]) for column in columns
     ):
         raise ValueError("Cached feature columns do not match the current schema")
-    with np.load(raw_path, allow_pickle=False) as raw:
-        if (
-            "feature_schema_version" not in raw
-            or raw["feature_schema_version"].item() != FEATURE_SCHEMA_VERSION
-        ):
+    with raw_path.open("rb") as stream:
+        if hashlib.file_digest(stream, "sha256").hexdigest() != expected_raw_hash:
             return None
-        x_raw = raw["x"]
-        aligned = (
-            x_raw.shape == (len(features_df), len(CNN_CHANNELS), 1024)
-            and np.isfinite(x_raw).all()
-            and all(
-                column in features_df
-                and key in raw
-                and np.array_equal(features_df[column].to_numpy(), raw[key])
-                for column, key in (
-                    ("subject_id", "subject"),
-                    ("label", "label"),
-                    ("window_id", "window_id"),
+        stream.seek(0)
+        with np.load(stream, allow_pickle=False) as raw:
+            if (
+                "feature_schema_version" not in raw
+                or raw["feature_schema_version"].item() != FEATURE_SCHEMA_VERSION
+            ):
+                return None
+            x_raw = raw["x"]
+            aligned = (
+                x_raw.shape == (len(features_df), len(CNN_CHANNELS), 1024)
+                and np.isfinite(x_raw).all()
+                and all(
+                    column in features_df
+                    and key in raw
+                    and np.array_equal(features_df[column].to_numpy(), raw[key])
+                    for column, key in (
+                        ("subject_id", "subject"),
+                        ("label", "label"),
+                        ("window_id", "window_id"),
+                    )
                 )
             )
-        )
-        if not aligned:
-            raise ValueError("Cached feature rows and raw CNN tensors are not aligned")
+            if not aligned:
+                raise ValueError(
+                    "Cached feature rows and raw CNN tensors are not aligned"
+                )
     return features_df, x_raw
