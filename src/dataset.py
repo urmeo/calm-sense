@@ -97,7 +97,7 @@ class WindowedDataset(LoggerMixin):
 
         temp_filt = self.sig.process_temperature(chest["Temp"])
         resp_filt = self.sig.process_respiration(chest["Resp"])
-        acc_mag = np.sqrt(np.sum(np.asarray(chest["ACC"]) ** 2, axis=1))
+        acc_mag = np.sqrt(np.sum(np.asarray(chest["ACC"], dtype=float) ** 2, axis=1))
 
         n = min(len(ecg_filt), len(labels))
         windows, raws, ys = [], [], []

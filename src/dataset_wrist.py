@@ -64,7 +64,7 @@ class WristDataset(LoggerMixin):
         bvp = np.asarray(wrist["BVP"]).flatten()
         eda = np.asarray(wrist["EDA"]).flatten()
         temp = np.asarray(wrist["TEMP"]).flatten()
-        acc = np.asarray(wrist["ACC"])
+        acc = np.asarray(wrist["ACC"], dtype=float)
         acc_mag = np.sqrt(np.sum(acc**2, axis=1))
 
         peaks = self._bvp_peaks(bvp)

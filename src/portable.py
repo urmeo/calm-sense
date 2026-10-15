@@ -96,7 +96,9 @@ def wesad_portable(
         bvp = np.asarray(wrist["BVP"]).flatten()
         eda = np.asarray(wrist["EDA"]).flatten()
         temp = np.asarray(wrist["TEMP"]).flatten()
-        acc_magnitude = np.sqrt(np.sum(np.asarray(wrist["ACC"]) ** 2, axis=1))
+        acc_magnitude = np.sqrt(
+            np.sum(np.asarray(wrist["ACC"], dtype=float) ** 2, axis=1)
+        )
 
         peaks = np.asarray(
             nk.ppg_findpeaks(

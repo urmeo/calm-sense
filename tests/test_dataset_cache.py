@@ -101,6 +101,51 @@ class DatasetCacheTests(unittest.TestCase):
             self.assertIsNone(dataset.load_cached())
             self.assertIsNone(dataset_wrist.load_wrist())
 
+    def test_integer_acceleration_is_finite_in_actual_chest_and_wrist_windows(self):
+        seconds = 60
+        chest_count = int(seconds * FS.CHEST)
+        chest_time = np.arange(chest_count) / FS.CHEST
+        wrist_time = np.arange(int(seconds * FS.WRIST_BVP)) / FS.WRIST_BVP
+        recording = {
+            "signal": {
+                "chest": {
+                    "ECG": np.sin(2 * np.pi * 1.2 * chest_time).reshape(-1, 1),
+                    "EDA": np.full((chest_count, 1), 2.0),
+                    "Temp": np.full((chest_count, 1), 33.0),
+                    "Resp": np.sin(2 * np.pi * 0.25 * chest_time).reshape(-1, 1),
+                    "ACC": np.full((chest_count, 3), 200, dtype=np.int16),
+                },
+                "wrist": {
+                    "BVP": np.sin(2 * np.pi * 1.2 * wrist_time).reshape(-1, 1),
+                    "EDA": np.full((int(seconds * FS.WRIST_EDA), 1), 2.0),
+                    "TEMP": np.full((int(seconds * FS.WRIST_TEMP), 1), 33.0),
+                    "ACC": np.full(
+                        (int(seconds * FS.WRIST_ACC), 3), 200, dtype=np.int16
+                    ),
+                },
+            },
+            "label": np.ones(chest_count, dtype=int),
+        }
+        path = self.loader.data_path / "S2" / "S2.pkl"
+        path.write_bytes(pickle.dumps(recording, protocol=4))
+        expected = np.sqrt(3 * 200.0**2)
+        for builder_type in (dataset.WindowedDataset, dataset_wrist.WristDataset):
+            with self.subTest(dataset=builder_type.__name__):
+                builder = builder_type(data_path=self.loader.data_path)
+                loaded = builder.loader.load_subject("S2")
+                self.assertEqual(loaded["chest"]["ACC"].dtype, np.dtype(np.int16))
+                self.assertEqual(loaded["wrist"]["ACC"].dtype, np.dtype(np.int16))
+                result = builder._process_subject("S2")
+                windows = result[0]
+                self.assertEqual(len(windows), 1)
+                magnitude = windows[0]["accelerometer"]["magnitude"]
+                self.assertTrue(np.isfinite(magnitude).all())
+                np.testing.assert_allclose(magnitude, expected)
+                if builder_type is dataset.WindowedDataset:
+                    cnn_acceleration = result[1][0][4]
+                    self.assertTrue(np.isfinite(cnn_acceleration).all())
+                    np.testing.assert_allclose(cnn_acceleration, expected, rtol=1e-6)
+
     def test_caches_require_a_matching_extraction_fingerprint(self):
         self.save_caches()
         for path, load in (

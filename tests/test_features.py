@@ -25,6 +25,7 @@ from src.features.hrv_time_domain import HRVTimeDomainExtractor
 from src.features.respiration_features import RespirationFeatureExtractor
 from src.features.temperature_features import TemperatureFeatureExtractor
 from src.preprocessing.ecg_processor import ECGProcessor
+from src.portable import wesad_portable
 from tests.cache_fixtures import source_loader
 
 
@@ -205,6 +206,64 @@ class FeaturesTests(unittest.TestCase):
         self.assertTrue(np.isnan(features["LF_peak_freq"]))
         with self.assertRaisesRegex(ValueError, "PSD method"):
             extractor.compute_psd(rr, method="typo")
+
+    def test_lomb_default_grid_and_density_keep_the_existing_computation(self):
+        from scipy.signal import lombscargle
+
+        rr = 800 + 30 * np.sin(np.arange(100) * 0.6)
+        time = np.r_[0.0, np.cumsum(rr[:-1]) / 1000.0]
+        centered = rr - rr.mean()
+        expected_freqs = np.linspace(0.001, 0.5, 512)
+        expected = np.maximum(
+            lombscargle(time, centered, 2 * np.pi * expected_freqs, normalize=False),
+            0.0,
+        )
+        expected *= np.var(centered) / np.trapezoid(expected, expected_freqs)
+        freqs, density = HRVFrequencyDomainExtractor().compute_psd(rr, method="lomb")
+        np.testing.assert_array_equal(freqs, expected_freqs)
+        np.testing.assert_array_equal(density, expected)
+
+    def test_lomb_grid_covers_custom_bands_above_half_a_hertz(self):
+        rr = 500 + 20 * np.sin(2 * np.pi * 0.8 * np.arange(200) * 0.5)
+        extractor = HRVFrequencyDomainExtractor(hf_band=(0.7, 0.9))
+        freqs, density = extractor.compute_psd(rr, method="lomb")
+        self.assertEqual(freqs[-1], 0.9)
+        self.assertGreater(extractor.compute_hf_power(freqs, density), 100.0)
+        self.assertAlmostEqual(freqs[np.argmax(density)], 0.8, delta=0.005)
+        np.testing.assert_allclose(np.trapezoid(density, freqs), np.var(rr))
+
+    def test_portable_integer_acceleration_preserves_magnitude(self):
+        duration = 60
+        recording = {
+            "label": np.ones(duration * 700, dtype=int),
+            "signal": {
+                "chest": {"ECG": np.zeros(duration * 700)},
+                "wrist": {
+                    "BVP": np.zeros(duration * 64),
+                    "EDA": np.ones(duration * 4),
+                    "TEMP": np.full(duration * 4, 35.0),
+                    "ACC": np.full((duration * 32, 3), 200, dtype=np.int16),
+                },
+            },
+        }
+        subject = self.tmp_path / "S2"
+        subject.mkdir()
+        (subject / "S2.pkl").write_bytes(pickle.dumps(recording))
+        with (
+            patch("neurokit2.ppg_clean", side_effect=lambda values, **kwargs: values),
+            patch(
+                "neurokit2.ppg_findpeaks",
+                return_value={"PPG_Peaks": np.arange(0, duration * 64, 64)},
+            ),
+        ):
+            portable = wesad_portable(data_path=self.tmp_path)
+
+        expected = np.sqrt(3 * 200.0**2)
+        self.assertAlmostEqual(portable.iloc[0]["ACC_mean"], expected)
+        self.assertAlmostEqual(portable.iloc[0]["ACC_energy"], expected**2)
+        acceleration = recording["signal"]["wrist"]["ACC"]
+        self.assertEqual(acceleration.dtype, np.int16)
+        np.testing.assert_array_equal(acceleration, 200)
 
     def test_sample_entropy_is_zero_when_every_matching_pattern_extends(self):
         for rr in (np.full(20, 800.0), np.tile([800.0, 820.0], 10)):

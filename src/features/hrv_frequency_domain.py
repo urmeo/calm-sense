@@ -107,7 +107,7 @@ class HRVFrequencyDomainExtractor(BaseHRVExtractor):
 
         rr_centered = rr - np.mean(rr)
 
-        f_max = 0.5
+        f_max = max(0.5, self.vlf_band[1], self.lf_band[1], self.hf_band[1])
         n_freqs = 512
         freqs = np.linspace(0.001, f_max, n_freqs)
 
