@@ -125,10 +125,17 @@ def plot_models(metrics):
 
 def plot_calibration(data):
     fig, (reliability, decision) = plt.subplots(1, 2, figsize=(12, 6.8))
+    model = data.get("model")
+    model_name = {
+        "lr": "Logistic Regression",
+        "rf": "Random Forest",
+        "xgb": "XGBoost",
+        "lgbm": "LightGBM",
+    }.get(model, model or "Model not recorded")
     _header(
         fig,
         "Calibration and decision curves",
-        f"Random Forest | Binary WESAD task | {data['n_windows']:,} held-out windows",
+        f"{model_name} | Binary WESAD task | {data['n_windows']:,} held-out windows",
     )
     reliability.plot(
         [0.5, 1], [0.5, 1], color=MUTED, linestyle=":", label="Perfect calibration"
@@ -151,7 +158,7 @@ def plot_calibration(data):
     reliability.set_xlabel("Mean predicted-class confidence", labelpad=12)
     reliability.set_ylabel("Accuracy within confidence bin", labelpad=12)
     reliability.set_xlim(0.48, 1.02)
-    reliability.set_ylim(0.28, 1.04)
+    reliability.set_ylim(0, 1.04)
     reliability.xaxis.set_major_formatter(PercentFormatter(1))
     reliability.yaxis.set_major_formatter(PercentFormatter(1))
     reliability.grid()

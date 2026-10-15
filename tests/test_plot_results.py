@@ -7,7 +7,66 @@ from pathlib import Path
 import numpy as np
 from sklearn.metrics import roc_auc_score, roc_curve
 
-from scripts.plot_results import _roc_points, _roc_source, plot_roc_auc, plt
+from scripts.plot_results import (
+    _roc_points,
+    _roc_source,
+    plot_calibration,
+    plot_roc_auc,
+    plt,
+)
+
+
+class CalibrationPlotTests(unittest.TestCase):
+    def tearDown(self):
+        plt.close("all")
+
+    def calibration_data(self, model="rf"):
+        summary = {
+            "ece": 0.35,
+            "reliability": [
+                {"confidence": 0.6, "accuracy": 0.0},
+                {"confidence": 0.9, "accuracy": 1.0},
+            ],
+        }
+        return {
+            "model": model,
+            "n_windows": 4,
+            "n_bins": 2,
+            "loso": summary,
+            "recalibrated_isotonic": summary,
+            "decision_curve": {
+                "thresholds": [0.1, 0.6],
+                "net_benefit_uncalibrated": [0.2, -0.1],
+                "net_benefit_recalibrated": [0.3, 0.1],
+                "treat_all": [0.4, -0.25],
+            },
+        }
+
+    def test_calibration_labels_the_recorded_model(self):
+        for model, label in (
+            ("lr", "Logistic Regression"),
+            ("rf", "Random Forest"),
+            ("xgb", "XGBoost"),
+            ("lgbm", "LightGBM"),
+            ("custom model", "custom model"),
+        ):
+            with self.subTest(model=model):
+                figure = plot_calibration(self.calibration_data(model))
+                self.assertTrue(figure.texts[1].get_text().startswith(f"{label} |"))
+
+    def test_calibration_does_not_invent_an_unrecorded_model(self):
+        data = self.calibration_data()
+        data.pop("model")
+        figure = plot_calibration(data)
+        self.assertIn("Model not recorded", figure.texts[1].get_text())
+
+    def test_reliability_plot_shows_low_accuracy_bins_and_full_unit_range(self):
+        figure = plot_calibration(self.calibration_data())
+        axis = figure.axes[0]
+        lower, upper = axis.get_ylim()
+        self.assertLessEqual(lower, 0)
+        self.assertGreaterEqual(upper, 1)
+        np.testing.assert_array_equal(axis.lines[1].get_ydata(), [0.0, 1.0])
 
 
 class RocPlotTests(unittest.TestCase):
