@@ -30,6 +30,7 @@ from src.config import (
     WESAD_DIR,
 )
 from src.datasets import non_eeg
+from src.datasets.records import record_files
 from src.portable import (
     OVERLAP,
     PORTABLE_FEATURE_COLUMNS,
@@ -196,15 +197,13 @@ def _raw_provenance(dataset):
         files = [directory / sid / f"{sid}.pkl" for sid in VALID_SUBJECTS]
     elif dataset == "noneeg":
         directory = non_eeg.DATA_DIR
-        files = [
-            directory / f"Subject{subject}_{record}.{extension}"
-            for subject in range(1, 21)
-            for record, extensions in (
-                ("AccTempEDA", ("hea", "dat", "atr")),
-                ("SpO2HR", ("hea", "dat")),
-            )
-            for extension in extensions
-        ]
+        files = []
+        for subject in range(1, 21):
+            for name in ("AccTempEDA", "SpO2HR"):
+                record = directory / f"Subject{subject}_{name}"
+                files.extend(record_files(record))
+                if name == "AccTempEDA":
+                    files.append(record.with_suffix(".atr"))
     else:
         raise ValueError(f"Unknown portable dataset: {dataset}")
     if not files:

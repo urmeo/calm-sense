@@ -5,7 +5,7 @@ from tempfile import TemporaryDirectory
 
 import numpy as np
 
-from src.datasets.records import read_annotations, read_record
+from src.datasets.records import read_annotations, read_record, record_files
 
 
 def word(kind, value=0):
@@ -58,6 +58,15 @@ class RecordTests(unittest.TestCase):
         self.assertEqual(result.fs, 8)
         self.assertEqual(result.units, ["mV", "C"])
         self.assertEqual(result.sig_name, ["lead 0", "lead 1"])
+
+    def test_record_files_uses_header_reference_without_loading_samples(self):
+        record = self.signal()
+        data = self.folder / "signal.dat"
+        data.unlink()
+        self.assertEqual(record_files(record), (record.with_suffix(".hea"), data))
+        self.change_header(record, 1, 0, "../outside.dat")
+        with self.assertRaisesRegex(ValueError, "record directory"):
+            record_files(record)
 
     def test_little_endian_signed_samples_and_negative_checksum(self):
         record = self.signal([[0x1234], [-0x2345]])

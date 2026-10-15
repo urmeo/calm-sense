@@ -40,13 +40,14 @@ class CrossDatasetTests(unittest.TestCase):
             (directory / f"{subject}.pkl").write_bytes(subject.encode())
         self.noneeg_path.mkdir()
         for subject in range(1, 21):
-            for record, extensions in (
-                ("AccTempEDA", ("hea", "dat", "atr")),
-                ("SpO2HR", ("hea", "dat")),
-            ):
-                for extension in extensions:
-                    name = f"Subject{subject}_{record}.{extension}"
-                    (self.noneeg_path / name).write_bytes(name.encode())
+            for record in ("AccTempEDA", "SpO2HR"):
+                name = f"Subject{subject}_{record}"
+                (self.noneeg_path / f"{name}.hea").write_text(
+                    f"{name} 1 8 2\n{name}.dat 16 1/mV 16 0 1 3 0 signal\n"
+                )
+                (self.noneeg_path / f"{name}.dat").write_bytes(b"\x01\x00\x02\x00")
+                if record == "AccTempEDA":
+                    (self.noneeg_path / f"{name}.atr").write_bytes(b"\x00\x00")
         self.stack.enter_context(
             patch.object(cross_dataset, "WESAD_DIR", self.wesad_path)
         )
@@ -146,6 +147,29 @@ class CrossDatasetTests(unittest.TestCase):
                     before["source_provenance"]["manifest_sha256"],
                     after["source_provenance"]["manifest_sha256"],
                 )
+
+    def test_header_referenced_data_changes_invalidate_portable_cache(self):
+        header = self.noneeg_path / "Subject20_SpO2HR.hea"
+        canonical = self.noneeg_path / "Subject20_SpO2HR.dat"
+        alternate = self.noneeg_path / "alternate.bin"
+        alternate.write_bytes(canonical.read_bytes())
+        header.write_text(header.read_text().replace(canonical.name, alternate.name))
+        with patch.object(cross_dataset, "PROCESSED_DATA_DIR", self.tmp_path):
+            _, before = cross_dataset._load_or_build_cache(
+                "noneeg", lambda: self.features
+            )
+            manifest = before["source_provenance"]["raw_file_sha256"]
+            self.assertIn(alternate.name, manifest)
+            self.assertNotIn(canonical.name, manifest)
+            state = alternate.stat()
+            alternate.write_bytes(b"\x02\x00\x01\x00")
+            os.utime(alternate, ns=(state.st_atime_ns, state.st_mtime_ns))
+            self.assertEqual(alternate.stat().st_size, state.st_size)
+            self.assertEqual(alternate.stat().st_mtime_ns, state.st_mtime_ns)
+            builder = Mock(return_value=self.features)
+            with self.assertRaisesRegex(ValueError, "raw inputs changed"):
+                cross_dataset._load_or_build_cache("noneeg", builder)
+            builder.assert_not_called()
 
     def test_missing_or_unreadable_raw_files_prevent_cache_reuse(self):
         for dataset, raw in (

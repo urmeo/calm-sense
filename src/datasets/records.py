@@ -21,7 +21,7 @@ class Annotations:
     aux_note: list[str]
 
 
-def read_record(record: str | Path) -> Record:
+def _read_header(record: str | Path):
     header = Path(f"{record}.hea")
     lines = [
         line.split()
@@ -45,6 +45,20 @@ def read_record(record: str | Path) -> Record:
         data_path = (header.parent / specs[0][0]).resolve()
         if data_path.parent != header.parent.resolve():
             raise ValueError("Signal file must remain in the record directory")
+    except (IndexError, TypeError, ValueError) as error:
+        raise ValueError(f"Invalid Non-EEG header {header}: {error}") from error
+    return header, data_path, specs, rate, samples, channels
+
+
+def record_files(record: str | Path) -> tuple[Path, Path]:
+    """Return the header and its referenced signal file without loading samples."""
+    header, data_path, *_ = _read_header(record)
+    return header, data_path
+
+
+def read_record(record: str | Path) -> Record:
+    header, data_path, specs, rate, samples, channels = _read_header(record)
+    try:
         gains, baselines, units, names, checksums = [], [], [], [], []
         for spec in specs:
             scaling = re.fullmatch(r"([^(/]+)(?:\((-?\d+)\))?/([^\s]+)", spec[2])
