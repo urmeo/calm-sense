@@ -46,6 +46,25 @@ class PersonalizeTests(unittest.TestCase):
         pick = _sample_k(np.array([0, 0, 1, 1]), 1, np.random.RandomState(0))
         self.assertEqual(len(pick), 1)
 
+    def test_sampling_keeps_classes_balanced_when_one_has_fewer_windows(self):
+        for counts, budget, expected in (
+            ([12, 2], 10, 2),
+            ([12, 1], 5, 1),
+            ([2, 12, 4], 12, 2),
+            ([10, 10], 5, 2),
+        ):
+            with self.subTest(counts=counts, budget=budget):
+                labels = np.repeat(np.arange(len(counts)), counts)
+                original = labels.copy()
+                first = _sample_k(labels, budget, np.random.RandomState(0))
+                second = _sample_k(labels, budget, np.random.RandomState(0))
+                selected = np.bincount(labels[first], minlength=len(counts))
+                np.testing.assert_array_equal(selected, [expected] * len(counts))
+                np.testing.assert_array_equal(first, second)
+                np.testing.assert_array_equal(labels, original)
+                self.assertEqual(len(np.unique(first)), len(first))
+                self.assertLessEqual(len(first), budget)
+
     def test_sampling_rejects_invalid_budget(self):
         for budget in [0, -1, 1.5, True]:
             with self.subTest(budget=budget):

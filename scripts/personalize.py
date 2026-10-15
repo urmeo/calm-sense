@@ -56,17 +56,17 @@ def _sample_k(y_pool, k, rng):
     y_pool = np.asarray(y_pool)
     if y_pool.ndim != 1:
         raise ValueError("Enrollment labels must be one-dimensional")
-    classes = np.unique(y_pool)
+    classes, counts = np.unique(y_pool, return_counts=True)
     if not len(classes):
         return np.array([], dtype=int)
     if k < len(classes):
         classes = rng.choice(classes, k, replace=False)
-    per = max(1, k // len(classes))
+    per = min(max(1, k // len(classes)), int(counts.min()))
     picks = []
     for c in classes:
         idx = np.where(y_pool == c)[0]
         rng.shuffle(idx)
-        picks.extend(idx[: min(per, len(idx))])
+        picks.extend(idx[:per])
     return np.array(picks, dtype=int)
 
 
