@@ -83,9 +83,9 @@ def _download(url, dest):
         raise ValueError(f"refusing non-HTTPS download: {url}")
     dest = Path(dest)
     dest.parent.mkdir(parents=True, exist_ok=True)
-    part = dest.with_suffix(dest.suffix + ".part")
     print(f"Downloading {url}")
-    try:
+    with TemporaryDirectory(dir=dest.parent) as directory:
+        part = Path(directory) / dest.name
         with urlopen(url, timeout=DOWNLOAD_TIMEOUT) as response, part.open(
             "wb"
         ) as stream:
@@ -100,8 +100,6 @@ def _download(url, dest):
             if total > 0 and downloaded != total:
                 raise RuntimeError("incomplete dataset download; retry the command")
         part.replace(dest)
-    finally:
-        part.unlink(missing_ok=True)
     print()
 
 

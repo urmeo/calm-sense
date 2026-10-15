@@ -7,6 +7,7 @@ from functools import partialmethod
 import hashlib
 import io
 import json
+import threading
 import zipfile
 from scripts import download_data
 from scripts.download_data import _download, _safe_extract
@@ -156,6 +157,77 @@ class DownloadTests(unittest.TestCase):
             calls, [("https://example.com/data.zip", download_data.DOWNLOAD_TIMEOUT)]
         )
         self.assertFalse(dest.with_suffix(".zip.part").exists())
+
+    def test_parallel_downloads_use_independent_partial_files(self):
+        destination = self.tmp_path / "data.zip"
+        first_written = threading.Event()
+        second_written = threading.Event()
+        first_published = threading.Event()
+        outcomes = {}
+
+        class Response(DownloadResponse):
+            def __init__(self, name):
+                super().__init__(name.encode() * 8)
+                self.name = name
+                self.started = False
+
+            def read(self, size):
+                if not self.started:
+                    self.started = True
+                    if self.name == "second" and not first_written.wait(10):
+                        raise RuntimeError("First download did not write")
+                    return super().read(size)
+                if self.name == "first":
+                    first_written.set()
+                    if not second_written.wait(10):
+                        raise RuntimeError("Second download did not write")
+                else:
+                    second_written.set()
+                    if not first_published.wait(10):
+                        raise RuntimeError("First download did not publish")
+                return b""
+
+        replace = Path.replace
+
+        def publish(source, target):
+            result = replace(source, target)
+            if target == destination and threading.current_thread().name == "first":
+                first_published.set()
+            return result
+
+        def download(name):
+            try:
+                _download(f"https://example.com/{name}", destination)
+                outcomes[name] = None
+            except Exception as error:
+                outcomes[name] = error
+
+        threads = [
+            threading.Thread(target=download, args=(name,), name=name)
+            for name in ("first", "second")
+        ]
+        with (
+            patch.object(
+                download_data,
+                "urlopen",
+                side_effect=lambda url, **kwargs: Response(url.rsplit("/", 1)[-1]),
+            ),
+            patch.object(Path, "replace", publish),
+        ):
+            try:
+                for thread in threads:
+                    thread.start()
+                for thread in threads:
+                    thread.join(15)
+            finally:
+                for event in (first_written, second_written, first_published):
+                    event.set()
+                for thread in threads:
+                    thread.join(2)
+        self.assertTrue(all(not thread.is_alive() for thread in threads))
+        self.assertEqual(outcomes, {"first": None, "second": None})
+        self.assertIn(destination.read_bytes(), (b"first" * 8, b"second" * 8))
+        self.assertEqual(set(self.tmp_path.iterdir()), {destination})
 
     def _case_download_failure_preserves_previous_file(self, redirect):
         tmp_path = self.tmp_path
