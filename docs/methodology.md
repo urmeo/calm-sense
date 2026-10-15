@@ -64,6 +64,8 @@ Personalization first retains every other held-out window to remove overlap. It 
 
 Requested budgets are 5, 10, and 20 windows. A budget of 5 selects 4 balanced windows because the sampler takes the same integer count from both classes. Limited class availability can reduce other budgets. With a requested budget of 20, mean ECE changes from 0.162 without calibration to 0.078; the training-subject global calibrator gives 0.099. These results are exploratory and do not establish an enrollment procedure for live use.
 
+The current sampler limits both classes to the smaller available class count. The saved personalization results predate this correction; rerun the analysis before reporting revised scores.
+
 [Decision curves](../outputs/figures/calibration_decision_curve.png) are also an offline analysis, without a validated clinical decision threshold. Net benefit requires finite thresholds with `0 <= p_t < 1`. The saved curve uses 12 thresholds from 0.05 to 0.60.
 
 Ablation, calibration, and personalization analyses have no multiplicity correction.
