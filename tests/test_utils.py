@@ -8,6 +8,7 @@ import hashlib
 import math
 from pathlib import Path
 import joblib
+from src import utils
 from src.utils import (
     atomic_write_text,
     load_verified_joblib,
@@ -36,6 +37,17 @@ class UtilsTests(unittest.TestCase):
         self.assertIn("T", p["generated_at"])
         self.assertTrue(isinstance(p["working_tree_dirty"], bool))
         self.assertEqual(p["feature_schema_version"], 2)
+
+    def test_exported_source_does_not_borrow_parent_repository_provenance(self):
+        repo = Path(utils.__file__).resolve().parents[1]
+        generated = repo / "outputs" / "generated"
+        generated.mkdir(parents=True, exist_ok=True)
+        with TemporaryDirectory(dir=generated) as directory:
+            source = Path(directory) / "src" / "utils.py"
+            with patch.object(utils, "__file__", str(source)):
+                result = provenance()
+        self.assertEqual(result["git_sha"], "unknown")
+        self.assertIsNone(result["working_tree_dirty"])
 
     def test_paired_effect_size_direction_and_small_sample_correction(self):
         a = [0.9, 0.8, 0.95, 0.7]

@@ -78,18 +78,29 @@ def provenance() -> dict:
     from .features.feature_pipeline import FEATURE_SCHEMA_VERSION
 
     root = Path(__file__).resolve().parent.parent
+    sha, dirty = "unknown", None
     try:
-        sha = subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], cwd=root, text=True, stderr=subprocess.DEVNULL
+        git_root = subprocess.check_output(
+            ["git", "rev-parse", "--show-toplevel"],
+            cwd=root,
+            text=True,
+            stderr=subprocess.DEVNULL,
         ).strip()
-        dirty = bool(
-            subprocess.check_output(
-                ["git", "status", "--porcelain"],
+        if Path(git_root).resolve() == root:
+            sha = subprocess.check_output(
+                ["git", "rev-parse", "HEAD"],
                 cwd=root,
                 text=True,
                 stderr=subprocess.DEVNULL,
             ).strip()
-        )
+            dirty = bool(
+                subprocess.check_output(
+                    ["git", "status", "--porcelain"],
+                    cwd=root,
+                    text=True,
+                    stderr=subprocess.DEVNULL,
+                ).strip()
+            )
     except (OSError, subprocess.CalledProcessError):
         sha = "unknown"
         dirty = None
