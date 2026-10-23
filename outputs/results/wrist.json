@@ -1,0 +1,97 @@
+{
+  "wrist_models": [
+    {
+      "model": "Logistic Regression",
+      "accuracy_mean": 0.8665022760507693,
+      "f1_macro_mean": 0.8534971721613346
+    },
+    {
+      "model": "Random Forest",
+      "accuracy_mean": 0.8898946761880608,
+      "f1_macro_mean": 0.8676232677590837
+    },
+    {
+      "model": "XGBoost",
+      "accuracy_mean": 0.9011378278555161,
+      "f1_macro_mean": 0.8805641565955026
+    },
+    {
+      "model": "LightGBM",
+      "accuracy_mean": 0.875217916322082,
+      "f1_macro_mean": 0.8490557237859379
+    }
+  ],
+  "wrist_best": {
+    "model": "XGBoost",
+    "accuracy_mean": 0.9011378278555161,
+    "f1_macro_mean": 0.8805641565955026
+  },
+  "chest_best": {
+    "model": "Random Forest",
+    "accuracy_mean": 0.9098717730174039
+  },
+  "same_model_rf": {
+    "chest": 0.9098717730174039,
+    "wrist": 0.8898946761880608,
+    "drop_pts": 1.997709682934301
+  },
+  "best_per_arm_drop_pts": 0.8733945161887746,
+  "provenance": {
+    "git_sha": "4f5c02f05f6492bd5da4483b7a5328946969914c",
+    "working_tree_dirty": false,
+    "feature_schema_version": 2,
+    "generated_at": "2026-10-04T08:58:09.620926+00:00",
+    "primary_benchmark_sha256": "3864d8c60477aec1a67bb63e1a9c134859c53634162476fb2d8c47bfc0b23961",
+    "source_file_sha256": {
+      "src/__init__.py": "d3c26d00b0e108f768d60a6db5cc4bf33f2181018845354a8aad0e22c1908ee0",
+      "src/calibration.py": "572e9d6a4e9cec4ad52ca149b51a38e6599888a7ec8608908cc83a4e09c1fc0e",
+      "src/config.py": "6da810691f058451b725a40c112c75efbc5b969e1c00e2ea6dba730c8eb2c23c",
+      "src/data/__init__.py": "b4f425cec36e7973dad882b10fca956ce5adb6ac64d104f008ad80673c7f6c7e",
+      "src/data/loader.py": "f6fa1af374524d1f46c5dc6c9877373061df220b13e1987351e76204953efe5b",
+      "src/dataset.py": "acf2b8ce21f450c76aa9afa76e126cde2bd7f2a63d788b27db3031f1ad51da3b",
+      "src/dataset_wrist.py": "2c968c9e7f674f6046672111085b324f32fc5eddee18ca43cd1ab3ce79598950",
+      "src/datasets/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "src/datasets/non_eeg.py": "68f11503029af1f7a65e1fbf2faac6f5c6dd9a81ddff98e9bba68c50a9cef2ee",
+      "src/datasets/records.py": "5d96d1c68ca814c4fd58b985d892498ddd33abb014492cd2be6f6d337d755f63",
+      "src/features/__init__.py": "48ea617d38171cd70615d6d04d2d4b1d2447b5fe08d0a323747cd81b24e3d539",
+      "src/features/accelerometer_features.py": "827b7ccf5c536aa32767e31f2b3dc14297f1199cb65cb1e5f5efadb4f6f753ed",
+      "src/features/eda_features.py": "ab5901b383c5ea92e4eb95fc8d346f5e682d26d08f06945db976b6e5ac007816",
+      "src/features/feature_pipeline.py": "37947edd56851fe6894d95d6f94ebedba0190b7971eb5ddfc60cf358521831ef",
+      "src/features/hrv_base.py": "44424936c2084091b858ed918bf00296fabe9ae8b715fce69ddec6a61fba9f7e",
+      "src/features/hrv_frequency_domain.py": "5c27ebf5db243b93263e00e2c94a2523093729133e3869df864b5ed7911dbb50",
+      "src/features/hrv_nonlinear.py": "35a10e46e93f2c01f5c9cb8f7fa837d051dce54d7307e755a596ab7ab496aaae",
+      "src/features/hrv_time_domain.py": "0190acbd8ef451278862bf5bd07f48bc2bb8a4b98b7287b4586fbaae69f03021",
+      "src/features/respiration_features.py": "bbdc53242f0c6fd47d438128031158da14bf9eec7867d60675687bfa45b3b132",
+      "src/features/temperature_features.py": "7aaf58fc02d32a12cfd5ed2a3b547609db54451d802276207f50e4181bb73ccc",
+      "src/logging_config.py": "862bf2b798207e11dd474c40f0ee47b11279daeef8b35db5c729707d5c9aeeff",
+      "src/models/__init__.py": "4f23cc600a8f6f23a882b39fae77d071f93e87914025f8f36c2c42570da6f91f",
+      "src/models/dl/__init__.py": "adbc41ee3c0cd000ae5d19bbc33de0a40a44e07e36b31ea79ee30d185a28f0f8",
+      "src/models/dl/cnn_1d.py": "ffd9ac5ae88b4fcb400d93136767a4350d4d834203a7a9e3a58d4130712ea7d0",
+      "src/models/ml/__init__.py": "a20bd57c0830414be0f60ca4e5457ed5586005cf0001a3db5815f2e4547187f3",
+      "src/models/ml/classifiers.py": "6d3e004139cd359d8750c895b7ba28a8f0ef40ce4cf29b8dead4cd277308bc0b",
+      "src/portable.py": "d15945c5dfef49cb49a271695da1031d30f2f882d722a6c0395deae1881980ab",
+      "src/preprocessing/__init__.py": "f63cb32bc7acb288264b2678f439f14e30f1071534ccbe04e5ecf711ae4a1f90",
+      "src/preprocessing/ecg_processor.py": "f67cde8d1cb421d16fb3c1adbe7b365de1b3f7d39b2027df42f1ccd75d3c02ef",
+      "src/preprocessing/eda_processor.py": "68050850b56998c59548241e74bb1c0a2a737ba29c5572a44bfef4e2885a3867",
+      "src/preprocessing/filters.py": "6b21326d221f373ad3310ec0a9a9b722973344d011a960d47d2c65106459cb1b",
+      "src/synthetic.py": "df2cdc11767ca315f8c9cb8c522920fe1b2925a462616226f3dd190c9cc23256",
+      "src/utils.py": "5775968c009962b032ffe5d914e6a192cd872e49b43d47c02c184bbf82802e95",
+      "scripts/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scripts/ablation.py": "1947542011f456fc015198aeca21cff0a8581eaac563e7c251379acca9148667",
+      "scripts/build_dashboard_data.py": "7f16ba786ffdaa8f4f10346d90409a49684afeb4b48c2bf8d9d1810138c7b145",
+      "scripts/calibration.py": "fea65b408f9c0a16fa86fd8606cf98b88e2335c3217b21ac6e3fd729f9d0e80e",
+      "scripts/cross_dataset.py": "6c91f9a57ee3364694a59caaeedc4f0a8a16e2314c173af8f8a4b8bcaa5f0c8b",
+      "scripts/download_data.py": "9ea501fd5a88e244b818b09a409dde11e9d473c1de1d9480ec6769c2be293d61",
+      "scripts/export_signals.py": "650d9749ee43e467615cfc168e4fa7a9da07ddb6893b2bee42e0fae6ca66d560",
+      "scripts/personalize.py": "e2b8f3d6f151ab81d3c56dc80c85f17a084dd65b20a9c205921ee0d71bbd6209",
+      "scripts/run_experiment.py": "2a5aca2ae641347698e358fa72515cf112aab93d7db54363364a331da9661458",
+      "scripts/stamp_provenance.py": "0941540589cfb7797810f686794f8945cf408a9870c07405e8a1a2ab7e617310",
+      "scripts/stats.py": "fb7dab38e243f1f7d2c6ede6d0c0a6f3326a4d241430c96daad1e43391d582bb",
+      "scripts/threshold_metrics.py": "fc21ac9868d5d934ed3791fddf6840dd0550f0104abb25ae7a211a7803a094d6",
+      "scripts/tuning.py": "c4a03bad87ce4aa637cdabb09cad2a3fd3af44f8261fcc2b0ddbfa27c13f301f",
+      "scripts/update_readme_tables.py": "4e3a0cf11e4f89934c6cc495f8f2e27a2c2a4a52e0edae027a273a627cbbe7c5",
+      "scripts/wrist.py": "2845b718b9f63fa4e7640d06be566918dfd2b27c6a41c40dd8a4d7c99f026ad3"
+    },
+    "feature_frame_sha256": "c2eacd6f85df5d945287ca88bde1a306264637fa1d240784992513ce664c0be2"
+  }
+}

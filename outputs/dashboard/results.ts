@@ -1,0 +1,1405 @@
+const data = {
+  "benchmark_protocol_version": 2,
+  "binary": {
+    "n_windows": 869,
+    "n_features": 58,
+    "classes": [
+      "baseline",
+      "stress"
+    ],
+    "models": [
+      {
+        "model": "Logistic Regression",
+        "accuracy_mean": 0.9097996886391274,
+        "accuracy_std": 0.09828916444598088,
+        "f1_macro_mean": 0.8930612772492521,
+        "balanced_accuracy": 0.9069574692524371
+      },
+      {
+        "model": "Random Forest",
+        "accuracy_mean": 0.9098717730174039,
+        "accuracy_std": 0.09974178364307273,
+        "f1_macro_mean": 0.8954574217496878,
+        "balanced_accuracy": 0.8986779417390196
+      },
+      {
+        "model": "XGBoost",
+        "accuracy_mean": 0.9082430352631214,
+        "accuracy_std": 0.11398819725938425,
+        "f1_macro_mean": 0.8809441691561228,
+        "balanced_accuracy": 0.8918763837852249
+      },
+      {
+        "model": "LightGBM",
+        "accuracy_mean": 0.8889063977506144,
+        "accuracy_std": 0.11631235041118664,
+        "f1_macro_mean": 0.8550769560811996,
+        "balanced_accuracy": 0.8664060417077214
+      },
+      {
+        "model": "1D-CNN",
+        "accuracy_mean": 0.733183573473657,
+        "accuracy_std": 0.2395631353979552,
+        "f1_macro_mean": 0.6539897553131958,
+        "balanced_accuracy": 0.7251701113983331
+      }
+    ],
+    "best_model": "Random Forest",
+    "loso_accuracy": 0.9098717730174039,
+    "loso_pooled_accuracy": 0.9090909090909091,
+    "loso_matched_accuracy": 0.9134396355353075,
+    "within_subject_accuracy": 0.9635535307517085,
+    "optimism_gap_pts": 5.0,
+    "n_subjects": 15,
+    "inference_model": "Random Forest"
+  },
+  "multiclass": {
+    "n_windows": 1032,
+    "n_features": 58,
+    "classes": [
+      "baseline",
+      "stress",
+      "amusement"
+    ],
+    "models": [
+      {
+        "model": "Logistic Regression",
+        "accuracy_mean": 0.6588302773358019,
+        "accuracy_std": 0.16306550914953402,
+        "f1_macro_mean": 0.6029848601529179,
+        "balanced_accuracy": 0.6659956155051315
+      },
+      {
+        "model": "Random Forest",
+        "accuracy_mean": 0.6513142045891603,
+        "accuracy_std": 0.20566916906260876,
+        "f1_macro_mean": 0.5424400607667782,
+        "balanced_accuracy": 0.5825357844764208
+      },
+      {
+        "model": "XGBoost",
+        "accuracy_mean": 0.6419482088173698,
+        "accuracy_std": 0.20300879039080535,
+        "f1_macro_mean": 0.5620114404252471,
+        "balanced_accuracy": 0.5930899770136294
+      },
+      {
+        "model": "LightGBM",
+        "accuracy_mean": 0.6723222523154001,
+        "accuracy_std": 0.19539752377355024,
+        "f1_macro_mean": 0.5897081033526352,
+        "balanced_accuracy": 0.6344449153117931
+      },
+      {
+        "model": "1D-CNN",
+        "accuracy_mean": 0.4987677742482776,
+        "accuracy_std": 0.19968627309552656,
+        "f1_macro_mean": 0.4010107700563552,
+        "balanced_accuracy": 0.5235836625829217
+      }
+    ],
+    "best_model": "LightGBM",
+    "loso_accuracy": 0.6723222523154001,
+    "loso_pooled_accuracy": 0.6744186046511628,
+    "loso_matched_accuracy": 0.6718146718146718,
+    "within_subject_accuracy": 0.9401544401544402,
+    "optimism_gap_pts": 26.8,
+    "n_subjects": 15
+  },
+  "shap": [
+    {
+      "feature": "ACC_zero_crossings",
+      "mean_abs_shap": 1.3297045
+    },
+    {
+      "feature": "HRV_MedianNN",
+      "mean_abs_shap": 0.9255162
+    },
+    {
+      "feature": "ACC_std",
+      "mean_abs_shap": 0.8106444
+    },
+    {
+      "feature": "EDA_SCR_recovery_time_mean",
+      "mean_abs_shap": 0.80219054
+    },
+    {
+      "feature": "EDA_SCR_amplitude_max",
+      "mean_abs_shap": 0.7674681
+    },
+    {
+      "feature": "HRV_MeanNN",
+      "mean_abs_shap": 0.666066
+    },
+    {
+      "feature": "RESP_rate",
+      "mean_abs_shap": 0.57739174
+    },
+    {
+      "feature": "EDA_SCL_max",
+      "mean_abs_shap": 0.48528534
+    },
+    {
+      "feature": "ACC_peak_freq",
+      "mean_abs_shap": 0.39472985
+    },
+    {
+      "feature": "ACC_magnitude",
+      "mean_abs_shap": 0.31361315
+    },
+    {
+      "feature": "EDA_SCL_mean",
+      "mean_abs_shap": 0.2931796
+    },
+    {
+      "feature": "TEMP_mean",
+      "mean_abs_shap": 0.28791964
+    }
+  ],
+  "shap_model": "XGBoost",
+  "shap_scope": "full_data_binary_fit",
+  "stats": {
+    "best_model": "Random Forest",
+    "best_accuracy_mean": 0.9098717730174039,
+    "best_ci95": [
+      0.8578650617720665,
+      0.9562343260890288
+    ],
+    "omnibus_friedman": {
+      "chi2": 1.8750000000000164,
+      "p_value": 0.5987516330675582
+    },
+    "pairwise_holm": {
+      "Logistic Regression vs Random Forest": {
+        "delta_mean": -7.208437827643799e-05,
+        "p_raw": 0.7670968684102772,
+        "p_holm": 1.0,
+        "effect_size": {
+          "cohens_d": -0.0009753967732114608,
+          "hedges_g": -0.0009220306009222525,
+          "n": 15
+        }
+      },
+      "Logistic Regression vs XGBoost": {
+        "delta_mean": 0.0015566533760059675,
+        "p_raw": 0.5937116848746408,
+        "p_holm": 1.0,
+        "effect_size": {
+          "cohens_d": 0.018396814882073828,
+          "hedges_g": 0.017390283366353322,
+          "n": 15
+        }
+      },
+      "Logistic Regression vs LightGBM": {
+        "delta_mean": 0.020893290888512994,
+        "p_raw": 0.7670968684102772,
+        "p_holm": 1.0,
+        "effect_size": {
+          "cohens_d": 0.25713574684033025,
+          "hedges_g": 0.24306726625430686,
+          "n": 15
+        }
+      },
+      "Random Forest vs XGBoost": {
+        "delta_mean": 0.0016287377542824055,
+        "p_raw": 0.8239269463283861,
+        "p_holm": 1.0,
+        "effect_size": {
+          "cohens_d": 0.02914440206160874,
+          "hedges_g": 0.027549845646822873,
+          "n": 15
+        }
+      },
+      "Random Forest vs LightGBM": {
+        "delta_mean": 0.020965375266789432,
+        "p_raw": 0.1730709208049953,
+        "p_holm": 0.8653546040249765,
+        "effect_size": {
+          "cohens_d": 0.40864985959487077,
+          "hedges_g": 0.3862916978579826,
+          "n": 15
+        }
+      },
+      "XGBoost vs LightGBM": {
+        "delta_mean": 0.019336637512507027,
+        "p_raw": 0.0687035743228782,
+        "p_holm": 0.41222144593726917,
+        "effect_size": {
+          "cohens_d": 0.5242404437274478,
+          "hedges_g": 0.4955580586619143,
+          "n": 15
+        }
+      }
+    },
+    "provenance": {
+      "git_sha": "4f5c02f05f6492bd5da4483b7a5328946969914c",
+      "working_tree_dirty": false,
+      "feature_schema_version": 2,
+      "generated_at": "2026-10-04T08:59:25.523848+00:00",
+      "primary_benchmark_sha256": "3864d8c60477aec1a67bb63e1a9c134859c53634162476fb2d8c47bfc0b23961",
+      "source_file_sha256": {
+        "src/__init__.py": "d3c26d00b0e108f768d60a6db5cc4bf33f2181018845354a8aad0e22c1908ee0",
+        "src/calibration.py": "572e9d6a4e9cec4ad52ca149b51a38e6599888a7ec8608908cc83a4e09c1fc0e",
+        "src/config.py": "6da810691f058451b725a40c112c75efbc5b969e1c00e2ea6dba730c8eb2c23c",
+        "src/data/__init__.py": "b4f425cec36e7973dad882b10fca956ce5adb6ac64d104f008ad80673c7f6c7e",
+        "src/data/loader.py": "f6fa1af374524d1f46c5dc6c9877373061df220b13e1987351e76204953efe5b",
+        "src/dataset.py": "acf2b8ce21f450c76aa9afa76e126cde2bd7f2a63d788b27db3031f1ad51da3b",
+        "src/dataset_wrist.py": "2c968c9e7f674f6046672111085b324f32fc5eddee18ca43cd1ab3ce79598950",
+        "src/datasets/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "src/datasets/non_eeg.py": "68f11503029af1f7a65e1fbf2faac6f5c6dd9a81ddff98e9bba68c50a9cef2ee",
+        "src/datasets/records.py": "5d96d1c68ca814c4fd58b985d892498ddd33abb014492cd2be6f6d337d755f63",
+        "src/features/__init__.py": "48ea617d38171cd70615d6d04d2d4b1d2447b5fe08d0a323747cd81b24e3d539",
+        "src/features/accelerometer_features.py": "827b7ccf5c536aa32767e31f2b3dc14297f1199cb65cb1e5f5efadb4f6f753ed",
+        "src/features/eda_features.py": "ab5901b383c5ea92e4eb95fc8d346f5e682d26d08f06945db976b6e5ac007816",
+        "src/features/feature_pipeline.py": "37947edd56851fe6894d95d6f94ebedba0190b7971eb5ddfc60cf358521831ef",
+        "src/features/hrv_base.py": "44424936c2084091b858ed918bf00296fabe9ae8b715fce69ddec6a61fba9f7e",
+        "src/features/hrv_frequency_domain.py": "5c27ebf5db243b93263e00e2c94a2523093729133e3869df864b5ed7911dbb50",
+        "src/features/hrv_nonlinear.py": "35a10e46e93f2c01f5c9cb8f7fa837d051dce54d7307e755a596ab7ab496aaae",
+        "src/features/hrv_time_domain.py": "0190acbd8ef451278862bf5bd07f48bc2bb8a4b98b7287b4586fbaae69f03021",
+        "src/features/respiration_features.py": "bbdc53242f0c6fd47d438128031158da14bf9eec7867d60675687bfa45b3b132",
+        "src/features/temperature_features.py": "7aaf58fc02d32a12cfd5ed2a3b547609db54451d802276207f50e4181bb73ccc",
+        "src/logging_config.py": "862bf2b798207e11dd474c40f0ee47b11279daeef8b35db5c729707d5c9aeeff",
+        "src/models/__init__.py": "4f23cc600a8f6f23a882b39fae77d071f93e87914025f8f36c2c42570da6f91f",
+        "src/models/dl/__init__.py": "adbc41ee3c0cd000ae5d19bbc33de0a40a44e07e36b31ea79ee30d185a28f0f8",
+        "src/models/dl/cnn_1d.py": "ffd9ac5ae88b4fcb400d93136767a4350d4d834203a7a9e3a58d4130712ea7d0",
+        "src/models/ml/__init__.py": "a20bd57c0830414be0f60ca4e5457ed5586005cf0001a3db5815f2e4547187f3",
+        "src/models/ml/classifiers.py": "6d3e004139cd359d8750c895b7ba28a8f0ef40ce4cf29b8dead4cd277308bc0b",
+        "src/portable.py": "d15945c5dfef49cb49a271695da1031d30f2f882d722a6c0395deae1881980ab",
+        "src/preprocessing/__init__.py": "f63cb32bc7acb288264b2678f439f14e30f1071534ccbe04e5ecf711ae4a1f90",
+        "src/preprocessing/ecg_processor.py": "f67cde8d1cb421d16fb3c1adbe7b365de1b3f7d39b2027df42f1ccd75d3c02ef",
+        "src/preprocessing/eda_processor.py": "68050850b56998c59548241e74bb1c0a2a737ba29c5572a44bfef4e2885a3867",
+        "src/preprocessing/filters.py": "6b21326d221f373ad3310ec0a9a9b722973344d011a960d47d2c65106459cb1b",
+        "src/synthetic.py": "df2cdc11767ca315f8c9cb8c522920fe1b2925a462616226f3dd190c9cc23256",
+        "src/utils.py": "5775968c009962b032ffe5d914e6a192cd872e49b43d47c02c184bbf82802e95",
+        "scripts/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "scripts/ablation.py": "1947542011f456fc015198aeca21cff0a8581eaac563e7c251379acca9148667",
+        "scripts/build_dashboard_data.py": "7f16ba786ffdaa8f4f10346d90409a49684afeb4b48c2bf8d9d1810138c7b145",
+        "scripts/calibration.py": "fea65b408f9c0a16fa86fd8606cf98b88e2335c3217b21ac6e3fd729f9d0e80e",
+        "scripts/cross_dataset.py": "6c91f9a57ee3364694a59caaeedc4f0a8a16e2314c173af8f8a4b8bcaa5f0c8b",
+        "scripts/download_data.py": "9ea501fd5a88e244b818b09a409dde11e9d473c1de1d9480ec6769c2be293d61",
+        "scripts/export_signals.py": "650d9749ee43e467615cfc168e4fa7a9da07ddb6893b2bee42e0fae6ca66d560",
+        "scripts/personalize.py": "e2b8f3d6f151ab81d3c56dc80c85f17a084dd65b20a9c205921ee0d71bbd6209",
+        "scripts/run_experiment.py": "2a5aca2ae641347698e358fa72515cf112aab93d7db54363364a331da9661458",
+        "scripts/stamp_provenance.py": "0941540589cfb7797810f686794f8945cf408a9870c07405e8a1a2ab7e617310",
+        "scripts/stats.py": "fb7dab38e243f1f7d2c6ede6d0c0a6f3326a4d241430c96daad1e43391d582bb",
+        "scripts/threshold_metrics.py": "fc21ac9868d5d934ed3791fddf6840dd0550f0104abb25ae7a211a7803a094d6",
+        "scripts/tuning.py": "c4a03bad87ce4aa637cdabb09cad2a3fd3af44f8261fcc2b0ddbfa27c13f301f",
+        "scripts/update_readme_tables.py": "4e3a0cf11e4f89934c6cc495f8f2e27a2c2a4a52e0edae027a273a627cbbe7c5",
+        "scripts/wrist.py": "2845b718b9f63fa4e7640d06be566918dfd2b27c6a41c40dd8a4d7c99f026ad3"
+      }
+    }
+  },
+  "wrist": {
+    "wrist_models": [
+      {
+        "model": "Logistic Regression",
+        "accuracy_mean": 0.8665022760507693,
+        "f1_macro_mean": 0.8534971721613346
+      },
+      {
+        "model": "Random Forest",
+        "accuracy_mean": 0.8898946761880608,
+        "f1_macro_mean": 0.8676232677590837
+      },
+      {
+        "model": "XGBoost",
+        "accuracy_mean": 0.9011378278555161,
+        "f1_macro_mean": 0.8805641565955026
+      },
+      {
+        "model": "LightGBM",
+        "accuracy_mean": 0.875217916322082,
+        "f1_macro_mean": 0.8490557237859379
+      }
+    ],
+    "wrist_best": {
+      "model": "XGBoost",
+      "accuracy_mean": 0.9011378278555161,
+      "f1_macro_mean": 0.8805641565955026
+    },
+    "chest_best": {
+      "model": "Random Forest",
+      "accuracy_mean": 0.9098717730174039
+    },
+    "same_model_rf": {
+      "chest": 0.9098717730174039,
+      "wrist": 0.8898946761880608,
+      "drop_pts": 1.997709682934301
+    },
+    "best_per_arm_drop_pts": 0.8733945161887746,
+    "provenance": {
+      "git_sha": "4f5c02f05f6492bd5da4483b7a5328946969914c",
+      "working_tree_dirty": false,
+      "feature_schema_version": 2,
+      "generated_at": "2026-10-04T08:58:09.620926+00:00",
+      "primary_benchmark_sha256": "3864d8c60477aec1a67bb63e1a9c134859c53634162476fb2d8c47bfc0b23961",
+      "source_file_sha256": {
+        "src/__init__.py": "d3c26d00b0e108f768d60a6db5cc4bf33f2181018845354a8aad0e22c1908ee0",
+        "src/calibration.py": "572e9d6a4e9cec4ad52ca149b51a38e6599888a7ec8608908cc83a4e09c1fc0e",
+        "src/config.py": "6da810691f058451b725a40c112c75efbc5b969e1c00e2ea6dba730c8eb2c23c",
+        "src/data/__init__.py": "b4f425cec36e7973dad882b10fca956ce5adb6ac64d104f008ad80673c7f6c7e",
+        "src/data/loader.py": "f6fa1af374524d1f46c5dc6c9877373061df220b13e1987351e76204953efe5b",
+        "src/dataset.py": "acf2b8ce21f450c76aa9afa76e126cde2bd7f2a63d788b27db3031f1ad51da3b",
+        "src/dataset_wrist.py": "2c968c9e7f674f6046672111085b324f32fc5eddee18ca43cd1ab3ce79598950",
+        "src/datasets/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "src/datasets/non_eeg.py": "68f11503029af1f7a65e1fbf2faac6f5c6dd9a81ddff98e9bba68c50a9cef2ee",
+        "src/datasets/records.py": "5d96d1c68ca814c4fd58b985d892498ddd33abb014492cd2be6f6d337d755f63",
+        "src/features/__init__.py": "48ea617d38171cd70615d6d04d2d4b1d2447b5fe08d0a323747cd81b24e3d539",
+        "src/features/accelerometer_features.py": "827b7ccf5c536aa32767e31f2b3dc14297f1199cb65cb1e5f5efadb4f6f753ed",
+        "src/features/eda_features.py": "ab5901b383c5ea92e4eb95fc8d346f5e682d26d08f06945db976b6e5ac007816",
+        "src/features/feature_pipeline.py": "37947edd56851fe6894d95d6f94ebedba0190b7971eb5ddfc60cf358521831ef",
+        "src/features/hrv_base.py": "44424936c2084091b858ed918bf00296fabe9ae8b715fce69ddec6a61fba9f7e",
+        "src/features/hrv_frequency_domain.py": "5c27ebf5db243b93263e00e2c94a2523093729133e3869df864b5ed7911dbb50",
+        "src/features/hrv_nonlinear.py": "35a10e46e93f2c01f5c9cb8f7fa837d051dce54d7307e755a596ab7ab496aaae",
+        "src/features/hrv_time_domain.py": "0190acbd8ef451278862bf5bd07f48bc2bb8a4b98b7287b4586fbaae69f03021",
+        "src/features/respiration_features.py": "bbdc53242f0c6fd47d438128031158da14bf9eec7867d60675687bfa45b3b132",
+        "src/features/temperature_features.py": "7aaf58fc02d32a12cfd5ed2a3b547609db54451d802276207f50e4181bb73ccc",
+        "src/logging_config.py": "862bf2b798207e11dd474c40f0ee47b11279daeef8b35db5c729707d5c9aeeff",
+        "src/models/__init__.py": "4f23cc600a8f6f23a882b39fae77d071f93e87914025f8f36c2c42570da6f91f",
+        "src/models/dl/__init__.py": "adbc41ee3c0cd000ae5d19bbc33de0a40a44e07e36b31ea79ee30d185a28f0f8",
+        "src/models/dl/cnn_1d.py": "ffd9ac5ae88b4fcb400d93136767a4350d4d834203a7a9e3a58d4130712ea7d0",
+        "src/models/ml/__init__.py": "a20bd57c0830414be0f60ca4e5457ed5586005cf0001a3db5815f2e4547187f3",
+        "src/models/ml/classifiers.py": "6d3e004139cd359d8750c895b7ba28a8f0ef40ce4cf29b8dead4cd277308bc0b",
+        "src/portable.py": "d15945c5dfef49cb49a271695da1031d30f2f882d722a6c0395deae1881980ab",
+        "src/preprocessing/__init__.py": "f63cb32bc7acb288264b2678f439f14e30f1071534ccbe04e5ecf711ae4a1f90",
+        "src/preprocessing/ecg_processor.py": "f67cde8d1cb421d16fb3c1adbe7b365de1b3f7d39b2027df42f1ccd75d3c02ef",
+        "src/preprocessing/eda_processor.py": "68050850b56998c59548241e74bb1c0a2a737ba29c5572a44bfef4e2885a3867",
+        "src/preprocessing/filters.py": "6b21326d221f373ad3310ec0a9a9b722973344d011a960d47d2c65106459cb1b",
+        "src/synthetic.py": "df2cdc11767ca315f8c9cb8c522920fe1b2925a462616226f3dd190c9cc23256",
+        "src/utils.py": "5775968c009962b032ffe5d914e6a192cd872e49b43d47c02c184bbf82802e95",
+        "scripts/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "scripts/ablation.py": "1947542011f456fc015198aeca21cff0a8581eaac563e7c251379acca9148667",
+        "scripts/build_dashboard_data.py": "7f16ba786ffdaa8f4f10346d90409a49684afeb4b48c2bf8d9d1810138c7b145",
+        "scripts/calibration.py": "fea65b408f9c0a16fa86fd8606cf98b88e2335c3217b21ac6e3fd729f9d0e80e",
+        "scripts/cross_dataset.py": "6c91f9a57ee3364694a59caaeedc4f0a8a16e2314c173af8f8a4b8bcaa5f0c8b",
+        "scripts/download_data.py": "9ea501fd5a88e244b818b09a409dde11e9d473c1de1d9480ec6769c2be293d61",
+        "scripts/export_signals.py": "650d9749ee43e467615cfc168e4fa7a9da07ddb6893b2bee42e0fae6ca66d560",
+        "scripts/personalize.py": "e2b8f3d6f151ab81d3c56dc80c85f17a084dd65b20a9c205921ee0d71bbd6209",
+        "scripts/run_experiment.py": "2a5aca2ae641347698e358fa72515cf112aab93d7db54363364a331da9661458",
+        "scripts/stamp_provenance.py": "0941540589cfb7797810f686794f8945cf408a9870c07405e8a1a2ab7e617310",
+        "scripts/stats.py": "fb7dab38e243f1f7d2c6ede6d0c0a6f3326a4d241430c96daad1e43391d582bb",
+        "scripts/threshold_metrics.py": "fc21ac9868d5d934ed3791fddf6840dd0550f0104abb25ae7a211a7803a094d6",
+        "scripts/tuning.py": "c4a03bad87ce4aa637cdabb09cad2a3fd3af44f8261fcc2b0ddbfa27c13f301f",
+        "scripts/update_readme_tables.py": "4e3a0cf11e4f89934c6cc495f8f2e27a2c2a4a52e0edae027a273a627cbbe7c5",
+        "scripts/wrist.py": "2845b718b9f63fa4e7640d06be566918dfd2b27c6a41c40dd8a4d7c99f026ad3"
+      },
+      "feature_frame_sha256": "c2eacd6f85df5d945287ca88bde1a306264637fa1d240784992513ce664c0be2"
+    }
+  },
+  "cross_dataset": {
+    "n_shared_features": 18,
+    "methodology": {
+      "portable_schema_version": 3,
+      "slope_units": "per_second",
+      "finite_sample_timestamps": "original_sample_positions",
+      "signal_units": {
+        "wesad": {
+          "EDA": "uS",
+          "TEMP": "degC",
+          "ACC": "1/64 g",
+          "HR": "bpm"
+        },
+        "noneeg": {
+          "EDA": "NU",
+          "TEMP": "degC",
+          "ACC": "NU",
+          "HR": "bpm"
+        }
+      },
+      "hr_window_boundary": "include_timestamps_in_[start,end)",
+      "window_seconds": 60.0,
+      "overlap": 0.5,
+      "packages": {
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "pandas": "2.3.3",
+        "scikit-learn": "1.6.1",
+        "neurokit2": "0.2.12"
+      }
+    },
+    "datasets": {
+      "wesad": {
+        "n_windows": 869,
+        "n_subjects": 15,
+        "label_counts": {
+          "0": 562,
+          "1": 307
+        },
+        "cache_sha256": "ce45076602775d668cd6894657342d34925128961d610f99db734d9aa27595a5",
+        "source_provenance": {
+          "feature_source": "raw_reextraction",
+          "raw_file_sha256": {
+            "data/raw/WESAD/S2/S2.pkl": "36ef5e8afc0f91998eefba7c12fc9fa97b7b07198cbec0126917d7abb436ca23",
+            "data/raw/WESAD/S3/S3.pkl": "5c8bd4a82af029c082e610bca28a011fca2ae3b23e14a18458ebb5990be4015e",
+            "data/raw/WESAD/S4/S4.pkl": "0f0740a79388723360ff12b4f47c465665ea7827d1399b18ac43908daac17900",
+            "data/raw/WESAD/S5/S5.pkl": "74bd187e3a9c1ca4259af52d04974c8e7ff7dc49ceea7e269f499ca98fe6d8ec",
+            "data/raw/WESAD/S6/S6.pkl": "8aa9bf57b69f4fe5bce06c550230857627c3f05befa2f787151646bb29ee8f62",
+            "data/raw/WESAD/S7/S7.pkl": "9cb62705ae7f53dca327a9a00a6f9fdabf5128d449174ab37594658e912cb6d8",
+            "data/raw/WESAD/S8/S8.pkl": "dac1141dac11d56b3641be982f45da63f05e9d74154f59e6ea0cdcf47fc72710",
+            "data/raw/WESAD/S9/S9.pkl": "24dc004e201bd541f092989443f0a29ebf89e4a227a80bb6b6d1987255039544",
+            "data/raw/WESAD/S10/S10.pkl": "41da29c68366f33650f3d41a6be78107bf6942929c3bb0ef46238078ddddee9f",
+            "data/raw/WESAD/S11/S11.pkl": "f39557a8d660b10154936f51debf2926aea7ebb9b26a168858f59502f914d8f7",
+            "data/raw/WESAD/S13/S13.pkl": "772fb490f19b279e49367271e009fc10d3a3ca1e3456df0d68b9063a73992066",
+            "data/raw/WESAD/S14/S14.pkl": "e7bd33c57538319a25c6d53e6a9fb6c1abd12800cfc64bb63275d89de8d2fd60",
+            "data/raw/WESAD/S15/S15.pkl": "1ea573bc6b45ba79fb134f9460d691b86176f60dce23420dc514c28017d4049c",
+            "data/raw/WESAD/S16/S16.pkl": "f65cf40cada75c3e9f5813276d7dcc90359c3b06dec41d68656c0a6e61dbc575",
+            "data/raw/WESAD/S17/S17.pkl": "3315796a75227d54d7b0056736f671484fd2fb85afffa65818fd76aeff2920fa"
+          },
+          "manifest_sha256": "071b26dc484ec7f4024648123d111964518111df0a16f6afc99f8aae173f0fe3",
+          "extraction_context": {
+            "git_sha": "4f5c02f05f6492bd5da4483b7a5328946969914c",
+            "working_tree_dirty": false,
+            "feature_schema_version": 2,
+            "generated_at": "2026-10-04T08:44:36.300196+00:00",
+            "source_file_sha256": {
+              "src/portable.py": "d15945c5dfef49cb49a271695da1031d30f2f882d722a6c0395deae1881980ab",
+              "src/datasets/non_eeg.py": "68f11503029af1f7a65e1fbf2faac6f5c6dd9a81ddff98e9bba68c50a9cef2ee",
+              "src/datasets/records.py": "5d96d1c68ca814c4fd58b985d892498ddd33abb014492cd2be6f6d337d755f63",
+              "scripts/cross_dataset.py": "6c91f9a57ee3364694a59caaeedc4f0a8a16e2314c173af8f8a4b8bcaa5f0c8b",
+              "scripts/run_experiment.py": "2a5aca2ae641347698e358fa72515cf112aab93d7db54363364a331da9661458",
+              "src/models/ml/classifiers.py": "6d3e004139cd359d8750c895b7ba28a8f0ef40ce4cf29b8dead4cd277308bc0b",
+              "src/config.py": "6da810691f058451b725a40c112c75efbc5b969e1c00e2ea6dba730c8eb2c23c"
+            }
+          }
+        }
+      },
+      "noneeg": {
+        "n_windows": 1133,
+        "n_subjects": 20,
+        "label_counts": {
+          "0": 709,
+          "1": 424
+        },
+        "cache_sha256": "d134682b050063f6a9a25162e38e90843dca495ac04c10e0562f0ca35debf880",
+        "source_provenance": {
+          "feature_source": "raw_reextraction",
+          "raw_file_sha256": {
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject10_AccTempEDA.atr": "e18369410282121ff3cfa79f8ed8cfeea15b73b5b8227d1953fd3551395a50ad",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject10_AccTempEDA.dat": "4ffb176d15b966f23fc19283220aff327d043ec3b1f1aa39853f62d04a713fbd",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject10_AccTempEDA.hea": "5e7dac5c13b59efa5de8b986de6a1f380cc249d60e4587a3be0bcc6a100162f0",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject10_SpO2HR.dat": "579a9eed3becaeff3fbd53ecfac320bf1b244150e4a7620cacc85d1e4ba00484",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject10_SpO2HR.hea": "fda50b6ba9862f96693d3517273502696b71ab6c3531b24d4e9004ded2736fa6",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject11_AccTempEDA.atr": "20d8a34663837ad8c831180b8351cafd7acdc5f6ca31a88c96e2c2a0717c92ae",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject11_AccTempEDA.dat": "e220f404c795081e5996abcc8bed3f983fbbc5666f00f977ad24d1dfd74f1f5a",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject11_AccTempEDA.hea": "103994de98a660f6077b9a2af6680b18304f7ba4d6fd15f9e9af5322be12bd33",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject11_SpO2HR.dat": "72a0eb7728659da346b97bfba6a011327122a0e5fa52ba2982b1431a1160de30",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject11_SpO2HR.hea": "77e5c1ec4c04361ab20990e81eadb42046babc56f8a1410286c5033a933bd439",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject12_AccTempEDA.atr": "1d4b209979bd978746319173e4c14cde12264775f773a56f6bef29f6052e391b",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject12_AccTempEDA.dat": "38ae91180870a23f0bd139e88ab81be94ab0701a38c2789bfd021102232ff70d",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject12_AccTempEDA.hea": "b97ba77c0d17b41b118724bb1f72a37a1d7b35213a408bc335887f2dcae0f44b",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject12_SpO2HR.dat": "d817cd801b0754add2bfcbf296910d6578f1c3f146faec33d4c51bb1b503afd1",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject12_SpO2HR.hea": "4eb067343b4148b1769e611b63669683e9acc830d50f6ba953ad6e19ae8c35b6",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject13_AccTempEDA.atr": "adcee4adeea28ca73b2ed163dced2b79770a5abce497b499ceeb7ad6bed83fa1",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject13_AccTempEDA.dat": "277869268a939796d7e23d388212d47225b9fefe650ae7f5dbac82be5d844e67",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject13_AccTempEDA.hea": "8c6d4ae2bb34dc6cbb33060b8a68a835354dffdc58604baf6209599aaec4bb54",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject13_SpO2HR.dat": "696599a78924701529637a64de33fa21daad56e23aa798da4557c9c77dea6e99",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject13_SpO2HR.hea": "7d8c48e1efec17c337f5f4a3324aeab4701fca69f53d865ddf22cb42877217cc",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject14_AccTempEDA.atr": "720724ae41b8ca2290a231f8ea3069876df48c361006dd73a7b6230e9fe1221a",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject14_AccTempEDA.dat": "e3400f15e54238dc0b3681b378b6a48a73de00e765717386e24d06d8347bd049",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject14_AccTempEDA.hea": "483307083b8a3c97b3ec78b760da0e2bbf41dade62e5a5302cccaf357db68160",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject14_SpO2HR.dat": "b6f1d4a306a5ead02de3958886accdb8442796904e4341927ffa7ca12d8f9ebb",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject14_SpO2HR.hea": "879a013a22d14045c558b7a3dc603f953c58b23613707cac0bc1882c19112c67",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject15_AccTempEDA.atr": "52bf9656fb47e5e1ff954df32eb2e2ef49c9cb102cc2b58d0b5031c3b9c4e18b",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject15_AccTempEDA.dat": "72dfadef1182a2ff867d3f88660f58cca4497683cc4668af7b7e8cacef334986",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject15_AccTempEDA.hea": "b471f85bda75c4180090d9facc6d3b956ec8c54d22049bbd13ba36ada35e440e",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject15_SpO2HR.dat": "cb49fac4b2d59fb40555d20c0c1e61b1f500a679dd5f02c34162a0ead774dada",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject15_SpO2HR.hea": "113f3e09a8e6123adb7abbc397e5464d90547110d910c975fce01b5482512f67",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject16_AccTempEDA.atr": "d9e7026051bcf1524f87cae6b06d79c1ccd49df958d87ba28306a0d8f938bbae",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject16_AccTempEDA.dat": "ad5d69af41c9f95410f3fbda9ad4e7c19459fb67b32d79e1acb7573dbb435301",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject16_AccTempEDA.hea": "9be128d1c11f104bda91a29673217da8bd696121867847a06e853310edc61ca2",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject16_SpO2HR.dat": "fbcf993f94220e5bbe6d1eccd8e019f5ad16c35abcb4469ac0d790ca6b780d08",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject16_SpO2HR.hea": "a1dd60a025ba4abd383c368e6f17be60ff6e44bc574cd5f9cf3b74ca9b8a5a71",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject17_AccTempEDA.atr": "6cddaed47d3189b26c64a9afd2914f946454e8a89c6203ec066b60d270d5e22d",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject17_AccTempEDA.dat": "f1dd03373f942d3cffa5e0d76b89e5e51cfc8c50037cb61d804d8b65308be0bf",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject17_AccTempEDA.hea": "4b3c371969a8568a528367e04d9e69ae4efdad52b9f80e536309b9edf67248b0",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject17_SpO2HR.dat": "23313e3d7a45135e1d0a3e3dd754ed38a161d485ccd4c33c3bfa2c782e0d5d4e",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject17_SpO2HR.hea": "822aa941c2694df886e15d8315152bab9e41f43078c8143c308a533441d43241",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject18_AccTempEDA.atr": "561adf472427596323a384a28eb2655bb4361f6cf056911a89b282a7d0d9b9ad",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject18_AccTempEDA.dat": "d0cfd19a2b1f206529db7cc02bf658e12ee81dd053a98b029b89ce56ecd9397c",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject18_AccTempEDA.hea": "cd162ead0e42dbcb3e8dfc41a34983be556941ad9c670e19694739d963454eeb",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject18_SpO2HR.dat": "33f3c349bb0ecf9598c30742397e9503ae4089e5638c7bcbcb05142593980094",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject18_SpO2HR.hea": "ee2b9fec3b39205f063554b76655533f1b4ee5e959f9efc040a3c2521f9b2d0b",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject19_AccTempEDA.atr": "dbf3578755b30277dfb7a3f1f6df9107ccdbe880ba78409680b0aa33790f1f31",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject19_AccTempEDA.dat": "f7ac626bc70fa291172ec75e6ea60d075bed85971c5943a637de13b849f61f46",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject19_AccTempEDA.hea": "cbafc848996921d9ce65e180583b9e3ef6d2c0fd609fc15e7e40d577a8bed28e",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject19_SpO2HR.dat": "4674f096de8e5a2a84f10ba1f828b8eb967ad163a4a593d7caeefc6f0893863c",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject19_SpO2HR.hea": "328d521c656a9da4d572c6aa8bd137acecc1e1a78078c44f21847aebe0e9d768",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject1_AccTempEDA.atr": "461f57af6d4098806e648d9ba43ec9285bea677079e418ef6661fc483d4fd4ae",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject1_AccTempEDA.dat": "4b9110a099419ed77d80397ad433d8c03eaafda26ceb223a29ebd987c1023fcf",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject1_AccTempEDA.hea": "c3e3662a21b475f7253f1531782de7c54aa232efe637c5646dd2233a417f1cc3",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject1_SpO2HR.dat": "ba8489e8b9be69c1bc2c2cd349656245412fe7fcd105d271de22f786ea87d4e2",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject1_SpO2HR.hea": "29bf5322ff7331df90a6db4771c756838e5cd46e5d4939ecb460b15e1d2a3c53",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject20_AccTempEDA.atr": "d93424f4d55681fa9d4910a52a36e863bb86b4cfa12c21051c372ec20a4a795b",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject20_AccTempEDA.dat": "9c7b6fdd0917220dd662272d0003a3980d5b08b06429a510af24ca7417aed865",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject20_AccTempEDA.hea": "26f672f4291c52ef26fc5c7779bde767d154afa0f0b905a608db67ee659fb969",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject20_SpO2HR.dat": "0a7e9379c6eb2835a6170e5edc2708a327cfafb1f97e74a63c5494f7bb2f1e9a",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject20_SpO2HR.hea": "2e6542118c9a7390dc6c05bd7725781d8ae0e74fd20c4d72d037a5887a8a02b0",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject2_AccTempEDA.atr": "03050f943446452a336067269345dce9b249ae4b8f17d9848c893c0252f0e463",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject2_AccTempEDA.dat": "a3d960b165feb363354333fbbb118127bb4a2028b0e1af4f82fe4fe068bb7892",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject2_AccTempEDA.hea": "4e149e150e3ddfdc524a47e8db4384da1bb93cd97bab0877d709812656cd126e",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject2_SpO2HR.dat": "b47b2e43e23a42485cc4834b3f0c0ba211f6e5e621e327b3bca5a620423e96be",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject2_SpO2HR.hea": "d5392d8703641c9db85223b5134b3896fd16ef2ae468914c4f3091db880e883a",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject3_AccTempEDA.atr": "14813d6a89f758e568c34424780fa36e7b7051d90710f1970a610c187d9715ab",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject3_AccTempEDA.dat": "c1d79d77e6e2b742590c9785d90b6ce29e72cc3b58c0d087fbd4e3e0434a25e8",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject3_AccTempEDA.hea": "c255e04857e490148ff57de013168956410176dbba50d05be10a7106b1e9f430",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject3_SpO2HR.dat": "b37920dd7cfcd9dd1fa012476f7ada6101b7f1c56d90d22d02562ac50804c2bd",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject3_SpO2HR.hea": "8154af677f778bc41b73f5af5b858da13db066ff94beb0adc07ee3aa5632d06b",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject4_AccTempEDA.atr": "faacc3ce8500afebeb4415581ffc2ff63edb0ff8e4e307b39b6980dc9fc57370",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject4_AccTempEDA.dat": "4e6d9fbccae6dc5c9562d89f025c2815a9d686dac0481ba1c0d2175c0bd3562d",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject4_AccTempEDA.hea": "699006012ffdd7b80856fbf09fc2e88cfa145c77fdf7e3d37c422ab465805272",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject4_SpO2HR.dat": "fa0f27d2d2b7145f13ef77cc936de2dae487b9d23757752e018025e489827f4d",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject4_SpO2HR.hea": "cf08714fc1893ff3ad145fabd2b8e34e48c55324ef4c8bc3b8d87519292c7d4e",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject5_AccTempEDA.atr": "4586b8b1e31a4daa6d74b9c9ea5bea912306ad06e1bd4daa58470c5a465319a5",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject5_AccTempEDA.dat": "febc9b10bc23169643066bf74d45f62eb780cfef9d4041b86895cce607dc876c",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject5_AccTempEDA.hea": "2ed24b6791a3d6c1b8dbd4726bd654c642d9bf8935b1daecce5a5e7170330e2a",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject5_SpO2HR.dat": "11647a0f4dde5c974e887358d044e8c7083b3ad1df3e4750e01539a7c0e0786c",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject5_SpO2HR.hea": "aa0c4b32b76beeb40d3121962960646e1ef3cf05268cf3b956c2068aeb6f3566",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject6_AccTempEDA.atr": "19638f2e04ac65d2a50252b0f35ade0b84fcccdc4bba264bea4bc177894d0210",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject6_AccTempEDA.dat": "39df81d2e3b62b5ca8ead496f4b9ebd24a38a1c0a97b361b944da589915b39cd",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject6_AccTempEDA.hea": "05965fb726000bb95385615979a2c7e8a72174f49089f7305362aedd42922767",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject6_SpO2HR.dat": "9490b29cef38e5501978f964ef40d77cfb4d2cf36fa549f5cece2a6007520aff",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject6_SpO2HR.hea": "22942814676b75748ea2ec4bcfa9a262219925f88d26c5a0b992f246e5dc375b",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject7_AccTempEDA.atr": "9cbf5560b42df6807c13315b78df823db2464b251263b91c4bd87b30606cd83b",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject7_AccTempEDA.dat": "7e650a82b534bd5c2e98e0207ed53d12f0dd14dd613123af89e541a45acfbaed",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject7_AccTempEDA.hea": "d02274bb615566410927107c6901dc47749915d93a11b8f1c9d2b1f4331451e1",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject7_SpO2HR.dat": "d62d88ab5560bb8c295936e7f710f443bbded40f9dca167962b3159abf631cc3",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject7_SpO2HR.hea": "27f09ff2f25d914502d1a60ef18d5237fb86cc31cf8178b8bb74176f03d8b542",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject8_AccTempEDA.atr": "87f535b1b8aae9810fc1978ed7b2d96af1ed3f50944d8233b43f0f17b88158c3",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject8_AccTempEDA.dat": "db2cb495c7a5983aa09701de91c47aeadbd548f69db28ce37858d10cba3469ac",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject8_AccTempEDA.hea": "60e8f07399c2b2a6b743cf4e89a57c576615576d8ccfb4d2a7177a2e9ce2f1ef",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject8_SpO2HR.dat": "87a7fc8eae8c5e71e5ade66731c91b5b34d4e72496a0b5c0463c76f3f87a805d",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject8_SpO2HR.hea": "4ca107e6499d7f80532d0428411d82528f94fb093f1a3e45337988f3aed7f92b",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject9_AccTempEDA.atr": "adcee4adeea28ca73b2ed163dced2b79770a5abce497b499ceeb7ad6bed83fa1",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject9_AccTempEDA.dat": "882637d07329d1b71175ee7a229ab41aff26aca741d8cf61c75f1bf1571a8f43",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject9_AccTempEDA.hea": "99eab9abb40c9ef7ffedf1db7ba3534f59f924400fc24c05345c3a0ee6925c21",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject9_SpO2HR.dat": "c62b43e35b27fd4f189a59a7ca67f4228b95257cd1e94470b40a4dbd496bd156",
+            "data/external/noneeg/non-eeg-dataset-for-assessment-of-neurological-status-1.0.0/Subject9_SpO2HR.hea": "68d05ac96f65ed66369c7cd3041ed81754b2e20bedf35a07303d9c465798baa4"
+          },
+          "manifest_sha256": "d2f3ca7a0064d37916024d414721e83286dac4423ac800b21ff3f60e47d20e77",
+          "extraction_context": {
+            "git_sha": "4f5c02f05f6492bd5da4483b7a5328946969914c",
+            "working_tree_dirty": false,
+            "feature_schema_version": 2,
+            "generated_at": "2026-10-04T08:44:37.573521+00:00",
+            "source_file_sha256": {
+              "src/portable.py": "d15945c5dfef49cb49a271695da1031d30f2f882d722a6c0395deae1881980ab",
+              "src/datasets/non_eeg.py": "68f11503029af1f7a65e1fbf2faac6f5c6dd9a81ddff98e9bba68c50a9cef2ee",
+              "src/datasets/records.py": "5d96d1c68ca814c4fd58b985d892498ddd33abb014492cd2be6f6d337d755f63",
+              "scripts/cross_dataset.py": "6c91f9a57ee3364694a59caaeedc4f0a8a16e2314c173af8f8a4b8bcaa5f0c8b",
+              "scripts/run_experiment.py": "2a5aca2ae641347698e358fa72515cf112aab93d7db54363364a331da9661458",
+              "src/models/ml/classifiers.py": "6d3e004139cd359d8750c895b7ba28a8f0ef40ce4cf29b8dead4cd277308bc0b",
+              "src/config.py": "6da810691f058451b725a40c112c75efbc5b969e1c00e2ea6dba730c8eb2c23c"
+            }
+          }
+        }
+      }
+    },
+    "within_wesad": {
+      "accuracy": 0.8748761460805793,
+      "f1_macro": 0.851954818659015,
+      "balanced_accuracy": 0.8675536416010757
+    },
+    "within_noneeg": {
+      "accuracy": 0.7214590731661965,
+      "f1_macro": 0.6728598549304764,
+      "balanced_accuracy": 0.7013066503446257
+    },
+    "wesad_to_noneeg": {
+      "accuracy": 0.6354810238305384,
+      "balanced_accuracy": 0.5580042313117066,
+      "f1_macro": 0.5437620962827544
+    },
+    "noneeg_to_wesad": {
+      "accuracy": 0.5212888377445339,
+      "balanced_accuracy": 0.4968759780680909,
+      "f1_macro": 0.494795684498854
+    },
+    "provenance": {
+      "git_sha": "4f5c02f05f6492bd5da4483b7a5328946969914c",
+      "working_tree_dirty": false,
+      "feature_schema_version": 2,
+      "generated_at": "2026-10-04T08:57:21.879608+00:00",
+      "source_file_sha256": {
+        "src/__init__.py": "d3c26d00b0e108f768d60a6db5cc4bf33f2181018845354a8aad0e22c1908ee0",
+        "src/calibration.py": "572e9d6a4e9cec4ad52ca149b51a38e6599888a7ec8608908cc83a4e09c1fc0e",
+        "src/config.py": "6da810691f058451b725a40c112c75efbc5b969e1c00e2ea6dba730c8eb2c23c",
+        "src/data/__init__.py": "b4f425cec36e7973dad882b10fca956ce5adb6ac64d104f008ad80673c7f6c7e",
+        "src/data/loader.py": "f6fa1af374524d1f46c5dc6c9877373061df220b13e1987351e76204953efe5b",
+        "src/dataset.py": "acf2b8ce21f450c76aa9afa76e126cde2bd7f2a63d788b27db3031f1ad51da3b",
+        "src/dataset_wrist.py": "2c968c9e7f674f6046672111085b324f32fc5eddee18ca43cd1ab3ce79598950",
+        "src/datasets/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "src/datasets/non_eeg.py": "68f11503029af1f7a65e1fbf2faac6f5c6dd9a81ddff98e9bba68c50a9cef2ee",
+        "src/datasets/records.py": "5d96d1c68ca814c4fd58b985d892498ddd33abb014492cd2be6f6d337d755f63",
+        "src/features/__init__.py": "48ea617d38171cd70615d6d04d2d4b1d2447b5fe08d0a323747cd81b24e3d539",
+        "src/features/accelerometer_features.py": "827b7ccf5c536aa32767e31f2b3dc14297f1199cb65cb1e5f5efadb4f6f753ed",
+        "src/features/eda_features.py": "ab5901b383c5ea92e4eb95fc8d346f5e682d26d08f06945db976b6e5ac007816",
+        "src/features/feature_pipeline.py": "37947edd56851fe6894d95d6f94ebedba0190b7971eb5ddfc60cf358521831ef",
+        "src/features/hrv_base.py": "44424936c2084091b858ed918bf00296fabe9ae8b715fce69ddec6a61fba9f7e",
+        "src/features/hrv_frequency_domain.py": "5c27ebf5db243b93263e00e2c94a2523093729133e3869df864b5ed7911dbb50",
+        "src/features/hrv_nonlinear.py": "35a10e46e93f2c01f5c9cb8f7fa837d051dce54d7307e755a596ab7ab496aaae",
+        "src/features/hrv_time_domain.py": "0190acbd8ef451278862bf5bd07f48bc2bb8a4b98b7287b4586fbaae69f03021",
+        "src/features/respiration_features.py": "bbdc53242f0c6fd47d438128031158da14bf9eec7867d60675687bfa45b3b132",
+        "src/features/temperature_features.py": "7aaf58fc02d32a12cfd5ed2a3b547609db54451d802276207f50e4181bb73ccc",
+        "src/logging_config.py": "862bf2b798207e11dd474c40f0ee47b11279daeef8b35db5c729707d5c9aeeff",
+        "src/models/__init__.py": "4f23cc600a8f6f23a882b39fae77d071f93e87914025f8f36c2c42570da6f91f",
+        "src/models/dl/__init__.py": "adbc41ee3c0cd000ae5d19bbc33de0a40a44e07e36b31ea79ee30d185a28f0f8",
+        "src/models/dl/cnn_1d.py": "ffd9ac5ae88b4fcb400d93136767a4350d4d834203a7a9e3a58d4130712ea7d0",
+        "src/models/ml/__init__.py": "a20bd57c0830414be0f60ca4e5457ed5586005cf0001a3db5815f2e4547187f3",
+        "src/models/ml/classifiers.py": "6d3e004139cd359d8750c895b7ba28a8f0ef40ce4cf29b8dead4cd277308bc0b",
+        "src/portable.py": "d15945c5dfef49cb49a271695da1031d30f2f882d722a6c0395deae1881980ab",
+        "src/preprocessing/__init__.py": "f63cb32bc7acb288264b2678f439f14e30f1071534ccbe04e5ecf711ae4a1f90",
+        "src/preprocessing/ecg_processor.py": "f67cde8d1cb421d16fb3c1adbe7b365de1b3f7d39b2027df42f1ccd75d3c02ef",
+        "src/preprocessing/eda_processor.py": "68050850b56998c59548241e74bb1c0a2a737ba29c5572a44bfef4e2885a3867",
+        "src/preprocessing/filters.py": "6b21326d221f373ad3310ec0a9a9b722973344d011a960d47d2c65106459cb1b",
+        "src/synthetic.py": "df2cdc11767ca315f8c9cb8c522920fe1b2925a462616226f3dd190c9cc23256",
+        "src/utils.py": "5775968c009962b032ffe5d914e6a192cd872e49b43d47c02c184bbf82802e95",
+        "scripts/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "scripts/ablation.py": "1947542011f456fc015198aeca21cff0a8581eaac563e7c251379acca9148667",
+        "scripts/build_dashboard_data.py": "7f16ba786ffdaa8f4f10346d90409a49684afeb4b48c2bf8d9d1810138c7b145",
+        "scripts/calibration.py": "fea65b408f9c0a16fa86fd8606cf98b88e2335c3217b21ac6e3fd729f9d0e80e",
+        "scripts/cross_dataset.py": "6c91f9a57ee3364694a59caaeedc4f0a8a16e2314c173af8f8a4b8bcaa5f0c8b",
+        "scripts/download_data.py": "9ea501fd5a88e244b818b09a409dde11e9d473c1de1d9480ec6769c2be293d61",
+        "scripts/export_signals.py": "650d9749ee43e467615cfc168e4fa7a9da07ddb6893b2bee42e0fae6ca66d560",
+        "scripts/personalize.py": "e2b8f3d6f151ab81d3c56dc80c85f17a084dd65b20a9c205921ee0d71bbd6209",
+        "scripts/run_experiment.py": "2a5aca2ae641347698e358fa72515cf112aab93d7db54363364a331da9661458",
+        "scripts/stamp_provenance.py": "0941540589cfb7797810f686794f8945cf408a9870c07405e8a1a2ab7e617310",
+        "scripts/stats.py": "fb7dab38e243f1f7d2c6ede6d0c0a6f3326a4d241430c96daad1e43391d582bb",
+        "scripts/threshold_metrics.py": "fc21ac9868d5d934ed3791fddf6840dd0550f0104abb25ae7a211a7803a094d6",
+        "scripts/tuning.py": "c4a03bad87ce4aa637cdabb09cad2a3fd3af44f8261fcc2b0ddbfa27c13f301f",
+        "scripts/update_readme_tables.py": "4e3a0cf11e4f89934c6cc495f8f2e27a2c2a4a52e0edae027a273a627cbbe7c5",
+        "scripts/wrist.py": "2845b718b9f63fa4e7640d06be566918dfd2b27c6a41c40dd8a4d7c99f026ad3"
+      },
+      "primary_benchmark_sha256": "3864d8c60477aec1a67bb63e1a9c134859c53634162476fb2d8c47bfc0b23961"
+    }
+  },
+  "calibration": {
+    "model": "rf",
+    "positive_class": "stress",
+    "n_windows": 869,
+    "n_bins": 15,
+    "brier_definition": "positive_class_mse",
+    "loso": {
+      "ece": 0.07679826164740455,
+      "mce": 0.17716258461380419,
+      "brier": 0.06939908614815746,
+      "reliability": [
+        {
+          "confidence": 0.5199848534927303,
+          "accuracy": 0.4482758620689655,
+          "count": 29
+        },
+        {
+          "confidence": 0.566530479211972,
+          "accuracy": 0.7058823529411765,
+          "count": 68
+        },
+        {
+          "confidence": 0.6300744855769183,
+          "accuracy": 0.6190476190476191,
+          "count": 63
+        },
+        {
+          "confidence": 0.7000303978423361,
+          "accuracy": 0.8771929824561403,
+          "count": 57
+        },
+        {
+          "confidence": 0.7675481722665569,
+          "accuracy": 0.8636363636363636,
+          "count": 66
+        },
+        {
+          "confidence": 0.8324468932465137,
+          "accuracy": 0.9897959183673469,
+          "count": 98
+        },
+        {
+          "confidence": 0.902710499077398,
+          "accuracy": 0.9876543209876543,
+          "count": 162
+        },
+        {
+          "confidence": 0.9728027084335081,
+          "accuracy": 1.0,
+          "count": 326
+        }
+      ]
+    },
+    "loso_matched": {
+      "ece": 0.09036039684713013,
+      "mce": 0.3630623943241681,
+      "brier": 0.07342324916991273,
+      "reliability": [
+        {
+          "confidence": 0.5147785109095941,
+          "accuracy": 0.5217391304347826,
+          "count": 23
+        },
+        {
+          "confidence": 0.5686963248811742,
+          "accuracy": 0.6470588235294118,
+          "count": 34
+        },
+        {
+          "confidence": 0.6369376056758319,
+          "accuracy": 1.0,
+          "count": 25
+        },
+        {
+          "confidence": 0.6990008242962837,
+          "accuracy": 0.8,
+          "count": 40
+        },
+        {
+          "confidence": 0.7708042569136249,
+          "accuracy": 0.8421052631578947,
+          "count": 38
+        },
+        {
+          "confidence": 0.8321080591867654,
+          "accuracy": 0.9830508474576272,
+          "count": 59
+        },
+        {
+          "confidence": 0.9038845016593223,
+          "accuracy": 1.0,
+          "count": 78
+        },
+        {
+          "confidence": 0.9674986161219584,
+          "accuracy": 1.0,
+          "count": 142
+        }
+      ]
+    },
+    "within_subject": {
+      "ece": 0.08679310681887316,
+      "mce": 0.2519027892460389,
+      "brier": 0.03807262770829153,
+      "reliability": [
+        {
+          "confidence": 0.520687270453571,
+          "accuracy": 0.4,
+          "count": 5
+        },
+        {
+          "confidence": 0.5662790289357793,
+          "accuracy": 0.8181818181818182,
+          "count": 11
+        },
+        {
+          "confidence": 0.6304030195657381,
+          "accuracy": 0.65,
+          "count": 20
+        },
+        {
+          "confidence": 0.6991297610103487,
+          "accuracy": 0.9,
+          "count": 30
+        },
+        {
+          "confidence": 0.7689106694145903,
+          "accuracy": 1.0,
+          "count": 24
+        },
+        {
+          "confidence": 0.8369753416464591,
+          "accuracy": 0.9836065573770492,
+          "count": 61
+        },
+        {
+          "confidence": 0.9069441414848478,
+          "accuracy": 1.0,
+          "count": 87
+        },
+        {
+          "confidence": 0.971526107976606,
+          "accuracy": 1.0,
+          "count": 201
+        }
+      ]
+    },
+    "recalibrated_isotonic": {
+      "ece": 0.02621080691485835,
+      "mce": 0.350283364455763,
+      "brier": 0.06436896073845343,
+      "reliability": [
+        {
+          "confidence": 0.5227564983256275,
+          "accuracy": 0.3103448275862069,
+          "count": 29
+        },
+        {
+          "confidence": 0.5554975055289597,
+          "accuracy": 0.5483870967741935,
+          "count": 31
+        },
+        {
+          "confidence": 0.6331575144981947,
+          "accuracy": 0.6923076923076923,
+          "count": 26
+        },
+        {
+          "confidence": 0.6981094514122848,
+          "accuracy": 0.34782608695652173,
+          "count": 23
+        },
+        {
+          "confidence": 0.7666785633675121,
+          "accuracy": 0.7619047619047619,
+          "count": 63
+        },
+        {
+          "confidence": 0.8395490440880069,
+          "accuracy": 0.8888888888888888,
+          "count": 27
+        },
+        {
+          "confidence": 0.910405985600722,
+          "accuracy": 0.8958333333333334,
+          "count": 48
+        },
+        {
+          "confidence": 0.9927170345177327,
+          "accuracy": 0.9855305466237942,
+          "count": 622
+        }
+      ]
+    },
+    "recalibrated_sigmoid": {
+      "ece": 0.02803495647615467,
+      "mce": 0.11724763707168806,
+      "brier": 0.06181569081843997,
+      "reliability": [
+        {
+          "confidence": 0.5191159992919483,
+          "accuracy": 0.6363636363636364,
+          "count": 11
+        },
+        {
+          "confidence": 0.5697976501321569,
+          "accuracy": 0.5588235294117647,
+          "count": 34
+        },
+        {
+          "confidence": 0.6367693057106562,
+          "accuracy": 0.6410256410256411,
+          "count": 39
+        },
+        {
+          "confidence": 0.6992546052568431,
+          "accuracy": 0.6666666666666666,
+          "count": 48
+        },
+        {
+          "confidence": 0.7690390477333714,
+          "accuracy": 0.7894736842105263,
+          "count": 38
+        },
+        {
+          "confidence": 0.8342483399844712,
+          "accuracy": 0.8666666666666667,
+          "count": 60
+        },
+        {
+          "confidence": 0.9059597409192671,
+          "accuracy": 0.9279279279279279,
+          "count": 111
+        },
+        {
+          "confidence": 0.9662703969870101,
+          "accuracy": 0.9962121212121212,
+          "count": 528
+        }
+      ]
+    },
+    "calibration_optimism_gap_ece": 0.0036,
+    "recalibration_reduction_ece": 0.0506,
+    "gap_significance": {
+      "n_subjects": 15,
+      "mean_brier_gap": 0.03498195171657161,
+      "ci95": [
+        0.019064131291025573,
+        0.05467607256156426
+      ],
+      "wilcoxon_p": 6.103515625e-05,
+      "effect_size": {
+        "cohens_d": 0.9561559359187687,
+        "hedges_g": 0.9038424735278818,
+        "n": 15
+      },
+      "per_subject": {
+        "S10": {
+          "loso": 0.18670079012096827,
+          "within": 0.05328751184956848
+        },
+        "S11": {
+          "loso": 0.03708505553794641,
+          "within": 0.016904492381428052
+        },
+        "S13": {
+          "loso": 0.14475091495719375,
+          "within": 0.051374470831344735
+        },
+        "S14": {
+          "loso": 0.05950731515664574,
+          "within": 0.03031877026556533
+        },
+        "S15": {
+          "loso": 0.13814121807887447,
+          "within": 0.0861347110666406
+        },
+        "S16": {
+          "loso": 0.003355771379552823,
+          "within": 0.0015127961176624048
+        },
+        "S17": {
+          "loso": 0.05434308424836523,
+          "within": 0.04180189017294171
+        },
+        "S2": {
+          "loso": 0.11636737821164071,
+          "within": 0.08799742285135595
+        },
+        "S3": {
+          "loso": 0.045567389310779485,
+          "within": 0.024472260804823207
+        },
+        "S4": {
+          "loso": 0.010776755527853206,
+          "within": 0.008767938729227421
+        },
+        "S5": {
+          "loso": 0.027745062453354074,
+          "within": 0.01345052297153987
+        },
+        "S6": {
+          "loso": 0.04994260867546754,
+          "within": 0.04005267761401901
+        },
+        "S7": {
+          "loso": 0.09735876567708888,
+          "within": 0.03488643849646049
+        },
+        "S8": {
+          "loso": 0.04171547215438484,
+          "within": 0.023136770701080146
+        },
+        "S9": {
+          "loso": 0.08080264079587089,
+          "within": 0.055332271683754805
+        }
+      }
+    },
+    "decision_curve": {
+      "thresholds": [
+        0.05,
+        0.1,
+        0.15,
+        0.2,
+        0.25,
+        0.3,
+        0.35,
+        0.4,
+        0.45,
+        0.5,
+        0.55,
+        0.6
+      ],
+      "net_benefit_uncalibrated": [
+        0.3306280661377264,
+        0.31466564377956785,
+        0.3067081838489136,
+        0.30350978135788265,
+        0.29382431914077484,
+        0.2845635377280947,
+        0.2770647074444543,
+        0.26620636747219023,
+        0.271890365100952,
+        0.26237054085155354,
+        0.2603247666538806,
+        0.2485615650172612
+      ],
+      "net_benefit_recalibrated": [
+        0.3377142511053237,
+        0.3247666538805779,
+        0.31374805388208216,
+        0.3063866513233602,
+        0.2968929804372842,
+        0.2911392405063291,
+        0.280162875099584,
+        0.2754123513617185,
+        0.2704257767548907,
+        0.25316455696202533,
+        0.2525252525252525,
+        0.2428078250863061
+      ],
+      "treat_all": [
+        0.3192417176427836,
+        0.2814218130673827,
+        0.2391525079536993,
+        0.1915995397008055,
+        0.13770617568085922,
+        0.07611375965806338,
+        0.005045587324068346,
+        -0.07786728039892604,
+        -0.17585521498064655,
+        -0.2934407364787112,
+        -0.4371563738652349,
+        -0.6168009205983889
+      ]
+    },
+    "provenance": {
+      "git_sha": "4f5c02f05f6492bd5da4483b7a5328946969914c",
+      "working_tree_dirty": false,
+      "feature_schema_version": 2,
+      "generated_at": "2026-10-04T08:57:57.578962+00:00",
+      "primary_benchmark_sha256": "3864d8c60477aec1a67bb63e1a9c134859c53634162476fb2d8c47bfc0b23961",
+      "source_file_sha256": {
+        "src/__init__.py": "d3c26d00b0e108f768d60a6db5cc4bf33f2181018845354a8aad0e22c1908ee0",
+        "src/calibration.py": "572e9d6a4e9cec4ad52ca149b51a38e6599888a7ec8608908cc83a4e09c1fc0e",
+        "src/config.py": "6da810691f058451b725a40c112c75efbc5b969e1c00e2ea6dba730c8eb2c23c",
+        "src/data/__init__.py": "b4f425cec36e7973dad882b10fca956ce5adb6ac64d104f008ad80673c7f6c7e",
+        "src/data/loader.py": "f6fa1af374524d1f46c5dc6c9877373061df220b13e1987351e76204953efe5b",
+        "src/dataset.py": "acf2b8ce21f450c76aa9afa76e126cde2bd7f2a63d788b27db3031f1ad51da3b",
+        "src/dataset_wrist.py": "2c968c9e7f674f6046672111085b324f32fc5eddee18ca43cd1ab3ce79598950",
+        "src/datasets/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "src/datasets/non_eeg.py": "68f11503029af1f7a65e1fbf2faac6f5c6dd9a81ddff98e9bba68c50a9cef2ee",
+        "src/datasets/records.py": "5d96d1c68ca814c4fd58b985d892498ddd33abb014492cd2be6f6d337d755f63",
+        "src/features/__init__.py": "48ea617d38171cd70615d6d04d2d4b1d2447b5fe08d0a323747cd81b24e3d539",
+        "src/features/accelerometer_features.py": "827b7ccf5c536aa32767e31f2b3dc14297f1199cb65cb1e5f5efadb4f6f753ed",
+        "src/features/eda_features.py": "ab5901b383c5ea92e4eb95fc8d346f5e682d26d08f06945db976b6e5ac007816",
+        "src/features/feature_pipeline.py": "37947edd56851fe6894d95d6f94ebedba0190b7971eb5ddfc60cf358521831ef",
+        "src/features/hrv_base.py": "44424936c2084091b858ed918bf00296fabe9ae8b715fce69ddec6a61fba9f7e",
+        "src/features/hrv_frequency_domain.py": "5c27ebf5db243b93263e00e2c94a2523093729133e3869df864b5ed7911dbb50",
+        "src/features/hrv_nonlinear.py": "35a10e46e93f2c01f5c9cb8f7fa837d051dce54d7307e755a596ab7ab496aaae",
+        "src/features/hrv_time_domain.py": "0190acbd8ef451278862bf5bd07f48bc2bb8a4b98b7287b4586fbaae69f03021",
+        "src/features/respiration_features.py": "bbdc53242f0c6fd47d438128031158da14bf9eec7867d60675687bfa45b3b132",
+        "src/features/temperature_features.py": "7aaf58fc02d32a12cfd5ed2a3b547609db54451d802276207f50e4181bb73ccc",
+        "src/logging_config.py": "862bf2b798207e11dd474c40f0ee47b11279daeef8b35db5c729707d5c9aeeff",
+        "src/models/__init__.py": "4f23cc600a8f6f23a882b39fae77d071f93e87914025f8f36c2c42570da6f91f",
+        "src/models/dl/__init__.py": "adbc41ee3c0cd000ae5d19bbc33de0a40a44e07e36b31ea79ee30d185a28f0f8",
+        "src/models/dl/cnn_1d.py": "ffd9ac5ae88b4fcb400d93136767a4350d4d834203a7a9e3a58d4130712ea7d0",
+        "src/models/ml/__init__.py": "a20bd57c0830414be0f60ca4e5457ed5586005cf0001a3db5815f2e4547187f3",
+        "src/models/ml/classifiers.py": "6d3e004139cd359d8750c895b7ba28a8f0ef40ce4cf29b8dead4cd277308bc0b",
+        "src/portable.py": "d15945c5dfef49cb49a271695da1031d30f2f882d722a6c0395deae1881980ab",
+        "src/preprocessing/__init__.py": "f63cb32bc7acb288264b2678f439f14e30f1071534ccbe04e5ecf711ae4a1f90",
+        "src/preprocessing/ecg_processor.py": "f67cde8d1cb421d16fb3c1adbe7b365de1b3f7d39b2027df42f1ccd75d3c02ef",
+        "src/preprocessing/eda_processor.py": "68050850b56998c59548241e74bb1c0a2a737ba29c5572a44bfef4e2885a3867",
+        "src/preprocessing/filters.py": "6b21326d221f373ad3310ec0a9a9b722973344d011a960d47d2c65106459cb1b",
+        "src/synthetic.py": "df2cdc11767ca315f8c9cb8c522920fe1b2925a462616226f3dd190c9cc23256",
+        "src/utils.py": "5775968c009962b032ffe5d914e6a192cd872e49b43d47c02c184bbf82802e95",
+        "scripts/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "scripts/ablation.py": "1947542011f456fc015198aeca21cff0a8581eaac563e7c251379acca9148667",
+        "scripts/build_dashboard_data.py": "7f16ba786ffdaa8f4f10346d90409a49684afeb4b48c2bf8d9d1810138c7b145",
+        "scripts/calibration.py": "fea65b408f9c0a16fa86fd8606cf98b88e2335c3217b21ac6e3fd729f9d0e80e",
+        "scripts/cross_dataset.py": "6c91f9a57ee3364694a59caaeedc4f0a8a16e2314c173af8f8a4b8bcaa5f0c8b",
+        "scripts/download_data.py": "9ea501fd5a88e244b818b09a409dde11e9d473c1de1d9480ec6769c2be293d61",
+        "scripts/export_signals.py": "650d9749ee43e467615cfc168e4fa7a9da07ddb6893b2bee42e0fae6ca66d560",
+        "scripts/personalize.py": "e2b8f3d6f151ab81d3c56dc80c85f17a084dd65b20a9c205921ee0d71bbd6209",
+        "scripts/run_experiment.py": "2a5aca2ae641347698e358fa72515cf112aab93d7db54363364a331da9661458",
+        "scripts/stamp_provenance.py": "0941540589cfb7797810f686794f8945cf408a9870c07405e8a1a2ab7e617310",
+        "scripts/stats.py": "fb7dab38e243f1f7d2c6ede6d0c0a6f3326a4d241430c96daad1e43391d582bb",
+        "scripts/threshold_metrics.py": "fc21ac9868d5d934ed3791fddf6840dd0550f0104abb25ae7a211a7803a094d6",
+        "scripts/tuning.py": "c4a03bad87ce4aa637cdabb09cad2a3fd3af44f8261fcc2b0ddbfa27c13f301f",
+        "scripts/update_readme_tables.py": "4e3a0cf11e4f89934c6cc495f8f2e27a2c2a4a52e0edae027a273a627cbbe7c5",
+        "scripts/wrist.py": "2845b718b9f63fa4e7640d06be566918dfd2b27c6a41c40dd8a4d7c99f026ad3"
+      }
+    }
+  },
+  "personalization": {
+    "model": "rf",
+    "brier_definition": "positive_class_mse",
+    "eval_frac": 0.5,
+    "k_values": [
+      5,
+      10,
+      20
+    ],
+    "n_subjects": 15,
+    "uncalibrated": {
+      "ece": 0.1622200690143117,
+      "brier": 0.0734771978547732
+    },
+    "global": {
+      "ece": 0.099318045690849,
+      "brier": 0.07081306797752952
+    },
+    "fewshot": {
+      "5": {
+        "ece": 0.09905589106523488,
+        "brier": 0.06094267938254643
+      },
+      "10": {
+        "ece": 0.08301287117405313,
+        "brier": 0.06134685022300026
+      },
+      "20": {
+        "ece": 0.07843912479159916,
+        "brier": 0.06340786363385216
+      }
+    },
+    "provenance": {
+      "git_sha": "4f5c02f05f6492bd5da4483b7a5328946969914c",
+      "working_tree_dirty": false,
+      "feature_schema_version": 2,
+      "generated_at": "2026-10-04T08:59:38.048853+00:00",
+      "primary_benchmark_sha256": "3864d8c60477aec1a67bb63e1a9c134859c53634162476fb2d8c47bfc0b23961",
+      "source_file_sha256": {
+        "src/__init__.py": "d3c26d00b0e108f768d60a6db5cc4bf33f2181018845354a8aad0e22c1908ee0",
+        "src/calibration.py": "572e9d6a4e9cec4ad52ca149b51a38e6599888a7ec8608908cc83a4e09c1fc0e",
+        "src/config.py": "6da810691f058451b725a40c112c75efbc5b969e1c00e2ea6dba730c8eb2c23c",
+        "src/data/__init__.py": "b4f425cec36e7973dad882b10fca956ce5adb6ac64d104f008ad80673c7f6c7e",
+        "src/data/loader.py": "f6fa1af374524d1f46c5dc6c9877373061df220b13e1987351e76204953efe5b",
+        "src/dataset.py": "acf2b8ce21f450c76aa9afa76e126cde2bd7f2a63d788b27db3031f1ad51da3b",
+        "src/dataset_wrist.py": "2c968c9e7f674f6046672111085b324f32fc5eddee18ca43cd1ab3ce79598950",
+        "src/datasets/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "src/datasets/non_eeg.py": "68f11503029af1f7a65e1fbf2faac6f5c6dd9a81ddff98e9bba68c50a9cef2ee",
+        "src/datasets/records.py": "5d96d1c68ca814c4fd58b985d892498ddd33abb014492cd2be6f6d337d755f63",
+        "src/features/__init__.py": "48ea617d38171cd70615d6d04d2d4b1d2447b5fe08d0a323747cd81b24e3d539",
+        "src/features/accelerometer_features.py": "827b7ccf5c536aa32767e31f2b3dc14297f1199cb65cb1e5f5efadb4f6f753ed",
+        "src/features/eda_features.py": "ab5901b383c5ea92e4eb95fc8d346f5e682d26d08f06945db976b6e5ac007816",
+        "src/features/feature_pipeline.py": "37947edd56851fe6894d95d6f94ebedba0190b7971eb5ddfc60cf358521831ef",
+        "src/features/hrv_base.py": "44424936c2084091b858ed918bf00296fabe9ae8b715fce69ddec6a61fba9f7e",
+        "src/features/hrv_frequency_domain.py": "5c27ebf5db243b93263e00e2c94a2523093729133e3869df864b5ed7911dbb50",
+        "src/features/hrv_nonlinear.py": "35a10e46e93f2c01f5c9cb8f7fa837d051dce54d7307e755a596ab7ab496aaae",
+        "src/features/hrv_time_domain.py": "0190acbd8ef451278862bf5bd07f48bc2bb8a4b98b7287b4586fbaae69f03021",
+        "src/features/respiration_features.py": "bbdc53242f0c6fd47d438128031158da14bf9eec7867d60675687bfa45b3b132",
+        "src/features/temperature_features.py": "7aaf58fc02d32a12cfd5ed2a3b547609db54451d802276207f50e4181bb73ccc",
+        "src/logging_config.py": "862bf2b798207e11dd474c40f0ee47b11279daeef8b35db5c729707d5c9aeeff",
+        "src/models/__init__.py": "4f23cc600a8f6f23a882b39fae77d071f93e87914025f8f36c2c42570da6f91f",
+        "src/models/dl/__init__.py": "adbc41ee3c0cd000ae5d19bbc33de0a40a44e07e36b31ea79ee30d185a28f0f8",
+        "src/models/dl/cnn_1d.py": "ffd9ac5ae88b4fcb400d93136767a4350d4d834203a7a9e3a58d4130712ea7d0",
+        "src/models/ml/__init__.py": "a20bd57c0830414be0f60ca4e5457ed5586005cf0001a3db5815f2e4547187f3",
+        "src/models/ml/classifiers.py": "6d3e004139cd359d8750c895b7ba28a8f0ef40ce4cf29b8dead4cd277308bc0b",
+        "src/portable.py": "d15945c5dfef49cb49a271695da1031d30f2f882d722a6c0395deae1881980ab",
+        "src/preprocessing/__init__.py": "f63cb32bc7acb288264b2678f439f14e30f1071534ccbe04e5ecf711ae4a1f90",
+        "src/preprocessing/ecg_processor.py": "f67cde8d1cb421d16fb3c1adbe7b365de1b3f7d39b2027df42f1ccd75d3c02ef",
+        "src/preprocessing/eda_processor.py": "68050850b56998c59548241e74bb1c0a2a737ba29c5572a44bfef4e2885a3867",
+        "src/preprocessing/filters.py": "6b21326d221f373ad3310ec0a9a9b722973344d011a960d47d2c65106459cb1b",
+        "src/synthetic.py": "df2cdc11767ca315f8c9cb8c522920fe1b2925a462616226f3dd190c9cc23256",
+        "src/utils.py": "5775968c009962b032ffe5d914e6a192cd872e49b43d47c02c184bbf82802e95",
+        "scripts/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "scripts/ablation.py": "1947542011f456fc015198aeca21cff0a8581eaac563e7c251379acca9148667",
+        "scripts/build_dashboard_data.py": "7f16ba786ffdaa8f4f10346d90409a49684afeb4b48c2bf8d9d1810138c7b145",
+        "scripts/calibration.py": "fea65b408f9c0a16fa86fd8606cf98b88e2335c3217b21ac6e3fd729f9d0e80e",
+        "scripts/cross_dataset.py": "6c91f9a57ee3364694a59caaeedc4f0a8a16e2314c173af8f8a4b8bcaa5f0c8b",
+        "scripts/download_data.py": "9ea501fd5a88e244b818b09a409dde11e9d473c1de1d9480ec6769c2be293d61",
+        "scripts/export_signals.py": "650d9749ee43e467615cfc168e4fa7a9da07ddb6893b2bee42e0fae6ca66d560",
+        "scripts/personalize.py": "e2b8f3d6f151ab81d3c56dc80c85f17a084dd65b20a9c205921ee0d71bbd6209",
+        "scripts/run_experiment.py": "2a5aca2ae641347698e358fa72515cf112aab93d7db54363364a331da9661458",
+        "scripts/stamp_provenance.py": "0941540589cfb7797810f686794f8945cf408a9870c07405e8a1a2ab7e617310",
+        "scripts/stats.py": "fb7dab38e243f1f7d2c6ede6d0c0a6f3326a4d241430c96daad1e43391d582bb",
+        "scripts/threshold_metrics.py": "fc21ac9868d5d934ed3791fddf6840dd0550f0104abb25ae7a211a7803a094d6",
+        "scripts/tuning.py": "c4a03bad87ce4aa637cdabb09cad2a3fd3af44f8261fcc2b0ddbfa27c13f301f",
+        "scripts/update_readme_tables.py": "4e3a0cf11e4f89934c6cc495f8f2e27a2c2a4a52e0edae027a273a627cbbe7c5",
+        "scripts/wrist.py": "2845b718b9f63fa4e7640d06be566918dfd2b27c6a41c40dd8a4d7c99f026ad3"
+      }
+    }
+  },
+  "tuning": {
+    "Logistic Regression": {
+      "accuracy_mean": 0.9017091303446256,
+      "accuracy_std": 0.11156846759920133,
+      "f1_macro_mean": 0.8830139669375331,
+      "balanced_accuracy_mean": 0.8978915860494808,
+      "best_params": {
+        "C": 0.1
+      }
+    },
+    "Random Forest": {
+      "accuracy_mean": 0.9088359914731476,
+      "accuracy_std": 0.10130008527116535,
+      "f1_macro_mean": 0.8877878966532035,
+      "balanced_accuracy_mean": 0.895969664425042,
+      "best_params": {
+        "max_depth": 6,
+        "min_samples_leaf": 5,
+        "n_estimators": 400
+      }
+    },
+    "XGBoost": {
+      "accuracy_mean": 0.8823388931445463,
+      "accuracy_std": 0.13690380733688104,
+      "f1_macro_mean": 0.852197380400339,
+      "balanced_accuracy_mean": 0.8694615876538073,
+      "best_params": {
+        "learning_rate": 0.1,
+        "max_depth": 3,
+        "scale_pos_weight": 1
+      }
+    },
+    "LightGBM": {
+      "accuracy_mean": 0.8910881865251827,
+      "accuracy_std": 0.11429436561700512,
+      "f1_macro_mean": 0.8565113934300375,
+      "balanced_accuracy_mean": 0.8688218955381425,
+      "best_params": {
+        "learning_rate": 0.1,
+        "n_estimators": 400,
+        "num_leaves": 31
+      }
+    },
+    "provenance": {
+      "git_sha": "4f5c02f05f6492bd5da4483b7a5328946969914c",
+      "working_tree_dirty": false,
+      "feature_schema_version": 2,
+      "generated_at": "2026-10-04T09:02:04.466121+00:00",
+      "primary_benchmark_sha256": "3864d8c60477aec1a67bb63e1a9c134859c53634162476fb2d8c47bfc0b23961",
+      "source_file_sha256": {
+        "src/__init__.py": "d3c26d00b0e108f768d60a6db5cc4bf33f2181018845354a8aad0e22c1908ee0",
+        "src/calibration.py": "572e9d6a4e9cec4ad52ca149b51a38e6599888a7ec8608908cc83a4e09c1fc0e",
+        "src/config.py": "6da810691f058451b725a40c112c75efbc5b969e1c00e2ea6dba730c8eb2c23c",
+        "src/data/__init__.py": "b4f425cec36e7973dad882b10fca956ce5adb6ac64d104f008ad80673c7f6c7e",
+        "src/data/loader.py": "f6fa1af374524d1f46c5dc6c9877373061df220b13e1987351e76204953efe5b",
+        "src/dataset.py": "acf2b8ce21f450c76aa9afa76e126cde2bd7f2a63d788b27db3031f1ad51da3b",
+        "src/dataset_wrist.py": "2c968c9e7f674f6046672111085b324f32fc5eddee18ca43cd1ab3ce79598950",
+        "src/datasets/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "src/datasets/non_eeg.py": "68f11503029af1f7a65e1fbf2faac6f5c6dd9a81ddff98e9bba68c50a9cef2ee",
+        "src/datasets/records.py": "5d96d1c68ca814c4fd58b985d892498ddd33abb014492cd2be6f6d337d755f63",
+        "src/features/__init__.py": "48ea617d38171cd70615d6d04d2d4b1d2447b5fe08d0a323747cd81b24e3d539",
+        "src/features/accelerometer_features.py": "827b7ccf5c536aa32767e31f2b3dc14297f1199cb65cb1e5f5efadb4f6f753ed",
+        "src/features/eda_features.py": "ab5901b383c5ea92e4eb95fc8d346f5e682d26d08f06945db976b6e5ac007816",
+        "src/features/feature_pipeline.py": "37947edd56851fe6894d95d6f94ebedba0190b7971eb5ddfc60cf358521831ef",
+        "src/features/hrv_base.py": "44424936c2084091b858ed918bf00296fabe9ae8b715fce69ddec6a61fba9f7e",
+        "src/features/hrv_frequency_domain.py": "5c27ebf5db243b93263e00e2c94a2523093729133e3869df864b5ed7911dbb50",
+        "src/features/hrv_nonlinear.py": "35a10e46e93f2c01f5c9cb8f7fa837d051dce54d7307e755a596ab7ab496aaae",
+        "src/features/hrv_time_domain.py": "0190acbd8ef451278862bf5bd07f48bc2bb8a4b98b7287b4586fbaae69f03021",
+        "src/features/respiration_features.py": "bbdc53242f0c6fd47d438128031158da14bf9eec7867d60675687bfa45b3b132",
+        "src/features/temperature_features.py": "7aaf58fc02d32a12cfd5ed2a3b547609db54451d802276207f50e4181bb73ccc",
+        "src/logging_config.py": "862bf2b798207e11dd474c40f0ee47b11279daeef8b35db5c729707d5c9aeeff",
+        "src/models/__init__.py": "4f23cc600a8f6f23a882b39fae77d071f93e87914025f8f36c2c42570da6f91f",
+        "src/models/dl/__init__.py": "adbc41ee3c0cd000ae5d19bbc33de0a40a44e07e36b31ea79ee30d185a28f0f8",
+        "src/models/dl/cnn_1d.py": "ffd9ac5ae88b4fcb400d93136767a4350d4d834203a7a9e3a58d4130712ea7d0",
+        "src/models/ml/__init__.py": "a20bd57c0830414be0f60ca4e5457ed5586005cf0001a3db5815f2e4547187f3",
+        "src/models/ml/classifiers.py": "6d3e004139cd359d8750c895b7ba28a8f0ef40ce4cf29b8dead4cd277308bc0b",
+        "src/portable.py": "d15945c5dfef49cb49a271695da1031d30f2f882d722a6c0395deae1881980ab",
+        "src/preprocessing/__init__.py": "f63cb32bc7acb288264b2678f439f14e30f1071534ccbe04e5ecf711ae4a1f90",
+        "src/preprocessing/ecg_processor.py": "f67cde8d1cb421d16fb3c1adbe7b365de1b3f7d39b2027df42f1ccd75d3c02ef",
+        "src/preprocessing/eda_processor.py": "68050850b56998c59548241e74bb1c0a2a737ba29c5572a44bfef4e2885a3867",
+        "src/preprocessing/filters.py": "6b21326d221f373ad3310ec0a9a9b722973344d011a960d47d2c65106459cb1b",
+        "src/synthetic.py": "df2cdc11767ca315f8c9cb8c522920fe1b2925a462616226f3dd190c9cc23256",
+        "src/utils.py": "5775968c009962b032ffe5d914e6a192cd872e49b43d47c02c184bbf82802e95",
+        "scripts/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "scripts/ablation.py": "1947542011f456fc015198aeca21cff0a8581eaac563e7c251379acca9148667",
+        "scripts/build_dashboard_data.py": "7f16ba786ffdaa8f4f10346d90409a49684afeb4b48c2bf8d9d1810138c7b145",
+        "scripts/calibration.py": "fea65b408f9c0a16fa86fd8606cf98b88e2335c3217b21ac6e3fd729f9d0e80e",
+        "scripts/cross_dataset.py": "6c91f9a57ee3364694a59caaeedc4f0a8a16e2314c173af8f8a4b8bcaa5f0c8b",
+        "scripts/download_data.py": "9ea501fd5a88e244b818b09a409dde11e9d473c1de1d9480ec6769c2be293d61",
+        "scripts/export_signals.py": "650d9749ee43e467615cfc168e4fa7a9da07ddb6893b2bee42e0fae6ca66d560",
+        "scripts/personalize.py": "e2b8f3d6f151ab81d3c56dc80c85f17a084dd65b20a9c205921ee0d71bbd6209",
+        "scripts/run_experiment.py": "2a5aca2ae641347698e358fa72515cf112aab93d7db54363364a331da9661458",
+        "scripts/stamp_provenance.py": "0941540589cfb7797810f686794f8945cf408a9870c07405e8a1a2ab7e617310",
+        "scripts/stats.py": "fb7dab38e243f1f7d2c6ede6d0c0a6f3326a4d241430c96daad1e43391d582bb",
+        "scripts/threshold_metrics.py": "fc21ac9868d5d934ed3791fddf6840dd0550f0104abb25ae7a211a7803a094d6",
+        "scripts/tuning.py": "c4a03bad87ce4aa637cdabb09cad2a3fd3af44f8261fcc2b0ddbfa27c13f301f",
+        "scripts/update_readme_tables.py": "4e3a0cf11e4f89934c6cc495f8f2e27a2c2a4a52e0edae027a273a627cbbe7c5",
+        "scripts/wrist.py": "2845b718b9f63fa4e7640d06be566918dfd2b27c6a41c40dd8a4d7c99f026ad3"
+      }
+    }
+  },
+  "ablation": [
+    {
+      "subset": "All features",
+      "n_features": 58,
+      "accuracy_mean": 0.909871773017404,
+      "accuracy_std": 0.0997417836430727,
+      "f1_macro_mean": 0.8954574217496878
+    },
+    {
+      "subset": "No motion (HRV+EDA+TEMP+RESP)",
+      "n_features": 53,
+      "accuracy_mean": 0.9012171664586784,
+      "accuracy_std": 0.1331654260548549,
+      "f1_macro_mean": 0.8911745758156677
+    },
+    {
+      "subset": "Autonomic (HRV+EDA)",
+      "n_features": 45,
+      "accuracy_mean": 0.8942012824790304,
+      "accuracy_std": 0.1302373624960402,
+      "f1_macro_mean": 0.8825880565086421
+    },
+    {
+      "subset": "HRV only",
+      "n_features": 30,
+      "accuracy_mean": 0.8098511396362962,
+      "accuracy_std": 0.1556504449843618,
+      "f1_macro_mean": 0.7770370744213463
+    },
+    {
+      "subset": "EDA only",
+      "n_features": 15,
+      "accuracy_mean": 0.8280149288265276,
+      "accuracy_std": 0.1278242330897043,
+      "f1_macro_mean": 0.8029723389993931
+    },
+    {
+      "subset": "Motion only (ACC)",
+      "n_features": 5,
+      "accuracy_mean": 0.884758068444891,
+      "accuracy_std": 0.0806252403036477,
+      "f1_macro_mean": 0.870252363040202
+    }
+  ],
+  "unverified_sections": [],
+  "benchmark_provenance": {
+    "git_sha": "4f5c02f05f6492bd5da4483b7a5328946969914c",
+    "working_tree_dirty": false,
+    "feature_schema_version": 2,
+    "generated_at": "2026-10-04T08:41:57.991010+00:00",
+    "source_file_sha256": {
+      "src/__init__.py": "d3c26d00b0e108f768d60a6db5cc4bf33f2181018845354a8aad0e22c1908ee0",
+      "src/calibration.py": "572e9d6a4e9cec4ad52ca149b51a38e6599888a7ec8608908cc83a4e09c1fc0e",
+      "src/config.py": "6da810691f058451b725a40c112c75efbc5b969e1c00e2ea6dba730c8eb2c23c",
+      "src/data/__init__.py": "b4f425cec36e7973dad882b10fca956ce5adb6ac64d104f008ad80673c7f6c7e",
+      "src/data/loader.py": "f6fa1af374524d1f46c5dc6c9877373061df220b13e1987351e76204953efe5b",
+      "src/dataset.py": "acf2b8ce21f450c76aa9afa76e126cde2bd7f2a63d788b27db3031f1ad51da3b",
+      "src/dataset_wrist.py": "2c968c9e7f674f6046672111085b324f32fc5eddee18ca43cd1ab3ce79598950",
+      "src/datasets/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "src/datasets/non_eeg.py": "68f11503029af1f7a65e1fbf2faac6f5c6dd9a81ddff98e9bba68c50a9cef2ee",
+      "src/datasets/records.py": "5d96d1c68ca814c4fd58b985d892498ddd33abb014492cd2be6f6d337d755f63",
+      "src/features/__init__.py": "48ea617d38171cd70615d6d04d2d4b1d2447b5fe08d0a323747cd81b24e3d539",
+      "src/features/accelerometer_features.py": "827b7ccf5c536aa32767e31f2b3dc14297f1199cb65cb1e5f5efadb4f6f753ed",
+      "src/features/eda_features.py": "ab5901b383c5ea92e4eb95fc8d346f5e682d26d08f06945db976b6e5ac007816",
+      "src/features/feature_pipeline.py": "37947edd56851fe6894d95d6f94ebedba0190b7971eb5ddfc60cf358521831ef",
+      "src/features/hrv_base.py": "44424936c2084091b858ed918bf00296fabe9ae8b715fce69ddec6a61fba9f7e",
+      "src/features/hrv_frequency_domain.py": "5c27ebf5db243b93263e00e2c94a2523093729133e3869df864b5ed7911dbb50",
+      "src/features/hrv_nonlinear.py": "35a10e46e93f2c01f5c9cb8f7fa837d051dce54d7307e755a596ab7ab496aaae",
+      "src/features/hrv_time_domain.py": "0190acbd8ef451278862bf5bd07f48bc2bb8a4b98b7287b4586fbaae69f03021",
+      "src/features/respiration_features.py": "bbdc53242f0c6fd47d438128031158da14bf9eec7867d60675687bfa45b3b132",
+      "src/features/temperature_features.py": "7aaf58fc02d32a12cfd5ed2a3b547609db54451d802276207f50e4181bb73ccc",
+      "src/logging_config.py": "862bf2b798207e11dd474c40f0ee47b11279daeef8b35db5c729707d5c9aeeff",
+      "src/models/__init__.py": "4f23cc600a8f6f23a882b39fae77d071f93e87914025f8f36c2c42570da6f91f",
+      "src/models/dl/__init__.py": "adbc41ee3c0cd000ae5d19bbc33de0a40a44e07e36b31ea79ee30d185a28f0f8",
+      "src/models/dl/cnn_1d.py": "ffd9ac5ae88b4fcb400d93136767a4350d4d834203a7a9e3a58d4130712ea7d0",
+      "src/models/ml/__init__.py": "a20bd57c0830414be0f60ca4e5457ed5586005cf0001a3db5815f2e4547187f3",
+      "src/models/ml/classifiers.py": "6d3e004139cd359d8750c895b7ba28a8f0ef40ce4cf29b8dead4cd277308bc0b",
+      "src/portable.py": "d15945c5dfef49cb49a271695da1031d30f2f882d722a6c0395deae1881980ab",
+      "src/preprocessing/__init__.py": "f63cb32bc7acb288264b2678f439f14e30f1071534ccbe04e5ecf711ae4a1f90",
+      "src/preprocessing/ecg_processor.py": "f67cde8d1cb421d16fb3c1adbe7b365de1b3f7d39b2027df42f1ccd75d3c02ef",
+      "src/preprocessing/eda_processor.py": "68050850b56998c59548241e74bb1c0a2a737ba29c5572a44bfef4e2885a3867",
+      "src/preprocessing/filters.py": "6b21326d221f373ad3310ec0a9a9b722973344d011a960d47d2c65106459cb1b",
+      "src/synthetic.py": "df2cdc11767ca315f8c9cb8c522920fe1b2925a462616226f3dd190c9cc23256",
+      "src/utils.py": "5775968c009962b032ffe5d914e6a192cd872e49b43d47c02c184bbf82802e95",
+      "scripts/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scripts/ablation.py": "1947542011f456fc015198aeca21cff0a8581eaac563e7c251379acca9148667",
+      "scripts/build_dashboard_data.py": "7f16ba786ffdaa8f4f10346d90409a49684afeb4b48c2bf8d9d1810138c7b145",
+      "scripts/calibration.py": "fea65b408f9c0a16fa86fd8606cf98b88e2335c3217b21ac6e3fd729f9d0e80e",
+      "scripts/cross_dataset.py": "6c91f9a57ee3364694a59caaeedc4f0a8a16e2314c173af8f8a4b8bcaa5f0c8b",
+      "scripts/download_data.py": "9ea501fd5a88e244b818b09a409dde11e9d473c1de1d9480ec6769c2be293d61",
+      "scripts/export_signals.py": "650d9749ee43e467615cfc168e4fa7a9da07ddb6893b2bee42e0fae6ca66d560",
+      "scripts/personalize.py": "e2b8f3d6f151ab81d3c56dc80c85f17a084dd65b20a9c205921ee0d71bbd6209",
+      "scripts/run_experiment.py": "2a5aca2ae641347698e358fa72515cf112aab93d7db54363364a331da9661458",
+      "scripts/stamp_provenance.py": "0941540589cfb7797810f686794f8945cf408a9870c07405e8a1a2ab7e617310",
+      "scripts/stats.py": "fb7dab38e243f1f7d2c6ede6d0c0a6f3326a4d241430c96daad1e43391d582bb",
+      "scripts/threshold_metrics.py": "fc21ac9868d5d934ed3791fddf6840dd0550f0104abb25ae7a211a7803a094d6",
+      "scripts/tuning.py": "c4a03bad87ce4aa637cdabb09cad2a3fd3af44f8261fcc2b0ddbfa27c13f301f",
+      "scripts/update_readme_tables.py": "4e3a0cf11e4f89934c6cc495f8f2e27a2c2a4a52e0edae027a273a627cbbe7c5",
+      "scripts/wrist.py": "2845b718b9f63fa4e7640d06be566918dfd2b27c6a41c40dd8a4d7c99f026ad3"
+    }
+  },
+  "benchmark_source_matches_current": false
+};
+
+export default data;

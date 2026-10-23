@@ -1,0 +1,5 @@
+-r requirements.txt
+coverage>=7.0,<8.0
+black>=26.0,<27.0
+pyflakes>=3.4,<4.0
+pyright>=1.1,<2.0

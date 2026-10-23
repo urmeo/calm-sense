@@ -1,0 +1,25 @@
+{
+  "name": "calmsense-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node build.mjs dev",
+    "test": "node --experimental-strip-types --test tests/*.test.mjs",
+    "build": "tsc && node build.mjs build",
+    "preview": "node build.mjs preview"
+  },
+  "dependencies": {
+    "lucide-react": "^1.23.0",
+    "echarts": "^6.1.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.18.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "esbuild": "^0.28.2",
+    "typescript": "^6.0.0"
+  }
+}

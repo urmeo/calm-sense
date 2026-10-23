@@ -1,0 +1,251 @@
+{
+  "git_sha": "4f5c02f05f6492bd5da4483b7a5328946969914c",
+  "working_tree_dirty": false,
+  "feature_schema_version": 2,
+  "generated_at": "2026-10-04T09:05:02.671772+00:00",
+  "provenance_kind": "validated_reproduction",
+  "seed": 42,
+  "python": "3.12.14",
+  "packages": {
+    "numpy": "2.5.3",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.6.1",
+    "pandas": "2.3.3",
+    "neurokit2": "0.2.12",
+    "xgboost": "2.1.4",
+    "lightgbm": "4.7.0",
+    "torch": "2.14.1",
+    "shap": "0.52.0"
+  },
+  "data": {
+    "dataset": "WESAD",
+    "n_reference_subjects": 15,
+    "checksum_manifest_sha256": "9128fcd472a977ead540eadd5f83c279ac55f751a56a3405cba23e183eeac92b"
+  },
+  "result_sha256": {
+    "ablation.csv": "313558c6150079e986ab68deedd70d2fc5722485b1b6161a104112a4be6da96c",
+    "binary_model_comparison.csv": "d03c8e33156cd443ba640b7e9c8660be9de85918242a6913024f8956db160f01",
+    "binary_per_subject.csv": "d438d299103106ca8865229c1a378c138b560fce443345d81fa20fa53e5aa8cd",
+    "calibration.json": "32d6194582d4c1a65748167af2dce8a96d59aaf836c91bfae9b5e7757f88c192",
+    "cross_dataset.json": "6eef8f6bad1bc4ba5e8e2e47ed07e820fd68889dfb1fee23947bb86ff93a5425",
+    "metrics.json": "3864d8c60477aec1a67bb63e1a9c134859c53634162476fb2d8c47bfc0b23961",
+    "multiclass_model_comparison.csv": "887962524c8b492a9ee9b07157608880700b351ad3c99b6685673d433c200984",
+    "multiclass_per_subject.csv": "a5353585274865544b151b19baae5c926c1006a07d0a24dad7d0a443587149e0",
+    "personalization.json": "467570a4a501eed22208be9f4a34a3e75ac4bce1526d8e04aa0b97a39565d13d",
+    "shap_top_features.csv": "bd452975bc3bd189c95bff2c74344d09d0a3b6aba1a1605e6c87793f44eb207d",
+    "stats.json": "8bb85df1690e0673c82ff0e2d822984ce80a002d4902f1d7be031e6473ff4d7f",
+    "threshold_metrics.json": "951b1c7c3333a521502d45fdb3e2647d3f7f84876bac6b53b233576b69770a21",
+    "tuning.json": "50ac6007fda190188af8490df8bd358b1a757ef9e5dbab6b6cafb0758c333e64",
+    "wrist.json": "19f3d34978f79b916ceb0315cbbe8b9f86743041f51ee95f0ea8708eedbb99fe"
+  },
+  "primary_benchmark_sha256": "3864d8c60477aec1a67bb63e1a9c134859c53634162476fb2d8c47bfc0b23961",
+  "benchmark_source": {
+    "git_sha": "4f5c02f05f6492bd5da4483b7a5328946969914c",
+    "working_tree_dirty": false,
+    "feature_schema_version": 2,
+    "generated_at": "2026-10-04T08:41:57.991010+00:00",
+    "source_file_sha256": {
+      "src/__init__.py": "d3c26d00b0e108f768d60a6db5cc4bf33f2181018845354a8aad0e22c1908ee0",
+      "src/calibration.py": "572e9d6a4e9cec4ad52ca149b51a38e6599888a7ec8608908cc83a4e09c1fc0e",
+      "src/config.py": "6da810691f058451b725a40c112c75efbc5b969e1c00e2ea6dba730c8eb2c23c",
+      "src/data/__init__.py": "b4f425cec36e7973dad882b10fca956ce5adb6ac64d104f008ad80673c7f6c7e",
+      "src/data/loader.py": "f6fa1af374524d1f46c5dc6c9877373061df220b13e1987351e76204953efe5b",
+      "src/dataset.py": "acf2b8ce21f450c76aa9afa76e126cde2bd7f2a63d788b27db3031f1ad51da3b",
+      "src/dataset_wrist.py": "2c968c9e7f674f6046672111085b324f32fc5eddee18ca43cd1ab3ce79598950",
+      "src/datasets/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "src/datasets/non_eeg.py": "68f11503029af1f7a65e1fbf2faac6f5c6dd9a81ddff98e9bba68c50a9cef2ee",
+      "src/datasets/records.py": "5d96d1c68ca814c4fd58b985d892498ddd33abb014492cd2be6f6d337d755f63",
+      "src/features/__init__.py": "48ea617d38171cd70615d6d04d2d4b1d2447b5fe08d0a323747cd81b24e3d539",
+      "src/features/accelerometer_features.py": "827b7ccf5c536aa32767e31f2b3dc14297f1199cb65cb1e5f5efadb4f6f753ed",
+      "src/features/eda_features.py": "ab5901b383c5ea92e4eb95fc8d346f5e682d26d08f06945db976b6e5ac007816",
+      "src/features/feature_pipeline.py": "37947edd56851fe6894d95d6f94ebedba0190b7971eb5ddfc60cf358521831ef",
+      "src/features/hrv_base.py": "44424936c2084091b858ed918bf00296fabe9ae8b715fce69ddec6a61fba9f7e",
+      "src/features/hrv_frequency_domain.py": "5c27ebf5db243b93263e00e2c94a2523093729133e3869df864b5ed7911dbb50",
+      "src/features/hrv_nonlinear.py": "35a10e46e93f2c01f5c9cb8f7fa837d051dce54d7307e755a596ab7ab496aaae",
+      "src/features/hrv_time_domain.py": "0190acbd8ef451278862bf5bd07f48bc2bb8a4b98b7287b4586fbaae69f03021",
+      "src/features/respiration_features.py": "bbdc53242f0c6fd47d438128031158da14bf9eec7867d60675687bfa45b3b132",
+      "src/features/temperature_features.py": "7aaf58fc02d32a12cfd5ed2a3b547609db54451d802276207f50e4181bb73ccc",
+      "src/logging_config.py": "862bf2b798207e11dd474c40f0ee47b11279daeef8b35db5c729707d5c9aeeff",
+      "src/models/__init__.py": "4f23cc600a8f6f23a882b39fae77d071f93e87914025f8f36c2c42570da6f91f",
+      "src/models/dl/__init__.py": "adbc41ee3c0cd000ae5d19bbc33de0a40a44e07e36b31ea79ee30d185a28f0f8",
+      "src/models/dl/cnn_1d.py": "ffd9ac5ae88b4fcb400d93136767a4350d4d834203a7a9e3a58d4130712ea7d0",
+      "src/models/ml/__init__.py": "a20bd57c0830414be0f60ca4e5457ed5586005cf0001a3db5815f2e4547187f3",
+      "src/models/ml/classifiers.py": "6d3e004139cd359d8750c895b7ba28a8f0ef40ce4cf29b8dead4cd277308bc0b",
+      "src/portable.py": "d15945c5dfef49cb49a271695da1031d30f2f882d722a6c0395deae1881980ab",
+      "src/preprocessing/__init__.py": "f63cb32bc7acb288264b2678f439f14e30f1071534ccbe04e5ecf711ae4a1f90",
+      "src/preprocessing/ecg_processor.py": "f67cde8d1cb421d16fb3c1adbe7b365de1b3f7d39b2027df42f1ccd75d3c02ef",
+      "src/preprocessing/eda_processor.py": "68050850b56998c59548241e74bb1c0a2a737ba29c5572a44bfef4e2885a3867",
+      "src/preprocessing/filters.py": "6b21326d221f373ad3310ec0a9a9b722973344d011a960d47d2c65106459cb1b",
+      "src/synthetic.py": "df2cdc11767ca315f8c9cb8c522920fe1b2925a462616226f3dd190c9cc23256",
+      "src/utils.py": "5775968c009962b032ffe5d914e6a192cd872e49b43d47c02c184bbf82802e95",
+      "scripts/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scripts/ablation.py": "1947542011f456fc015198aeca21cff0a8581eaac563e7c251379acca9148667",
+      "scripts/build_dashboard_data.py": "7f16ba786ffdaa8f4f10346d90409a49684afeb4b48c2bf8d9d1810138c7b145",
+      "scripts/calibration.py": "fea65b408f9c0a16fa86fd8606cf98b88e2335c3217b21ac6e3fd729f9d0e80e",
+      "scripts/cross_dataset.py": "6c91f9a57ee3364694a59caaeedc4f0a8a16e2314c173af8f8a4b8bcaa5f0c8b",
+      "scripts/download_data.py": "9ea501fd5a88e244b818b09a409dde11e9d473c1de1d9480ec6769c2be293d61",
+      "scripts/export_signals.py": "650d9749ee43e467615cfc168e4fa7a9da07ddb6893b2bee42e0fae6ca66d560",
+      "scripts/personalize.py": "e2b8f3d6f151ab81d3c56dc80c85f17a084dd65b20a9c205921ee0d71bbd6209",
+      "scripts/run_experiment.py": "2a5aca2ae641347698e358fa72515cf112aab93d7db54363364a331da9661458",
+      "scripts/stamp_provenance.py": "0941540589cfb7797810f686794f8945cf408a9870c07405e8a1a2ab7e617310",
+      "scripts/stats.py": "fb7dab38e243f1f7d2c6ede6d0c0a6f3326a4d241430c96daad1e43391d582bb",
+      "scripts/threshold_metrics.py": "fc21ac9868d5d934ed3791fddf6840dd0550f0104abb25ae7a211a7803a094d6",
+      "scripts/tuning.py": "c4a03bad87ce4aa637cdabb09cad2a3fd3af44f8261fcc2b0ddbfa27c13f301f",
+      "scripts/update_readme_tables.py": "4e3a0cf11e4f89934c6cc495f8f2e27a2c2a4a52e0edae027a273a627cbbe7c5",
+      "scripts/wrist.py": "2845b718b9f63fa4e7640d06be566918dfd2b27c6a41c40dd8a4d7c99f026ad3"
+    }
+  },
+  "extraction_inputs": {
+    "dataset": "WESAD",
+    "feature_frame_sha256": "61597acfdbea6f3e85514600606efbd3719144e729fb5277b248bb8f4d86463e",
+    "feature_cache_sha256": "455577ed23f04507fb565ef22aaa967cbf0e36ae8031b22a43666aa114b142af",
+    "raw_windows_sha256": "52e04df30bc515ef7e27c24b04632cd9b12835d95e0ce4fe1df658170e71cc9f"
+  },
+  "input_verification": {
+    "checked_at_utc": "2026-10-04T08:22:12.396032+00:00",
+    "wesad": {
+      "subjects": 15,
+      "bytes": 13827624985,
+      "matches_repository_reference": true,
+      "files": [
+        {
+          "file": "raw/WESAD/S2/S2.pkl",
+          "bytes": 975117737,
+          "sha256": "36ef5e8afc0f91998eefba7c12fc9fa97b7b07198cbec0126917d7abb436ca23"
+        },
+        {
+          "file": "raw/WESAD/S3/S3.pkl",
+          "bytes": 1031507132,
+          "sha256": "5c8bd4a82af029c082e610bca28a011fca2ae3b23e14a18458ebb5990be4015e"
+        },
+        {
+          "file": "raw/WESAD/S4/S4.pkl",
+          "bytes": 1034344388,
+          "sha256": "0f0740a79388723360ff12b4f47c465665ea7827d1399b18ac43908daac17900"
+        },
+        {
+          "file": "raw/WESAD/S5/S5.pkl",
+          "bytes": 993435543,
+          "sha256": "74bd187e3a9c1ca4259af52d04974c8e7ff7dc49ceea7e269f499ca98fe6d8ec"
+        },
+        {
+          "file": "raw/WESAD/S6/S6.pkl",
+          "bytes": 1123292444,
+          "sha256": "8aa9bf57b69f4fe5bce06c550230857627c3f05befa2f787151646bb29ee8f62"
+        },
+        {
+          "file": "raw/WESAD/S7/S7.pkl",
+          "bytes": 829424437,
+          "sha256": "9cb62705ae7f53dca327a9a00a6f9fdabf5128d449174ab37594658e912cb6d8"
+        },
+        {
+          "file": "raw/WESAD/S8/S8.pkl",
+          "bytes": 869469022,
+          "sha256": "dac1141dac11d56b3641be982f45da63f05e9d74154f59e6ea0cdcf47fc72710"
+        },
+        {
+          "file": "raw/WESAD/S9/S9.pkl",
+          "bytes": 832647582,
+          "sha256": "24dc004e201bd541f092989443f0a29ebf89e4a227a80bb6b6d1987255039544"
+        },
+        {
+          "file": "raw/WESAD/S10/S10.pkl",
+          "bytes": 867178991,
+          "sha256": "41da29c68366f33650f3d41a6be78107bf6942929c3bb0ef46238078ddddee9f"
+        },
+        {
+          "file": "raw/WESAD/S11/S11.pkl",
+          "bytes": 831090213,
+          "sha256": "f39557a8d660b10154936f51debf2926aea7ebb9b26a168858f59502f914d8f7"
+        },
+        {
+          "file": "raw/WESAD/S13/S13.pkl",
+          "bytes": 885309681,
+          "sha256": "772fb490f19b279e49367271e009fc10d3a3ca1e3456df0d68b9063a73992066"
+        },
+        {
+          "file": "raw/WESAD/S14/S14.pkl",
+          "bytes": 881137147,
+          "sha256": "e7bd33c57538319a25c6d53e6a9fb6c1abd12800cfc64bb63275d89de8d2fd60"
+        },
+        {
+          "file": "raw/WESAD/S15/S15.pkl",
+          "bytes": 827715045,
+          "sha256": "1ea573bc6b45ba79fb134f9460d691b86176f60dce23420dc514c28017d4049c"
+        },
+        {
+          "file": "raw/WESAD/S16/S16.pkl",
+          "bytes": 898980304,
+          "sha256": "f65cf40cada75c3e9f5813276d7dcc90359c3b06dec41d68656c0a6e61dbc575"
+        },
+        {
+          "file": "raw/WESAD/S17/S17.pkl",
+          "bytes": 946975319,
+          "sha256": "3315796a75227d54d7b0056736f671484fd2fb85afffa65818fd76aeff2920fa"
+        }
+      ]
+    },
+    "noneeg": {
+      "files": 100,
+      "bytes": 3890140,
+      "matches_publisher_manifest": true,
+      "publisher_manifest_sha256": "41abecbd08535db8de08507750a6c29a59f5d98a242e5d4981b65cf441f1cfaf"
+    }
+  },
+  "extraction_validation": {
+    "retained_windows": 1032,
+    "raw_label_positions_and_retention_verified": true,
+    "minimum_label_purity": 0.9023809523809524,
+    "usable_features": 58,
+    "cnn_shape": [
+      1032,
+      5,
+      1024
+    ],
+    "cnn_finite_and_row_aligned": true
+  },
+  "nested_tuning": {
+    "task": "binary",
+    "outer_validation": "15-subject LOSO",
+    "inner_validation": "3-fold subject GroupKFold",
+    "selection_metric": "balanced_accuracy",
+    "reported_metric": "outer-fold subject mean accuracy",
+    "best_params_summary": "modal selection across outer folds",
+    "default_xgboost_balancing": "training-fold balanced sample weights",
+    "tuned_xgboost_balancing": "scale_pos_weight grid [1, 3]; no sample weights",
+    "inference_bundle": "default benchmark model; tuning models not exported"
+  },
+  "model_sha256": {
+    "stress_classifier.joblib": "72b3550cbd586f2d43d819d9c645e48ea7efb0f859c137fa48527c926fbb3a5f",
+    "stress_classifier.joblib.sha256": "bacf3b1d6b8e415ba3fe0c41556dca60f26043d07b3e0dad5611aa59f72dee26"
+  },
+  "runtime": {
+    "cnn_device": "cpu",
+    "torch_threads": 4,
+    "torch_interop_threads": 1,
+    "openmp_runtime": "scikit-learn bundled libomp.dylib",
+    "openmp_sha256": "7fe04d06d824817d39e4c99ec44e837fd6b5f0f75f2cc3e77a384c298f3f1709"
+  },
+  "publication_artifact_sha256": {
+    "outputs/figures/ablation.png": "a5aee1a5845c57646e872d62a23183929daf42d38d0f4eb6cf8a13da2f0b561d",
+    "outputs/figures/binary_confusion.png": "75d66e2502e426f19f975073d5e334915ab57543d73b9ca82c95caf6f5d558e7",
+    "outputs/figures/binary_model_comparison.png": "a25468210f05300443a1910585f52ae39abbb8f1ed65614a450809b6cae0be64",
+    "outputs/figures/binary_optimism_gap.png": "0b4f40fa76ce8ccd7efaa6fe8eb95633598f4b7acbdeaa0f9fdf4716cced9ecc",
+    "outputs/figures/binary_per_subject.png": "af042972a444b333465380dee478d14b57a39700fdd67659b7e43a1f37b11f76",
+    "outputs/figures/calibration_decision_curve.png": "8054048544f39c0184a6a6a1622b8d49ed0f292be5415ef649fb850207e397b4",
+    "outputs/figures/calibration_reliability.png": "372b4e8c13e9b49ec3af9578a7e44c7c7f1b6a22f3efdf235ff3c7162ee0435c",
+    "outputs/figures/chest_vs_wrist.png": "df4d14509cf8145c7e52eee644fcc7bfc09cc98e912d2db1a9fe8b4dad488bef",
+    "outputs/figures/cross_dataset.png": "1d7ba4c8955d3439315956df3f9997292d5efd24fab097dba5f80ef9564112d5",
+    "outputs/figures/multiclass_confusion.png": "23b7d0ffe92fd808b14851782140cc0d89bbd88ffee3581aa38c4cc5e919fa5c",
+    "outputs/figures/multiclass_model_comparison.png": "b6d1558ab0fac0490ee7caf52ab144b0820f5c11b9f8c5d77c5003dd8391f403",
+    "outputs/figures/personalization.png": "a92df899aaa0a96b58f712a73ed0deb4313becf95ff794df17a8558cf777dfa4",
+    "outputs/figures/shap_beeswarm.png": "b1bf1da7a0ef24ee9e973c2fd357eba68e8ce0579f51f6be54c36c9ed50b6d8b",
+    "outputs/figures/demo.gif": "30d9724adf824d06fbe84f6d2930656f31931d13f9fe6c1fb14bbc3e5ef032e3",
+    "outputs/dashboard/results.ts": "f8e845000b0d1eef61a59450726fad5a1196180cbb3195745b098bd3463c95cb",
+    "outputs/dashboard/signals.ts": "171ad31670b62fe1c011176edcb64816845195af0cd29df3547923dbac6583a6"
+  },
+  "documentation_sha256": {
+    "README.md": "af321d1a9869103a2c3b2fe37a8183642aad3d3e76a12d3739d745b3d7ede552",
+    "CITATION.cff": "d924f7e320a6a11083cbcd8274a704b58ee2f682454569ba393dfd999b7782ab"
+  }
+}

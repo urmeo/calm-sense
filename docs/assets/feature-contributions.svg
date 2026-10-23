@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="921.6pt" height="576pt" viewBox="0 0 921.6 576" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <title>XGBoost feature contributions</title>
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title>XGBoost feature contributions</dc:title>
+    <dc:description>{"benchmark_source": "4f5c02f05f6492bd5da4483b7a5328946969914c", "plotted_data": {"display_labels": {"ACC_magnitude": "ACC · mean magnitude", "ACC_peak_freq": "ACC · peak frequency", "ACC_std": "ACC · magnitude SD", "ACC_zero_crossings": "ACC · zero crossings", "EDA_SCL_max": "EDA · maximum tonic level", "EDA_SCR_amplitude_max": "EDA · maximum SCR amplitude", "EDA_SCR_recovery_time_mean": "EDA · mean SCR half-recovery time", "HRV_MeanNN": "HRV · mean NN interval", "HRV_MedianNN": "HRV · median NN interval", "RESP_rate": "RESP · breathing rate"}, "features": [{"feature": "ACC_zero_crossings", "mean_abs_shap": 1.3297045}, {"feature": "HRV_MedianNN", "mean_abs_shap": 0.9255162}, {"feature": "ACC_std", "mean_abs_shap": 0.8106444}, {"feature": "EDA_SCR_recovery_time_mean", "mean_abs_shap": 0.80219054}, {"feature": "EDA_SCR_amplitude_max", "mean_abs_shap": 0.7674681}, {"feature": "HRV_MeanNN", "mean_abs_shap": 0.666066}, {"feature": "RESP_rate", "mean_abs_shap": 0.57739174}, {"feature": "EDA_SCL_max", "mean_abs_shap": 0.48528534}, {"feature": "ACC_peak_freq", "mean_abs_shap": 0.39472985}, {"feature": "ACC_magnitude", "mean_abs_shap": 0.31361315}], "model": "XGBoost", "scope": "full_data_binary_fit"}, "scope": ["NN means normal-to-normal heartbeat interval; SCR is a skin conductance response.", "These magnitudes describe the fitted model, not held-out accuracy, signed effects or causality."], "source_files": {"outputs/results/metrics.json": "3864d8c60477aec1a67bb63e1a9c134859c53634162476fb2d8c47bfc0b23961", "outputs/results/shap_top_features.csv": "bd452975bc3bd189c95bff2c74344d09d0a3b6aba1a1605e6c87793f44eb207d"}}</dc:description>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.2, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 576
+L 921.6 576
+L 921.6 0
+L 0 0
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 331.776 443.52
+L 884.736 443.52
+L 884.736 149.76
+L 331.776 149.76
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1">
+      <path d="M 331.776 443.52
+L 331.776 149.76
+" clip-path="url(#p60f8a73d67)" style="fill: none; stroke: #e2e8f0; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_2">
+      <defs>
+       <path id="m72c4edd94b" d="M 0 0
+L 0 3.5
+" style="stroke: #52627a; stroke-width: 0.8"/>
+      </defs>
+      <g>
+       <use xlink:href="#m72c4edd94b" x="331.776" y="443.52" style="fill: #52627a; stroke: #52627a; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_1">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #52627a" x="331.776" y="458.877422" transform="rotate(-0 331.776 458.877422)">0.0</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_3">
+      <path d="M 509.490441 443.52
+L 509.490441 149.76
+" clip-path="url(#p60f8a73d67)" style="fill: none; stroke: #e2e8f0; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_4">
+      <g>
+       <use xlink:href="#m72c4edd94b" x="509.490441" y="443.52" style="fill: #52627a; stroke: #52627a; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_2">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #52627a" x="509.490441" y="458.877422" transform="rotate(-0 509.490441 458.877422)">0.5</text>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_5">
+      <path d="M 687.204883 443.52
+L 687.204883 149.76
+" clip-path="url(#p60f8a73d67)" style="fill: none; stroke: #e2e8f0; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_6">
+      <g>
+       <use xlink:href="#m72c4edd94b" x="687.204883" y="443.52" style="fill: #52627a; stroke: #52627a; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_3">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #52627a" x="687.204883" y="458.877422" transform="rotate(-0 687.204883 458.877422)">1.0</text>
+     </g>
+    </g>
+    <g id="xtick_4">
+     <g id="line2d_7">
+      <path d="M 864.919324 443.52
+L 864.919324 149.76
+" clip-path="url(#p60f8a73d67)" style="fill: none; stroke: #e2e8f0; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_8">
+      <g>
+       <use xlink:href="#m72c4edd94b" x="864.919324" y="443.52" style="fill: #52627a; stroke: #52627a; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_4">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #52627a" x="864.919324" y="458.877422" transform="rotate(-0 864.919324 458.877422)">1.5</text>
+     </g>
+    </g>
+    <g id="text_5">
+     <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #52627a" x="608.256" y="479.926406" transform="rotate(-0 608.256 479.926406)">Mean |SHAP|</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_9"/>
+     <g id="text_6">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #52627a" x="321.776" y="175.637322" transform="rotate(-0 321.776 175.637322)">ACC · zero crossings</text>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_10"/>
+     <g id="text_7">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #52627a" x="321.776" y="203.455504" transform="rotate(-0 321.776 203.455504)">HRV · median NN interval</text>
+     </g>
+    </g>
+    <g id="ytick_3">
+     <g id="line2d_11"/>
+     <g id="text_8">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #52627a" x="321.776" y="231.273686" transform="rotate(-0 321.776 231.273686)">ACC · magnitude SD</text>
+     </g>
+    </g>
+    <g id="ytick_4">
+     <g id="line2d_12"/>
+     <g id="text_9">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #52627a" x="321.776" y="259.091868" transform="rotate(-0 321.776 259.091868)">EDA · mean SCR half-recovery time</text>
+     </g>
+    </g>
+    <g id="ytick_5">
+     <g id="line2d_13"/>
+     <g id="text_10">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #52627a" x="321.776" y="286.91005" transform="rotate(-0 321.776 286.91005)">EDA · maximum SCR amplitude</text>
+     </g>
+    </g>
+    <g id="ytick_6">
+     <g id="line2d_14"/>
+     <g id="text_11">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #52627a" x="321.776" y="314.728232" transform="rotate(-0 321.776 314.728232)">HRV · mean NN interval</text>
+     </g>
+    </g>
+    <g id="ytick_7">
+     <g id="line2d_15"/>
+     <g id="text_12">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #52627a" x="321.776" y="342.546413" transform="rotate(-0 321.776 342.546413)">RESP · breathing rate</text>
+     </g>
+    </g>
+    <g id="ytick_8">
+     <g id="line2d_16"/>
+     <g id="text_13">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #52627a" x="321.776" y="370.364595" transform="rotate(-0 321.776 370.364595)">EDA · maximum tonic level</text>
+     </g>
+    </g>
+    <g id="ytick_9">
+     <g id="line2d_17"/>
+     <g id="text_14">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #52627a" x="321.776" y="398.182777" transform="rotate(-0 321.776 398.182777)">ACC · peak frequency</text>
+     </g>
+    </g>
+    <g id="ytick_10">
+     <g id="line2d_18"/>
+     <g id="text_15">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #52627a" x="321.776" y="426.000959" transform="rotate(-0 321.776 426.000959)">ACC · mean magnitude</text>
+     </g>
+    </g>
+   </g>
+   <g id="patch_3">
+    <path d="M 331.776 163.112727
+L 804.391385 163.112727
+L 804.391385 179.803636
+L 331.776 179.803636
+z
+" clip-path="url(#p60f8a73d67)" style="fill: #b45309"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 331.776 190.930909
+L 660.731189 190.930909
+L 660.731189 207.621818
+L 331.776 207.621818
+z
+" clip-path="url(#p60f8a73d67)" style="fill: #2563eb"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 331.776 218.749091
+L 619.902433 218.749091
+L 619.902433 235.44
+L 331.776 235.44
+z
+" clip-path="url(#p60f8a73d67)" style="fill: #b45309"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 331.776 246.567273
+L 616.897687 246.567273
+L 616.897687 263.258182
+L 331.776 263.258182
+z
+" clip-path="url(#p60f8a73d67)" style="fill: #0f766e"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 331.776 274.385455
+L 604.556329 274.385455
+L 604.556329 291.076364
+L 331.776 291.076364
+z
+" clip-path="url(#p60f8a73d67)" style="fill: #0f766e"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 331.776 302.203636
+L 568.515094 302.203636
+L 568.515094 318.894545
+L 331.776 318.894545
+z
+" clip-path="url(#p60f8a73d67)" style="fill: #2563eb"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 331.776 330.021818
+L 536.997701 330.021818
+L 536.997701 346.712727
+L 331.776 346.712727
+z
+" clip-path="url(#p60f8a73d67)" style="fill: #7c3aed"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 331.776 357.84
+L 504.260426 357.84
+L 504.260426 374.530909
+L 331.776 374.530909
+z
+" clip-path="url(#p60f8a73d67)" style="fill: #0f766e"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 331.776 385.658182
+L 472.07439 385.658182
+L 472.07439 402.349091
+L 331.776 402.349091
+z
+" clip-path="url(#p60f8a73d67)" style="fill: #b45309"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 331.776 413.476364
+L 443.243171 413.476364
+L 443.243171 430.167273
+L 331.776 430.167273
+z
+" clip-path="url(#p60f8a73d67)" style="fill: #b45309"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 331.776 443.52
+L 884.736 443.52
+" style="fill: none; stroke: #e2e8f0; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="text_16">
+    <text style="font-weight: 700; font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #17243b" x="813.277107" y="174.055838" transform="rotate(-0 813.277107 174.055838)">1.330</text>
+   </g>
+   <g id="text_17">
+    <text style="font-weight: 700; font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #17243b" x="669.616911" y="201.87402" transform="rotate(-0 669.616911 201.87402)">0.926</text>
+   </g>
+   <g id="text_18">
+    <text style="font-weight: 700; font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #17243b" x="628.788155" y="229.692202" transform="rotate(-0 628.788155 229.692202)">0.811</text>
+   </g>
+   <g id="text_19">
+    <text style="font-weight: 700; font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #17243b" x="625.783409" y="257.510384" transform="rotate(-0 625.783409 257.510384)">0.802</text>
+   </g>
+   <g id="text_20">
+    <text style="font-weight: 700; font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #17243b" x="613.442051" y="285.328565" transform="rotate(-0 613.442051 285.328565)">0.767</text>
+   </g>
+   <g id="text_21">
+    <text style="font-weight: 700; font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #17243b" x="577.400816" y="313.146747" transform="rotate(-0 577.400816 313.146747)">0.666</text>
+   </g>
+   <g id="text_22">
+    <text style="font-weight: 700; font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #17243b" x="545.883423" y="340.964929" transform="rotate(-0 545.883423 340.964929)">0.577</text>
+   </g>
+   <g id="text_23">
+    <text style="font-weight: 700; font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #17243b" x="513.146148" y="368.783111" transform="rotate(-0 513.146148 368.783111)">0.485</text>
+   </g>
+   <g id="text_24">
+    <text style="font-weight: 700; font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #17243b" x="480.960112" y="396.601293" transform="rotate(-0 480.960112 396.601293)">0.395</text>
+   </g>
+   <g id="text_25">
+    <text style="font-weight: 700; font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #17243b" x="452.128894" y="424.419474" transform="rotate(-0 452.128894 424.419474)">0.314</text>
+   </g>
+  </g>
+  <g id="line2d_19">
+   <path d="M 41.472 57.6
+L 880.128 57.6
+" style="fill: none; stroke: #e2e8f0; stroke-linecap: square"/>
+  </g>
+  <g id="text_26">
+   <text style="font-weight: 700; font-size: 20.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #17243b" x="41.472" y="41.496797" transform="rotate(-0 41.472 41.496797)">XGBoost feature contributions</text>
+  </g>
+  <g id="text_27">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #52627a" x="41.472" y="89.046406" transform="rotate(-0 41.472 89.046406)">Binary full-data fit  |  Top 10 saved mean absolute SHAP contributions</text>
+  </g>
+  <g id="text_28">
+   <text style="font-size: 9.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #52627a" x="41.472" y="516.978516" transform="rotate(-0 41.472 516.978516)">NN means normal-to-normal heartbeat interval; SCR is a skin conductance response.</text>
+  </g>
+  <g id="text_29">
+   <text style="font-size: 9.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #52627a" x="41.472" y="540.018516" transform="rotate(-0 41.472 540.018516)">These magnitudes describe the fitted model, not held-out accuracy, signed effects or causality.</text>
+  </g>
+  <g id="text_30">
+   <text style="font-size: 8.3px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #52627a" x="41.472" y="558.454055" transform="rotate(-0 41.472 558.454055)">Source: shap_top_features.csv; metrics.json  |  Benchmark: 4 Oct 2026; source 4f5c02f.</text>
+  </g>
+  <g id="legend_1">
+   <g id="line2d_20">
+    <defs>
+     <path id="mfe97088a0b" d="M -3 3
+L 3 3
+L 3 -3
+L -3 -3
+z
+" style="stroke: #b45309; stroke-linejoin: miter"/>
+    </defs>
+    <g>
+     <use xlink:href="#mfe97088a0b" x="671.893875" y="103.948594" style="fill: #b45309; stroke: #b45309; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="text_31">
+    <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #17243b" x="683.593875" y="107.098594" transform="rotate(-0 683.593875 107.098594)">Motion</text>
+   </g>
+   <g id="line2d_21">
+    <defs>
+     <path id="m8602aeb995" d="M -3 3
+L 3 3
+L 3 -3
+L -3 -3
+z
+" style="stroke: #2563eb; stroke-linejoin: miter"/>
+    </defs>
+    <g>
+     <use xlink:href="#m8602aeb995" x="730.305281" y="103.948594" style="fill: #2563eb; stroke: #2563eb; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="text_32">
+    <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #17243b" x="742.005281" y="107.098594" transform="rotate(-0 742.005281 107.098594)">HRV</text>
+   </g>
+   <g id="line2d_22">
+    <defs>
+     <path id="m799087e698" d="M -3 3
+L 3 3
+L 3 -3
+L -3 -3
+z
+" style="stroke: #0f766e; stroke-linejoin: miter"/>
+    </defs>
+    <g>
+     <use xlink:href="#m799087e698" x="776.891531" y="103.948594" style="fill: #0f766e; stroke: #0f766e; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="text_33">
+    <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #17243b" x="788.591531" y="107.098594" transform="rotate(-0 788.591531 107.098594)">EDA</text>
+   </g>
+   <g id="line2d_23">
+    <defs>
+     <path id="m831eb4b15e" d="M -3 3
+L 3 3
+L 3 -3
+L -3 -3
+z
+" style="stroke: #7c3aed; stroke-linejoin: miter"/>
+    </defs>
+    <g>
+     <use xlink:href="#m831eb4b15e" x="823.407469" y="103.948594" style="fill: #7c3aed; stroke: #7c3aed; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="text_34">
+    <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #17243b" x="835.107469" y="107.098594" transform="rotate(-0 835.107469 107.098594)">Respiration</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p60f8a73d67">
+   <rect x="331.776" y="149.76" width="552.96" height="293.76"/>
+  </clipPath>
+ </defs>
+</svg>

@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="921.6pt" height="453.6pt" viewBox="0 0 921.6 453.6" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <title>Matched windows, different validation</title>
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title>Matched windows, different validation</dc:title>
+    <dc:description>{"benchmark_source": "4f5c02f05f6492bd5da4483b7a5328946969914c", "plotted_data": {"binary": {"best_model": "Random Forest", "loso_matched_accuracy": 0.9134396355353075, "optimism_gap_pts": 5.0, "within_subject_accuracy": 0.9635535307517085}, "multiclass": {"best_model": "LightGBM", "loso_matched_accuracy": 0.6718146718146718, "optimism_gap_pts": 26.8, "within_subject_accuracy": 0.9401544401544402}}, "scope": ["Subject-mixed folds share people across training and testing; they do not test new-person performance.", "These pooled matched-window scores differ from the subject-mean accuracies in the main model table."], "source_files": {"outputs/results/metrics.json": "3864d8c60477aec1a67bb63e1a9c134859c53634162476fb2d8c47bfc0b23961"}}</dc:description>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.2, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 453.6
+L 921.6 453.6
+L 921.6 0
+L 0 0
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 138.24 312.984
+L 438.125714 312.984
+L 438.125714 122.472
+L 138.24 122.472
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1">
+      <path d="M 138.24 312.984
+L 138.24 122.472
+" clip-path="url(#p2e847a6ecf)" style="fill: none; stroke: #e2e8f0; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_2">
+      <defs>
+       <path id="m72c4edd94b" d="M 0 0
+L 0 3.5
+" style="stroke: #52627a; stroke-width: 0.8"/>
+      </defs>
+      <g>
+       <use xlink:href="#m72c4edd94b" x="138.24" y="312.984" style="fill: #52627a; stroke: #52627a; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_1">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #52627a" x="138.24" y="328.341422" transform="rotate(-0 138.24 328.341422)">0</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_3">
+      <path d="M 213.211429 312.984
+L 213.211429 122.472
+" clip-path="url(#p2e847a6ecf)" style="fill: none; stroke: #e2e8f0; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_4">
+      <g>
+       <use xlink:href="#m72c4edd94b" x="213.211429" y="312.984" style="fill: #52627a; stroke: #52627a; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_2">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #52627a" x="213.211429" y="328.341422" transform="rotate(-0 213.211429 328.341422)">25</text>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_5">
+      <path d="M 288.182857 312.984
+L 288.182857 122.472
+" clip-path="url(#p2e847a6ecf)" style="fill: none; stroke: #e2e8f0; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_6">
+      <g>
+       <use xlink:href="#m72c4edd94b" x="288.182857" y="312.984" style="fill: #52627a; stroke: #52627a; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_3">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #52627a" x="288.182857" y="328.341422" transform="rotate(-0 288.182857 328.341422)">50</text>
+     </g>
+    </g>
+    <g id="xtick_4">
+     <g id="line2d_7">
+      <path d="M 363.154286 312.984
+L 363.154286 122.472
+" clip-path="url(#p2e847a6ecf)" style="fill: none; stroke: #e2e8f0; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_8">
+      <g>
+       <use xlink:href="#m72c4edd94b" x="363.154286" y="312.984" style="fill: #52627a; stroke: #52627a; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_4">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #52627a" x="363.154286" y="328.341422" transform="rotate(-0 363.154286 328.341422)">75</text>
+     </g>
+    </g>
+    <g id="xtick_5">
+     <g id="line2d_9">
+      <path d="M 438.125714 312.984
+L 438.125714 122.472
+" clip-path="url(#p2e847a6ecf)" style="fill: none; stroke: #e2e8f0; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_10">
+      <g>
+       <use xlink:href="#m72c4edd94b" x="438.125714" y="312.984" style="fill: #52627a; stroke: #52627a; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_5">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #52627a" x="438.125714" y="328.341422" transform="rotate(-0 438.125714 328.341422)">100</text>
+     </g>
+    </g>
+    <g id="text_6">
+     <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #52627a" x="288.182857" y="343.342281" transform="rotate(-0 288.182857 343.342281)">Pooled accuracy (%)</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_11"/>
+     <g id="text_7">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #52627a" transform="translate(99.201406 173.943104)">LOSO</text>
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #52627a" transform="translate(43.491563 187.146112)">Person held out</text>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_12"/>
+     <g id="text_8">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #52627a" transform="translate(50.454219 250.148334)">Subject-mixed</text>
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #52627a" transform="translate(97.630469 263.351342)">5-fold</text>
+     </g>
+    </g>
+   </g>
+   <g id="patch_3">
+    <path d="M 138.24 157.526208
+L 412.167498 157.526208
+L 412.167498 194.104512
+L 138.24 194.104512
+z
+" clip-path="url(#p2e847a6ecf)" style="fill: #2563eb"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 138.24 233.731008
+L 427.195939 233.731008
+L 427.195939 270.309312
+L 138.24 270.309312
+z
+" clip-path="url(#p2e847a6ecf)" style="fill: #b45309"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 138.24 312.984
+L 438.125714 312.984
+" style="fill: none; stroke: #e2e8f0; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="text_9">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #ffffff" x="406.169783" y="178.932547" transform="rotate(-0 406.169783 178.932547)">91.3%</text>
+   </g>
+   <g id="text_10">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #ffffff" x="421.198225" y="255.137348" transform="rotate(-0 421.198225 255.137348)">96.4%</text>
+   </g>
+   <g id="text_11">
+    <text style="font-weight: 700; font-size: 10.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #b45309" x="138.24" y="360.612" transform="rotate(-0 138.24 360.612)">Subject-mixed difference: +5.0 percentage points</text>
+   </g>
+   <g id="text_12">
+    <text style="font-weight: 700; font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #17243b" x="138.24" y="108.472" transform="rotate(-0 138.24 108.472)">Binary | Random Forest</text>
+   </g>
+  </g>
+  <g id="axes_2">
+   <g id="patch_6">
+    <path d="M 594.066286 312.984
+L 893.952 312.984
+L 893.952 122.472
+L 594.066286 122.472
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="matplotlib.axis_3">
+    <g id="xtick_6">
+     <g id="line2d_13">
+      <path d="M 594.066286 312.984
+L 594.066286 122.472
+" clip-path="url(#pa820290cab)" style="fill: none; stroke: #e2e8f0; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_14">
+      <g>
+       <use xlink:href="#m72c4edd94b" x="594.066286" y="312.984" style="fill: #52627a; stroke: #52627a; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_13">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #52627a" x="594.066286" y="328.341422" transform="rotate(-0 594.066286 328.341422)">0</text>
+     </g>
+    </g>
+    <g id="xtick_7">
+     <g id="line2d_15">
+      <path d="M 669.037714 312.984
+L 669.037714 122.472
+" clip-path="url(#pa820290cab)" style="fill: none; stroke: #e2e8f0; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_16">
+      <g>
+       <use xlink:href="#m72c4edd94b" x="669.037714" y="312.984" style="fill: #52627a; stroke: #52627a; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_14">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #52627a" x="669.037714" y="328.341422" transform="rotate(-0 669.037714 328.341422)">25</text>
+     </g>
+    </g>
+    <g id="xtick_8">
+     <g id="line2d_17">
+      <path d="M 744.009143 312.984
+L 744.009143 122.472
+" clip-path="url(#pa820290cab)" style="fill: none; stroke: #e2e8f0; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_18">
+      <g>
+       <use xlink:href="#m72c4edd94b" x="744.009143" y="312.984" style="fill: #52627a; stroke: #52627a; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_15">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #52627a" x="744.009143" y="328.341422" transform="rotate(-0 744.009143 328.341422)">50</text>
+     </g>
+    </g>
+    <g id="xtick_9">
+     <g id="line2d_19">
+      <path d="M 818.980571 312.984
+L 818.980571 122.472
+" clip-path="url(#pa820290cab)" style="fill: none; stroke: #e2e8f0; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_20">
+      <g>
+       <use xlink:href="#m72c4edd94b" x="818.980571" y="312.984" style="fill: #52627a; stroke: #52627a; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_16">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #52627a" x="818.980571" y="328.341422" transform="rotate(-0 818.980571 328.341422)">75</text>
+     </g>
+    </g>
+    <g id="xtick_10">
+     <g id="line2d_21">
+      <path d="M 893.952 312.984
+L 893.952 122.472
+" clip-path="url(#pa820290cab)" style="fill: none; stroke: #e2e8f0; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_22">
+      <g>
+       <use xlink:href="#m72c4edd94b" x="893.952" y="312.984" style="fill: #52627a; stroke: #52627a; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_17">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #52627a" x="893.952" y="328.341422" transform="rotate(-0 893.952 328.341422)">100</text>
+     </g>
+    </g>
+    <g id="text_18">
+     <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #52627a" x="744.009143" y="343.342281" transform="rotate(-0 744.009143 343.342281)">Pooled accuracy (%)</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_4">
+    <g id="ytick_3">
+     <g id="line2d_23"/>
+     <g id="text_19">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #52627a" transform="translate(555.027692 173.943104)">LOSO</text>
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #52627a" transform="translate(499.317848 187.146112)">Person held out</text>
+     </g>
+    </g>
+    <g id="ytick_4">
+     <g id="line2d_24"/>
+     <g id="text_20">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #52627a" transform="translate(506.280504 250.148334)">Subject-mixed</text>
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #52627a" transform="translate(553.456754 263.351342)">5-fold</text>
+     </g>
+    </g>
+   </g>
+   <g id="patch_7">
+    <path d="M 594.066286 157.526208
+L 795.533908 157.526208
+L 795.533908 194.104512
+L 594.066286 194.104512
+z
+" clip-path="url(#pa820290cab)" style="fill: #2563eb"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 594.066286 233.731008
+L 876.005172 233.731008
+L 876.005172 270.309312
+L 594.066286 270.309312
+z
+" clip-path="url(#pa820290cab)" style="fill: #b45309"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 594.066286 312.984
+L 893.952 312.984
+" style="fill: none; stroke: #e2e8f0; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="text_21">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #ffffff" x="789.536194" y="178.932547" transform="rotate(-0 789.536194 178.932547)">67.2%</text>
+   </g>
+   <g id="text_22">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #ffffff" x="870.007457" y="255.137348" transform="rotate(-0 870.007457 255.137348)">94.0%</text>
+   </g>
+   <g id="text_23">
+    <text style="font-weight: 700; font-size: 10.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #b45309" x="594.066286" y="360.612" transform="rotate(-0 594.066286 360.612)">Subject-mixed difference: +26.8 percentage points</text>
+   </g>
+   <g id="text_24">
+    <text style="font-weight: 700; font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #17243b" x="594.066286" y="108.472" transform="rotate(-0 594.066286 108.472)">Three-class | LightGBM</text>
+   </g>
+  </g>
+  <g id="line2d_25">
+   <path d="M 41.472 45.36
+L 880.128 45.36
+" style="fill: none; stroke: #e2e8f0; stroke-linecap: square"/>
+  </g>
+  <g id="text_25">
+   <text style="font-weight: 700; font-size: 20.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #17243b" x="41.472" y="35.988797" transform="rotate(-0 41.472 35.988797)">Matched windows, different validation</text>
+  </g>
+  <g id="text_26">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #52627a" x="41.472" y="71.910406" transform="rotate(-0 41.472 71.910406)">Pooled accuracy  |  The same non-overlapping window subset is used within each task</text>
+  </g>
+  <g id="text_27">
+   <text style="font-size: 9.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #52627a" x="41.472" y="408.654516" transform="rotate(-0 41.472 408.654516)">Subject-mixed folds share people across training and testing; they do not test new-person performance.</text>
+  </g>
+  <g id="text_28">
+   <text style="font-size: 9.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #52627a" x="41.472" y="426.798516" transform="rotate(-0 41.472 426.798516)">These pooled matched-window scores differ from the subject-mean accuracies in the main model table.</text>
+  </g>
+  <g id="text_29">
+   <text style="font-size: 8.3px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #52627a" x="41.472" y="439.358855" transform="rotate(-0 41.472 439.358855)">Source: metrics.json  |  Benchmark: 4 Oct 2026; source 4f5c02f.</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p2e847a6ecf">
+   <rect x="138.24" y="122.472" width="299.885714" height="190.512"/>
+  </clipPath>
+  <clipPath id="pa820290cab">
+   <rect x="594.066286" y="122.472" width="299.885714" height="190.512"/>
+  </clipPath>
+ </defs>
+</svg>
